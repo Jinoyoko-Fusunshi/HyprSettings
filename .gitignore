@@ -1,0 +1,8 @@
+# ouput directories
+/target
+
+# IDE files
+.idea/
+
+# cargo files
+*.lock
