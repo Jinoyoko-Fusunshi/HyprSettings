@@ -1,9 +1,17 @@
+mod controls;
+mod settings_container;
+mod config;
+
+use std::cell::RefCell;
+use std::rc::Rc;
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, Button, Stack, Box, Orientation};
 use gtk::gdk::Display;
 use gtk::gio::File;
 
-type ButtonCallback = fn(&Button);
+use crate::controls::button::{create_button, ButtonCallback};
+use crate::controls::panel::{general_panel, Panel};
+use crate::settings_container::SettingsContainer;
 
 fn main() {
     // Panel names
@@ -21,7 +29,7 @@ fn main() {
 
     // GTK application start
     application.connect_activate(|app| {
-        // Load css style files
+        // Load CSS style files
         load_css_styles();
 
         // Create the main window application
@@ -32,6 +40,10 @@ fn main() {
             .default_height(600)
             .build();
 
+        // The settings container being updated by the individual panels
+        let settings_container = Rc::new(RefCell::new(SettingsContainer::new()));
+        
+        // Basic window layout of a navigation and content panel
         let category_panels = Stack::new();
         let window_container = Box::new(Orientation::Horizontal, 10);
         window_container.set_margin_start(10);
@@ -41,9 +53,11 @@ fn main() {
 
         let category_buttons = Box::new(Orientation::Vertical, 10);
         category_buttons.set_width_request(320);
+        category_buttons.add_css_class("navigation-panel");
 
         let category_content = Box::new(Orientation::Vertical, 10);
         category_content.set_hexpand(true);
+        category_content.add_css_class("content-panel");
 
         // The navigation buttons to toggle the individual category panel
         let general_button = create_category_button("general", GENERAL_PANEL_NAME, &category_panels);
@@ -59,13 +73,13 @@ fn main() {
         category_buttons.append(&info_button);
 
         // The category panels to be individually displayed
-        let general_panel = create_panel("General Panel");
+        let general_panel = general_panel::GeneralPanel::new(settings_container);
         let appearance_panel = create_panel("Appearance Panel");
         let programs_panel = create_panel("Programs Panel");
         let keybinds_panel = create_panel("Keybinds Panel");
         let info_panel = create_panel("Info Panel");
 
-        category_panels.add_named(&general_panel, Some(GENERAL_PANEL_NAME));
+        category_panels.add_named(general_panel.get_widget(), Some(GENERAL_PANEL_NAME));
         category_panels.add_named(&appearance_panel, Some(APPEARANCE_PANEL_NAME));
         category_panels.add_named(&programs_panel, Some(PROGRAMS_PANEL_NAME));
         category_panels.add_named(&keybinds_panel, Some(KEYBINDS_PANEL_NAME));
@@ -108,14 +122,4 @@ fn create_category_button(title: &str, click_element_name: &'static str, categor
     let category_button = create_button(title, Some(navigation_button_callback));
     category_button.set_height_request(48);
     category_button
-}
-
-fn create_button<F>(title: &str, click_action: Option<F>) -> Button
-where F: Fn(&Button) + 'static
-{
-    let navigation_button = Button::with_label(title);
-    if let Some(callback) = click_action{
-        navigation_button.connect_clicked(callback);
-    }
-    navigation_button
 }
