@@ -1,3 +1,5 @@
+use crate::monitor::monitor_setting::MonitorSetting;
+
 pub struct SettingsContainer {
     hyprland_config_path: String,
     virtual_terminal_program_path: String,
@@ -5,6 +7,7 @@ pub struct SettingsContainer {
     quick_search_program_path: String,
     lock_screen_program_path: String,
     notification_handler_program_path: String,
+    monitor_settings: Vec<MonitorSetting>,
 }
 
 impl SettingsContainer {
@@ -16,6 +19,7 @@ impl SettingsContainer {
             quick_search_program_path: String::new(),
             lock_screen_program_path: String::new(),
             notification_handler_program_path: String::new(),
+            monitor_settings: Vec::new(),
         }
     }
 
@@ -41,7 +45,26 @@ impl SettingsContainer {
     pub fn set_notification_handler_program_path(&mut self, notification_handler_program_path: String) {
         self.notification_handler_program_path = notification_handler_program_path;
     }
-    
+
+    pub fn set_monitor_settings(&mut self, monitor_information: Vec<MonitorSetting>) {
+        self.monitor_settings = monitor_information;
+    }
+
+    pub fn set_monitor_status_by_index(&mut self, status: bool, index: usize) {
+        self.monitor_settings[index].set_enabled(status);
+    }
+
+    pub fn set_monitor_width_resolution_by_index(&mut self, width: u32, index: usize) {
+        self.monitor_settings[index].set_width_resolution(width);
+    }
+
+    pub fn set_monitor_height_resolution_by_index(&mut self, height: u32, index: usize) {
+        self.monitor_settings[index].set_height_resolution(height);
+    }
+
+    pub fn set_monitor_refresh_rate_by_index(&mut self, rate: u32, index: usize) {
+        self.monitor_settings[index].set_refresh_rate(rate);
+    }
 
     pub fn get_hyprland_config_path(&self) -> &String {
         &self.hyprland_config_path
@@ -65,5 +88,9 @@ impl SettingsContainer {
     
     pub fn get_notification_handler_program_path(&self) -> &String {
         &self.notification_handler_program_path
+    }
+
+    pub fn get_monitor_settings(&self) -> &Vec<MonitorSetting> {
+        &self.monitor_settings
     }
 }

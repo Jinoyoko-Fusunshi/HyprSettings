@@ -5,3 +5,7 @@ box.navigation-panel {
 box.content-panel {
     background: #1a1a1a;
 }
+
+.entry {
+    border: solid 2px red;
+}

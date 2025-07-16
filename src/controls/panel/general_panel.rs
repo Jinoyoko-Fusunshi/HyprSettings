@@ -16,7 +16,7 @@ impl Panel for GeneralPanel {
 }
 
 impl GeneralPanel{
-    pub fn new(settings: Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
         let widget = gtk::Box::new(Orientation::Vertical, 0);
         widget.set_margin_top(10);
         widget.set_margin_bottom(10);
