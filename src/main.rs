@@ -2,6 +2,7 @@ mod controls;
 mod settings_container;
 mod config;
 mod monitor;
+mod css_styles;
 
 use std::cell::RefCell;
 use std::process::Command;
@@ -11,10 +12,11 @@ use gtk::{Application, ApplicationWindow, Box, Button, Orientation, Stack};
 use gtk::gdk::Display;
 use gtk::gio::File;
 use controls::button::{create_button, ButtonCallback};
-use controls::panel::{display_panel, general_panel, Panel};
+use controls::panel::{display_panel, general_panel, info_panel, Panel};
 use settings_container::SettingsContainer;
 use monitor::monitor_info_parser::{MonitorInfoParser};
 use monitor::monitor_setting::MonitorSetting;
+use crate::css_styles::CSSStyles;
 
 fn main() {
     // Panel names
@@ -79,11 +81,11 @@ fn main() {
 
         let category_buttons = Box::new(Orientation::Vertical, 10);
         category_buttons.set_width_request(320);
-        category_buttons.add_css_class("navigation-panel");
+        category_buttons.add_css_class(CSSStyles::NAVIGATION_PANEL);
 
         let category_content = Box::new(Orientation::Vertical, 10);
         category_content.set_hexpand(true);
-        category_content.add_css_class("content-panel");
+        category_content.add_css_class(CSSStyles::CONTENT_PANEL);
 
         // The navigation buttons to toggle the individual category panel
         let general_button = create_category_button("general", GENERAL_PANEL_NAME, &category_panels);
@@ -106,14 +108,14 @@ fn main() {
         let appearance_panel = create_panel("Appearance Panel");
         let programs_panel = create_panel("Programs Panel");
         let keybinds_panel = create_panel("Keybinds Panel");
-        let info_panel = create_panel("Info Panel");
+        let info_panel = info_panel::InfoPanel::new();
 
         category_panels.add_named(general_panel.get_widget(), Some(GENERAL_PANEL_NAME));
         category_panels.add_named(display_panel.get_widget(), Some(DISPLAY_PANEL_NAME));
         category_panels.add_named(&appearance_panel, Some(APPEARANCE_PANEL_NAME));
         category_panels.add_named(&programs_panel, Some(PROGRAMS_PANEL_NAME));
         category_panels.add_named(&keybinds_panel, Some(KEYBINDS_PANEL_NAME));
-        category_panels.add_named(&info_panel, Some(INFO_PANEL_NAME));
+        category_panels.add_named(info_panel.get_widget(), Some(INFO_PANEL_NAME));
 
         // Adding GTK UI controls to the window container
         category_content.append(&category_panels);

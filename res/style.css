@@ -6,6 +6,19 @@ box.content-panel {
     background: #1a1a1a;
 }
 
+label.application-title {
+    font-size: 20px;
+}
+
+button.url-link {
+    padding: 0;
+    margin: 0;
+}
+
+button.url-link > label {
+    text-decoration: none;
+}
+
 .entry {
-    border: solid 2px red;
+    border: 2px solid red;
 }
