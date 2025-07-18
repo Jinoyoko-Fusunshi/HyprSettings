@@ -22,3 +22,7 @@ button.url-link > label {
 .entry {
     border: 2px solid red;
 }
+
+.save-button {
+    background: #2196ff;
+}

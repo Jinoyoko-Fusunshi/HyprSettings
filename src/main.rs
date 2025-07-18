@@ -16,6 +16,7 @@ use controls::panel::{display_panel, general_panel, info_panel, Panel};
 use settings_container::SettingsContainer;
 use monitor::monitor_info_parser::{MonitorInfoParser};
 use monitor::monitor_setting::MonitorSetting;
+use crate::controls::panel::appearance_panel;
 use crate::css_styles::CSSStyles;
 
 fn main() {
@@ -56,9 +57,9 @@ fn main() {
         let output_string = String::from_utf8(output.stdout)
             .expect("Failed to parse wlr-randr output");
 
-        let mut wlrrandr_parser = MonitorInfoParser::new();
-        wlrrandr_parser.parse_output(&output_string);
-        let monitor_information = wlrrandr_parser.get_result();
+        let mut monitor_info_parser = MonitorInfoParser::new();
+        monitor_info_parser.parse_output(&output_string);
+        let monitor_information = monitor_info_parser.get_result();
 
         let max_monitor_video_modes = monitor_information
             .iter()
@@ -79,13 +80,13 @@ fn main() {
         window_container.set_margin_top(10);
         window_container.set_margin_bottom(10);
 
-        let category_buttons = Box::new(Orientation::Vertical, 10);
-        category_buttons.set_width_request(320);
-        category_buttons.add_css_class(CSSStyles::NAVIGATION_PANEL);
+        let category_buttons_box = Box::new(Orientation::Vertical, 10);
+        category_buttons_box.set_width_request(320);
+        category_buttons_box.add_css_class(CSSStyles::NAVIGATION_PANEL);
 
-        let category_content = Box::new(Orientation::Vertical, 10);
-        category_content.set_hexpand(true);
-        category_content.add_css_class(CSSStyles::CONTENT_PANEL);
+        let category_content_box = Box::new(Orientation::Vertical, 10);
+        category_content_box.set_hexpand(true);
+        category_content_box.add_css_class(CSSStyles::CONTENT_PANEL);
 
         // The navigation buttons to toggle the individual category panel
         let general_button = create_category_button("general", GENERAL_PANEL_NAME, &category_panels);
@@ -95,32 +96,41 @@ fn main() {
         let keybinds_button = create_category_button("keybinds", KEYBINDS_PANEL_NAME, &category_panels);
         let info_button = create_category_button("info", INFO_PANEL_NAME, &category_panels);
 
-        category_buttons.append(&general_button);
-        category_buttons.append(&display_button);
-        category_buttons.append(&appearance_button);
-        category_buttons.append(&programs_button);
-        category_buttons.append(&keybinds_button);
-        category_buttons.append(&info_button);
+        let settings_clone = settings_container.clone();
+        let save_button_click_callback = move |_: &Button| {
+            println!("{:?}", settings_clone.borrow())
+        };
+        let save_button = create_button("Save", Some(save_button_click_callback));
+        save_button.set_margin_top(10);
+        save_button.add_css_class(CSSStyles::SAVE_BUTTON);
+
+        category_buttons_box.append(&general_button);
+        category_buttons_box.append(&display_button);
+        category_buttons_box.append(&appearance_button);
+        category_buttons_box.append(&programs_button);
+        category_buttons_box.append(&keybinds_button);
+        category_buttons_box.append(&info_button);
+        category_buttons_box.append(&save_button);
 
         // The category panels to be individually displayed
         let general_panel = general_panel::GeneralPanel::new(&settings_container);
         let display_panel = display_panel::DisplayPanel::new(&settings_container);
-        let appearance_panel = create_panel("Appearance Panel");
+        let appearance_panel = appearance_panel::AppearancePanel::new(&settings_container);
         let programs_panel = create_panel("Programs Panel");
         let keybinds_panel = create_panel("Keybinds Panel");
         let info_panel = info_panel::InfoPanel::new();
 
         category_panels.add_named(general_panel.get_widget(), Some(GENERAL_PANEL_NAME));
         category_panels.add_named(display_panel.get_widget(), Some(DISPLAY_PANEL_NAME));
-        category_panels.add_named(&appearance_panel, Some(APPEARANCE_PANEL_NAME));
+        category_panels.add_named(appearance_panel.get_widget(), Some(APPEARANCE_PANEL_NAME));
         category_panels.add_named(&programs_panel, Some(PROGRAMS_PANEL_NAME));
         category_panels.add_named(&keybinds_panel, Some(KEYBINDS_PANEL_NAME));
         category_panels.add_named(info_panel.get_widget(), Some(INFO_PANEL_NAME));
 
         // Adding GTK UI controls to the window container
-        category_content.append(&category_panels);
-        window_container.append(&category_buttons);
-        window_container.append(&category_content);
+        category_content_box.append(&category_panels);
+        window_container.append(&category_buttons_box);
+        window_container.append(&category_content_box);
         window.set_child(Some(&window_container));
         window.present();
     });

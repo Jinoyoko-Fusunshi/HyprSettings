@@ -1,7 +1,8 @@
 use std::cell::{RefCell};
 use std::rc::Rc;
-use gtk::{glib, Adjustment, Align, Label, Orientation, Separator, SpinButton, Switch};
+use gtk::{glib, Align, Label, Orientation, Separator, SpinButton, Switch};
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::controls::named_spin_button_section::NamedSpinButtonSection;
 use crate::controls::panel::Panel;
 use crate::monitor::monitor_setting::MonitorSetting;
 use crate::settings_container::SettingsContainer;
@@ -102,33 +103,26 @@ impl DisplayPanel {
         monitor_display_info_box.append(&monitor_display_label);
 
         // The toggle button to set the monitor width size
-        let width_resolution_label = Label::new(Some("Width:"));
-        width_resolution_label.set_margin_start(60);
-        let display_width_spin_button = DisplayPanel::create_spin_button(
-            min_video_mode.get_width_resolution(), max_video_mode.get_width_resolution()
+        let width_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
+            "Width:", min_video_mode.get_width_resolution(), max_video_mode.get_width_resolution(),
+            Some(width_change_callback)
         );
-        display_width_spin_button.connect_value_changed(width_change_callback);
 
         // The toggle button to set the monitor height size
-        let height_resolution_label = Label::new(Some("Height:"));
-        let display_height_spin_button = DisplayPanel::create_spin_button(
-            min_video_mode.get_height_resolution(), max_video_mode.get_height_resolution()
+        let height_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
+            "Height:", min_video_mode.get_height_resolution(), max_video_mode.get_height_resolution(),
+            Some(height_change_callback)
         );
-        display_height_spin_button.connect_value_changed(height_change_callback);
 
         // The toggle button to set the monitor refresh rate
-        let refresh_rate_label = Label::new(Some("Refresh Rate:"));
-        let display_refresh_rate_spin_button = DisplayPanel::create_spin_button(
-            min_video_mode.get_refresh_rate(), max_video_mode.get_refresh_rate()
+        let refresh_rate_spin_button_section = DisplayPanel::create_display_spin_button(
+            "Refresh Rate:", min_video_mode.get_refresh_rate(), max_video_mode.get_refresh_rate(),
+            Some(refresh_rate_change_callback)
         );
-        display_refresh_rate_spin_button.connect_value_changed(refresh_rate_change_callback);
 
-        monitor_video_setting_box.append(&width_resolution_label);
-        monitor_video_setting_box.append(&display_width_spin_button);
-        monitor_video_setting_box.append(&height_resolution_label);
-        monitor_video_setting_box.append(&display_height_spin_button);
-        monitor_video_setting_box.append(&refresh_rate_label);
-        monitor_video_setting_box.append(&display_refresh_rate_spin_button);
+        monitor_video_setting_box.append(width_resolution_spin_button_section.get_widget());
+        monitor_video_setting_box.append(height_resolution_spin_button_section.get_widget());
+        monitor_video_setting_box.append(refresh_rate_spin_button_section.get_widget());
 
         entry_box.append(&monitor_display_info_box);
         entry_box.append(&monitor_video_setting_box);
@@ -144,25 +138,19 @@ impl DisplayPanel {
         label
     }
 
-    fn create_spin_button(min_value: u32, max_value: u32) -> SpinButton {
+    fn create_display_spin_button(
+        label_text: &str, min_value: u32, max_value: u32,
+        spin_button_change_callback: Option<impl Fn(&SpinButton) + 'static>
+    ) -> NamedSpinButtonSection {
         const NORMAL_INCREMENT_VALUE: f64 = 160.0;
         const PAGE_INCREMENT_VALUE: f64 = 320.0;
         const CLIMB_RATE: f64 = 1.0;
         const DISPLAYED_FLOAT_DIGITS: u32 = 0;
 
-        let adjustment = Adjustment::new(
-            max_value as f64,
-            min_value as f64,
-            max_value as f64,
-            NORMAL_INCREMENT_VALUE,
-            PAGE_INCREMENT_VALUE,
-            0.0
-        );
-        let display_width_spin_button = SpinButton::new(
-            Some(&adjustment), CLIMB_RATE, DISPLAYED_FLOAT_DIGITS
-        );
-        display_width_spin_button.set_numeric(true);
-        display_width_spin_button.set_wrap(true);
-        display_width_spin_button
+        NamedSpinButtonSection::new(
+            label_text, min_value as f64, max_value as f64, max_value as f64, NORMAL_INCREMENT_VALUE,
+            PAGE_INCREMENT_VALUE, 0.0, CLIMB_RATE, DISPLAYED_FLOAT_DIGITS,
+            false, spin_button_change_callback
+        )
     }
 }

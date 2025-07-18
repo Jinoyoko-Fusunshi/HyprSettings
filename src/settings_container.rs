@@ -1,5 +1,8 @@
+use gtk::gdk::RGBA;
+use crate::config::appearance_settings::AppearanceSettings;
 use crate::monitor::monitor_setting::MonitorSetting;
 
+#[derive(Debug)]
 pub struct SettingsContainer {
     hyprland_config_path: String,
     virtual_terminal_program_path: String,
@@ -8,10 +11,41 @@ pub struct SettingsContainer {
     lock_screen_program_path: String,
     notification_handler_program_path: String,
     monitor_settings: Vec<MonitorSetting>,
+    appearance_settings: AppearanceSettings,
 }
 
 impl SettingsContainer {
     pub fn new() -> Self {
+        let appearance_settings = AppearanceSettings::new(
+            String::new(),
+            false,
+            false,
+            0.0,
+            0.0,
+            0.0,
+            RGBA::new(0.0, 0.0, 0.0, 0.0),
+            RGBA::new(0.0, 0.0, 0.0, 0.0),
+            false,
+            false,
+            0.0,
+            0.0,
+            false,
+            0.0,
+            0.0,
+            false,
+            0.0,
+            0.0,
+            RGBA::new(0.0, 0.0, 0.0, 0.0),
+            false,
+            0.0,
+            0,
+            0.0,
+            String::new(),
+            String::new(),
+            false,
+            false,
+        );
+        
         Self {
             hyprland_config_path: String::new(),
             virtual_terminal_program_path: String::new(),
@@ -20,6 +54,7 @@ impl SettingsContainer {
             lock_screen_program_path: String::new(),
             notification_handler_program_path: String::new(),
             monitor_settings: Vec::new(),
+            appearance_settings,
         }
     }
 
@@ -86,11 +121,15 @@ impl SettingsContainer {
         &self.lock_screen_program_path
     }
     
-    pub fn get_notification_handler_program_path(&self) -> &String {
+    pub fn get_notification_handler_program_path(&mut self) -> &String {
         &self.notification_handler_program_path
     }
 
-    pub fn get_monitor_settings(&self) -> &Vec<MonitorSetting> {
+    pub fn get_monitor_settings(&mut self) -> &Vec<MonitorSetting> {
         &self.monitor_settings
+    }
+
+    pub fn get_appearance_settings(&mut self) -> &mut AppearanceSettings {
+        &mut self.appearance_settings
     }
 }
