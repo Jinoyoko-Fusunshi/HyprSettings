@@ -11,9 +11,19 @@ pub struct GeneralPanel {
 }
 
 impl Panel for GeneralPanel {
+    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
     }
+}
+
+impl Clone for GeneralPanel {
+    fn clone(&self) -> Self {
+        Self {
+            widget: self.widget.clone()
+        }
+    }   
 }
 
 impl GeneralPanel{
@@ -26,7 +36,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let config_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_hyprland_config_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("HyprLandConfig".to_string(), String::from(input.text()));
         };
         let config_section = NamedInputSection::new(
             "Hyprland config path:",
@@ -36,7 +47,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let terminal_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_virtual_terminal_program_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("VirtualTerminal".to_string(), String::from(input.text()));
         };
         let terminal_section = NamedInputSection::new(
             "Virtual terminal program path:",
@@ -46,7 +58,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let file_manager_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_file_manager_program_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("FileManager".to_string(), String::from(input.text()));
         };
         let file_manager_section = NamedInputSection::new(
             "File manager program path:",
@@ -56,7 +69,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let quick_search_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_quick_search_program_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("QuickSearch".to_string(), String::from(input.text()));
         };
         let quick_search_section = NamedInputSection::new(
             "Quick search program path:",
@@ -66,7 +80,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let lock_screen_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_lock_screen_program_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("LockScreen".to_string(), String::from(input.text()));
         };
         let lock_screen_section = NamedInputSection::new(
             "Lock screen program path:",
@@ -76,7 +91,8 @@ impl GeneralPanel{
 
         let settings_closure_clone = settings.clone();
         let notification_handler_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().set_notification_handler_program_path(String::from(input.text()));
+            settings_closure_clone.borrow_mut().program_settings
+                .insert("NotificationHandler".to_string(), String::from(input.text()));
         };
         let notification_handler_section = NamedInputSection::new(
             "Notification handler program path:",

@@ -1,6 +1,9 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use gtk::{Adjustment, Align, Label, Orientation, SpinButton};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::controls::panel::Panel;
+use crate::settings_container::SettingsContainer;
 
 pub struct NamedSpinButtonSection {
     spin_button_box: gtk::Box,
@@ -8,6 +11,10 @@ pub struct NamedSpinButtonSection {
 }
 
 impl Panel for NamedSpinButtonSection {
+    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+
+    }
+
     fn get_widget(&self) -> &gtk::Box {
         &self.spin_button_box
     }

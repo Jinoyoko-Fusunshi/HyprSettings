@@ -25,10 +25,10 @@ impl MonitorInfoParser {
         let mut multi_video_mode = false;
         let monitor_segments = self.get_monitor_segments(wlrrandr_output);
         for monitor_segment in monitor_segments {
-            let mut monitor_port_name = String::new();
-            let mut monitor_brand_name = String::new();
-            let mut monitor_model_name = String::new();
-            let mut monitor_serial_number = String::new();
+            let mut port_name = String::new();
+            let mut brand_name = String::new();
+            let mut model_name = String::new();
+            let mut serial_number = String::new();
             let mut monitor_video_modes: Vec<VideoMode> = vec!();
 
             let mut line_index = 0;
@@ -39,22 +39,22 @@ impl MonitorInfoParser {
                         .map(|x| x.to_string())
                         .collect::<Vec<String>>();
 
-                    monitor_port_name = split_monitor_display_name[0].clone();
+                    port_name = split_monitor_display_name[0].clone();
 
                     line_index += 1;
                     continue;
                 }
 
                 if line.contains("Make:") {
-                    monitor_brand_name = self.parse_field(String::from("Make: "), &line);
+                    brand_name = self.parse_field(String::from("Make: "), &line);
                 }
 
                 if line.contains("Model:") {
-                    monitor_model_name = self.parse_field(String::from("Model: "), &line);
+                    model_name = self.parse_field(String::from("Model: "), &line);
                 }
 
                 if line.contains("Serial:") {
-                    monitor_serial_number = self.parse_field(String::from("Serial: "), &line);
+                    serial_number = self.parse_field(String::from("Serial: "), &line);
                 }
 
                 if line.contains("Modes:") {
@@ -76,17 +76,21 @@ impl MonitorInfoParser {
             }
 
             monitor_video_modes.sort_by(|first_mode, second_mode| {
-                let first_screen_area = first_mode.get_width_resolution() * first_mode.get_height_resolution();
-                let second_screen_area = second_mode.get_width_resolution() * second_mode.get_height_resolution();
+                let first_screen_area = first_mode.width_resolution * first_mode.height_resolution;
+                let second_screen_area = second_mode.width_resolution * second_mode.height_resolution;
 
                 second_screen_area.cmp(&first_screen_area)
-                    .then(second_mode.get_refresh_rate().cmp(&first_mode.get_refresh_rate()))
+                    .then(second_mode.refresh_rate.cmp(&first_mode.refresh_rate))
             });
 
-            let monitor_information = MonitorInformation::new(
-                monitor_port_name, monitor_brand_name, monitor_model_name, monitor_serial_number,
-                monitor_video_modes[monitor_video_modes.len() -1].clone(), monitor_video_modes[0].clone(),
-            );
+            let monitor_information = MonitorInformation {
+                port_name,
+                brand_name,
+                model_name,
+                serial_number,
+                min_video_mode: monitor_video_modes[monitor_video_modes.len() -1].clone(),
+                max_video_mode: monitor_video_modes[0].clone(),
+            };
 
             self.monitor_infos.push(monitor_information);
         }
@@ -161,8 +165,10 @@ impl MonitorInfoParser {
         let parsed_max_refresh_rate_fixed = max_refresh_rate.parse::<f32>().unwrap_or_else(|_| 0.0);
         let fixed_max_refresh_rate = parsed_max_refresh_rate_fixed.round() as u32;
 
-        VideoMode::new(
-            parsed_max_width_resolution,parsed_max_height_resolution, fixed_max_refresh_rate,
-        )
+        VideoMode {
+            width_resolution: parsed_max_width_resolution, 
+            height_resolution: parsed_max_height_resolution, 
+            refresh_rate: fixed_max_refresh_rate,
+        }
     }
 }

@@ -12,8 +12,18 @@ pub struct DisplayPanel {
 }
 
 impl Panel for DisplayPanel {
+    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
+    }
+}
+
+impl Clone for DisplayPanel {
+    fn clone(&self) -> Self {
+        Self {
+            widget: self.widget.clone()
+        }
     }
 }
 
@@ -29,26 +39,29 @@ impl DisplayPanel {
         widget.append(&available_displays_label);
 
         let mut monitor_index: usize = 0;
-        for monitor_setting in settings.borrow_mut().get_monitor_settings() {
+        for monitor_setting in settings.borrow_mut().monitor_settings.iter() {
             let settings_clone = settings.clone();
             let status_action_callback = move |_: &Switch, state: bool| -> glib::Propagation {
-                settings_clone.borrow_mut().set_monitor_status_by_index(state, monitor_index);
+                settings_clone.borrow_mut().monitor_settings[monitor_index].enabled = state;
                 glib::Propagation::Proceed
             };
 
             let settings_clone = settings.clone();
             let width_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().set_monitor_width_resolution_by_index(spin_button.value() as u32, monitor_index);
+                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                    .video_mode.width_resolution = spin_button.value() as u32;
             };
 
             let settings_clone = settings.clone();
             let height_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().set_monitor_height_resolution_by_index(spin_button.value() as u32, monitor_index);
+                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                    .video_mode.height_resolution = spin_button.value() as u32;
             };
 
             let settings_clone = settings.clone();
             let refresh_rate_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().set_monitor_refresh_rate_by_index(spin_button.value() as u32, monitor_index);
+                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                    .video_mode.refresh_rate = spin_button.value() as u32;
             };
 
             let display_entry = DisplayPanel::create_display_entry(
@@ -69,15 +82,15 @@ impl DisplayPanel {
     }
 
     fn create_display_entry(
-        settings: &MonitorSetting,
+        monitor_setting: &MonitorSetting,
         status_action_callback: impl Fn(&Switch, bool) -> glib::Propagation + 'static,
         width_change_callback: impl Fn(&SpinButton) + 'static,
         height_change_callback: impl Fn(&SpinButton) + 'static,
         refresh_rate_change_callback: impl Fn(&SpinButton) + 'static,
     ) -> gtk::Box {
-        let monitor_information = settings.get_information();
-        let min_video_mode = monitor_information.get_min_video_mode();
-        let max_video_mode = monitor_information.get_max_video_mode();
+        let monitor_information = &monitor_setting.information;
+        let min_video_mode = &monitor_information.min_video_mode;
+        let max_video_mode = &monitor_information.max_video_mode;
 
         let entry_box = gtk::Box::new(Orientation::Vertical, 10);
         let monitor_display_info_box = gtk::Box::new(Orientation::Horizontal, 10);
@@ -91,11 +104,11 @@ impl DisplayPanel {
         monitor_toggle_switch.connect_state_set(status_action_callback);
 
         // The monitor display text information
-        let monitor_port_name = monitor_information.get_port_name().clone() + ": ";
+        let monitor_port_name = monitor_information.port_name.clone() + ": ";
         let monitor_port_label = DisplayPanel::create_label(&monitor_port_name, 80);
 
-        let monitor_display_name = monitor_information.get_model_name().clone() + " - " +
-            monitor_information.get_brand_name();
+        let monitor_display_name = monitor_information.model_name.clone() + " - " +
+            monitor_information.brand_name.as_str();
         let monitor_display_label = DisplayPanel::create_label(&monitor_display_name, 180);
 
         monitor_display_info_box.append(&monitor_toggle_switch);
@@ -104,19 +117,19 @@ impl DisplayPanel {
 
         // The toggle button to set the monitor width size
         let width_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
-            "Width:", min_video_mode.get_width_resolution(), max_video_mode.get_width_resolution(),
+            "Width:", min_video_mode.width_resolution, max_video_mode.width_resolution,
             Some(width_change_callback)
         );
 
         // The toggle button to set the monitor height size
         let height_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
-            "Height:", min_video_mode.get_height_resolution(), max_video_mode.get_height_resolution(),
+            "Height:", min_video_mode.height_resolution, max_video_mode.height_resolution,
             Some(height_change_callback)
         );
 
         // The toggle button to set the monitor refresh rate
         let refresh_rate_spin_button_section = DisplayPanel::create_display_spin_button(
-            "Refresh Rate:", min_video_mode.get_refresh_rate(), max_video_mode.get_refresh_rate(),
+            "Refresh Rate:", min_video_mode.refresh_rate, max_video_mode.refresh_rate,
             Some(refresh_rate_change_callback)
         );
 

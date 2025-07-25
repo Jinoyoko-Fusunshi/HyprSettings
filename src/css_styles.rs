@@ -6,4 +6,7 @@ impl CSSStyles {
     pub const APPLICATION_TITLE: &'static str = "application-title";
     pub const LINK_BUTTON_TEXT: &'static str = "url-link";
     pub const SAVE_BUTTON: &'static str = "save-button";
+    pub const CREATE_STARTUP_PROGRAM_BUTTON: &'static str = "create-startup-program";
+    pub const CANCEL_STARTUP_PROGRAM_BUTTON: &'static str = "cancel-startup-program";
+    pub const DISABLED_STARTUP_PROGRAM_BUTTON: &'static str = "disabled_startup_program";
 }

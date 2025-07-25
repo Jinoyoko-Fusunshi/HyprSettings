@@ -14,9 +14,19 @@ pub struct AppearancePanel {
 }
 
 impl Panel for AppearancePanel {
+    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
     }
+}
+
+impl Clone for AppearancePanel {
+    fn clone(&self) -> Self {
+        Self {
+            widget: self.widget.clone()
+        }
+    }   
 }
 
 impl AppearancePanel {
@@ -59,8 +69,8 @@ impl AppearancePanel {
         scrolled_window.set_child(Some(&appearance_box));
         appearance_scroll_box.append(&scrolled_window);
 
-        AppearancePanel {
-            widget: appearance_scroll_box,
+        Self {
+            widget: appearance_scroll_box
         }
     }
 
@@ -70,7 +80,7 @@ impl AppearancePanel {
         // Wallpaper image path option
         let settings_clone = settings.clone();
         let wallpaper_image_input_action = move |entry: &Entry| {
-            settings_clone.borrow_mut().get_appearance_settings().set_wallpaper_path(entry.text().to_string());
+            settings_clone.borrow_mut().appearance_settings.set_wallpaper_path(entry.text().to_string());
         };
         let wallpaper_image_input_section = NamedInputSection::new(
             "wallpaper path:",
@@ -83,7 +93,7 @@ impl AppearancePanel {
         let force_default_wallpaper_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_force_default_wallpaper(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_force_default_wallpaper(bool_value);
         };
         let force_default_wallpaper_options = vec!["false", "true"];
         let mut force_default_wallpaper_selection = NamedSelectionBox::new(
@@ -97,7 +107,7 @@ impl AppearancePanel {
         let disable_hyprland_logo_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_disable_hyprland_logo(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_disable_hyprland_logo(bool_value);
         };
         let disable_hyprland_logo_options = vec!["false", "true"];
         let mut disable_hyprland_logo_selection = NamedSelectionBox::new(
@@ -118,7 +128,7 @@ impl AppearancePanel {
         // Inner gap option
         let settings_clone = settings.clone();
         let inner_gap_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_inner_gab(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_inner_gab(spin_button.value());
         };
         let mut inner_gap_spin_button_section = NamedSpinButtonSection::new(
             "Inner gab:",
@@ -131,7 +141,7 @@ impl AppearancePanel {
         // Outer gap option
         let settings_clone = settings.clone();
         let outer_gap_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_outer_gab(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_outer_gab(spin_button.value());
         };
         let mut outer_gap_spin_button_section = NamedSpinButtonSection::new(
             "Outer gab:",
@@ -144,7 +154,7 @@ impl AppearancePanel {
         // Border size option
         let settings_clone = settings.clone();
         let border_size_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_border_size(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_border_size(spin_button.value());
         };
         let mut border_size_spin_button_section = NamedSpinButtonSection::new(
             "Border size:",
@@ -157,7 +167,7 @@ impl AppearancePanel {
         // Active border option
         let settings_clone = settings.clone();
         let active_border_color_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_active_border_color(color_button.rgba());
+            settings_clone.borrow_mut().appearance_settings.set_active_border_color(color_button.rgba());
         };
         let mut active_border_color_section = NamedColorButtonSection::new(
             "Active Border:", active_border_color_changed_callback
@@ -167,7 +177,7 @@ impl AppearancePanel {
         // Inactive border option
         let settings_clone = settings.clone();
         let inactive_border_color_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_inactive_border_color(color_button.rgba());
+            settings_clone.borrow_mut().appearance_settings.set_inactive_border_color(color_button.rgba());
         };
         let mut inactive_border_color_section = NamedColorButtonSection::new(
             "Inactive Border:", inactive_border_color_changed_callback
@@ -179,7 +189,7 @@ impl AppearancePanel {
         let border_resize_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_resize_on_border(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_resize_on_border(bool_value);
         };
         let resize_options = vec!["false", "true"];
         let mut border_resize_selection_box = NamedSelectionBox::new(
@@ -192,7 +202,7 @@ impl AppearancePanel {
         let tearing_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_allow_tearing(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_allow_tearing(bool_value);
         };
         let tearing_options = vec!["false", "true"];
         let mut allow_tearing_selection_box = NamedSelectionBox::new(
@@ -216,7 +226,7 @@ impl AppearancePanel {
         // Rounding option
         let settings_clone = settings.clone();
         let rounding_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_rounding(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_rounding(spin_button.value());
         };
         let mut rounding_spin_button = NamedSpinButtonSection::new(
             "Rounding:",
@@ -229,7 +239,7 @@ impl AppearancePanel {
         // Rounding power option
         let settings_clone = settings.clone();
         let rounding_spin_power_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_rounding_power(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_rounding_power(spin_button.value());
         };
         let mut rounding_spin_power_button = NamedSpinButtonSection::new(
             "Rounding power:",
@@ -244,7 +254,7 @@ impl AppearancePanel {
         let dim_inactive_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_dim_inactive(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_dim_inactive(bool_value);
         };
         let dim_inactive_options = vec!["false", "true"];
         let mut dim_inactive_selection_box = NamedSelectionBox::new(
@@ -255,7 +265,7 @@ impl AppearancePanel {
         // Active opacity option
         let settings_clone = settings.clone();
         let active_opacity_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_active_opacity(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_active_opacity(spin_button.value());
         };
         let mut active_opacity_spin_button = NamedSpinButtonSection::new(
             "Active opacity:",
@@ -268,7 +278,7 @@ impl AppearancePanel {
         // Inactive opacity option
         let settings_clone = settings.clone();
         let inactive_opacity_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_inactive_opacity(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_inactive_opacity(spin_button.value());
         };
         let mut inactive_opacity_spin_button = NamedSpinButtonSection::new(
             "Inactive opacity:",
@@ -283,7 +293,7 @@ impl AppearancePanel {
         let active_shadows_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_active_shadow(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_active_shadow(bool_value);
         };
         let mut active_shadows_selection_box = NamedSelectionBox::new(
           "Active shadows:", vec!["false", "true"],
@@ -294,7 +304,7 @@ impl AppearancePanel {
         // Shadow range option
         let settings_clone = settings.clone();
         let shadow_range_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_shadow_range(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_shadow_range(spin_button.value());
         };
         let mut shadow_range_spin_button = NamedSpinButtonSection::new(
             "Shadow range:",
@@ -307,7 +317,7 @@ impl AppearancePanel {
         // Shadow render power option
         let settings_clone = settings.clone();
         let shadow_render_power_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_shadow_render_power(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_shadow_render_power(spin_button.value());
         };
         let mut shadow_render_power_spin_button = NamedSpinButtonSection::new(
             "Shadow render power:",
@@ -320,7 +330,7 @@ impl AppearancePanel {
         // Shadow color option
         let settings_clone = settings.clone();
         let shadow_color_button_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_shadow_color(color_button.rgba())
+            settings_clone.borrow_mut().appearance_settings.set_shadow_color(color_button.rgba())
         };
         let mut shadow_color_button = NamedColorButtonSection::new("Shadow color:", shadow_color_button_changed_callback);
         shadow_color_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
@@ -330,7 +340,7 @@ impl AppearancePanel {
         let active_blur_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_active_blur(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_active_blur(bool_value);
         };
         let active_blur_options = vec!["false", "true"];
         let mut active_blur_selection_box = NamedSelectionBox::new(
@@ -341,7 +351,7 @@ impl AppearancePanel {
         // Blur size option
         let settings_clone = settings.clone();
         let blur_size_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_blur_size(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_blur_size(spin_button.value());
         };
         let mut blur_size_spin_button = NamedSpinButtonSection::new(
             "Blur size:", 0.0, 100.0, 10.0, 0.1,
@@ -353,7 +363,7 @@ impl AppearancePanel {
         // Blur passes option
         let settings_clone = settings.clone();
         let blur_passes_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_blur_passes(spin_button.value() as usize);
+            settings_clone.borrow_mut().appearance_settings.set_blur_passes(spin_button.value() as usize);
         };
         let mut blur_passes_spin_button = NamedSpinButtonSection::new(
             "Blur passes:", 0.0, 100.0, 10.0, 0.1,
@@ -365,7 +375,7 @@ impl AppearancePanel {
         // Blur vibrancy option
         let settings_clone = settings.clone();
         let blur_vibrancy_spin_button_changed_callback = move |spin_button: &SpinButton| {
-            settings_clone.borrow_mut().get_appearance_settings().set_blur_vibrancy(spin_button.value());
+            settings_clone.borrow_mut().appearance_settings.set_blur_vibrancy(spin_button.value());
         };
         let mut blur_vibrancy_spin_button = NamedSpinButtonSection::new(
             "Blur vibrancy:", 0.0, 100.0, 10.0, 0.1,
@@ -400,7 +410,7 @@ impl AppearancePanel {
         // Layout option
         let settings_clone = settings.clone();
         let layout_input_changed_callback = move |entry: &Entry| {
-          settings_clone.borrow_mut().get_appearance_settings().set_layout(entry.text().to_string());
+          settings_clone.borrow_mut().appearance_settings.set_layout(entry.text().to_string());
         };
         let layout_input_section = NamedInputSection::new(
             "Layout:", "e.g. dwindle, ", Some(layout_input_changed_callback)
@@ -411,7 +421,7 @@ impl AppearancePanel {
         let pseudo_tiling_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_pseudo_tiling(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_pseudo_tiling(bool_value);
         };
         let pseudo_tiling_options = vec!["false", "true"];
         let mut pseudo_tiling_selection_box = NamedSelectionBox::new(
@@ -424,7 +434,7 @@ impl AppearancePanel {
         let split_preservation_selection_changed_callback = move |entry: &ComboBoxText| {
             let selected_text = entry.active_text().expect("Cannot read active selection text");
             let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().get_appearance_settings().set_split_preservation(bool_value);
+            settings_clone.borrow_mut().appearance_settings.set_split_preservation(bool_value);
         };
         let split_preservation_options = vec!["false", "true"];
         let mut split_preservation_selection_box = NamedSelectionBox::new(
@@ -436,7 +446,7 @@ impl AppearancePanel {
         // Master status option
         let settings_clone = settings.clone();
         let master_status_input_changed_callback = move |entry: &Entry| {
-            settings_clone.borrow_mut().get_appearance_settings().set_master_status(entry.text().to_string());
+            settings_clone.borrow_mut().appearance_settings.set_master_status(entry.text().to_string());
         };
         let master_status_input_section = NamedInputSection::new(
             "Master status:", "e.g. master, ",

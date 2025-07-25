@@ -1,12 +1,19 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
 use crate::controls::panel::Panel;
+use crate::settings_container::SettingsContainer;
 
 pub struct NamedInputSection {
     panel: gtk::Box
 }
 
 impl Panel for NamedInputSection {
+    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+        todo!()
+    }
+
     fn get_widget(&self) -> &gtk::Box {
         &self.panel
     }

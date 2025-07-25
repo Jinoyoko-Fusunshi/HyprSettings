@@ -1,8 +1,6 @@
 use gtk::Button;
 use gtk::prelude::ButtonExt;
 
-pub type ButtonCallback = fn(&Button);
-
 pub fn create_button<F>(title: &str, click_action: Option<F>) -> Button
 where F: Fn(&Button) + 'static
 {
