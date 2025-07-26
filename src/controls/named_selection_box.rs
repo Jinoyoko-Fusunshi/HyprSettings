@@ -3,7 +3,7 @@ use std::rc::Rc;
 use gtk::{Align, ComboBoxText, Label, Orientation};
 use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct NamedSelectionBox {
     selection_box: gtk::Box,
@@ -11,7 +11,7 @@ pub struct NamedSelectionBox {
 }
 
 impl Panel for NamedSelectionBox {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
         
     }
 

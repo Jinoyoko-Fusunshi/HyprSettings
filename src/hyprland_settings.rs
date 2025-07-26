@@ -4,13 +4,13 @@ use crate::config::appearance_settings::AppearanceSettings;
 use crate::monitor::monitor_setting::MonitorSetting;
 
 #[derive(Debug)]
-pub struct SettingsContainer {
+pub struct HyprlandSettings {
     pub program_settings: HashMap<String, String>,
     pub monitor_settings: Vec<MonitorSetting>,
     pub appearance_settings: AppearanceSettings,
 }
 
-impl SettingsContainer {
+impl HyprlandSettings {
     pub fn new() -> Self {
         let program_settings = HashMap::new();
         let appearance_settings = AppearanceSettings::new(

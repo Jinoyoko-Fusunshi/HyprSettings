@@ -3,7 +3,7 @@ use std::rc::Rc;
 use gtk::{Align, ColorButton, Label};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct NamedColorButtonSection {
     color_button_box: gtk::Box,
@@ -11,7 +11,7 @@ pub struct NamedColorButtonSection {
 }
 
 impl Panel for NamedColorButtonSection {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
 
     }
 

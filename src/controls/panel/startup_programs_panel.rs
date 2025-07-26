@@ -5,7 +5,7 @@ use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::controls::panel::Panel;
 use crate::controls::panel::startup_program_entry_row::StartupProgramEntryRow;
 use crate::css_styles::CSSStyles;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct StartupProgramsPanel {
     program_panel_box: gtk::Box,
@@ -13,7 +13,7 @@ pub struct StartupProgramsPanel {
 }
 
 impl Panel for StartupProgramsPanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
         for entry in self.startup_entries.borrow().iter() {
             entry.reload_settings(settings);
         }
@@ -34,7 +34,7 @@ impl Clone for StartupProgramsPanel {
 }
 
 impl StartupProgramsPanel {
-    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
         // Create programs startup panel
         let program_panel_box = gtk::Box::new(Orientation::Vertical, 10);
         program_panel_box.set_margin_top(10);

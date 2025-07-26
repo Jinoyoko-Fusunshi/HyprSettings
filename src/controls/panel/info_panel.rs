@@ -4,14 +4,14 @@ use gtk::{Align, Label, LinkButton, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::controls::panel::Panel;
 use crate::css_styles::CSSStyles;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct InfoPanel {
     widget: gtk::Box,
 }
 
 impl Panel for InfoPanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.widget

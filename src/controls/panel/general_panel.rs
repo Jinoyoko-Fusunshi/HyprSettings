@@ -4,14 +4,14 @@ use gtk::{Entry, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::controls::named_input_section::NamedInputSection;
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct GeneralPanel {
     widget: gtk::Box
 }
 
 impl Panel for GeneralPanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
@@ -27,16 +27,16 @@ impl Clone for GeneralPanel {
 }
 
 impl GeneralPanel{
-    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
         let widget = gtk::Box::new(Orientation::Vertical, 0);
         widget.set_margin_top(10);
         widget.set_margin_bottom(10);
         widget.set_margin_start(10);
         widget.set_margin_end(10);
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let config_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("HyprLandConfig".to_string(), String::from(input.text()));
         };
         let config_section = NamedInputSection::new(
@@ -45,9 +45,9 @@ impl GeneralPanel{
             Some(config_input_section_change),
         );
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let terminal_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("VirtualTerminal".to_string(), String::from(input.text()));
         };
         let terminal_section = NamedInputSection::new(
@@ -56,9 +56,9 @@ impl GeneralPanel{
             Some(terminal_input_section_change),
         );
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let file_manager_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("FileManager".to_string(), String::from(input.text()));
         };
         let file_manager_section = NamedInputSection::new(
@@ -67,9 +67,9 @@ impl GeneralPanel{
             Some(file_manager_input_section_change),
         );
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let quick_search_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("QuickSearch".to_string(), String::from(input.text()));
         };
         let quick_search_section = NamedInputSection::new(
@@ -78,9 +78,9 @@ impl GeneralPanel{
             Some(quick_search_input_section_change),
         );
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let lock_screen_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("LockScreen".to_string(), String::from(input.text()));
         };
         let lock_screen_section = NamedInputSection::new(
@@ -89,9 +89,9 @@ impl GeneralPanel{
             Some(lock_screen_input_section_change),
         );
 
-        let settings_closure_clone = settings.clone();
+        let settings_clone = settings.clone();
         let notification_handler_input_section_change = move |input: &Entry| {
-            settings_closure_clone.borrow_mut().program_settings
+            settings_clone.borrow_mut().program_settings
                 .insert("NotificationHandler".to_string(), String::from(input.text()));
         };
         let notification_handler_section = NamedInputSection::new(

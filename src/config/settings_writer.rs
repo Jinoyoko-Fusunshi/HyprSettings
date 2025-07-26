@@ -1,13 +1,13 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct SettingsWriter {
-    settings: Rc<RefCell<SettingsContainer>>
+    settings: Rc<RefCell<HyprlandSettings>>
 }
 
 impl SettingsWriter {
-    pub fn new(settings: Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: Rc<RefCell<HyprlandSettings>>) -> Self {
         Self {
             settings
         }

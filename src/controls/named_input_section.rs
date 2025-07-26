@@ -3,14 +3,14 @@ use std::rc::Rc;
 use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct NamedInputSection {
     panel: gtk::Box
 }
 
 impl Panel for NamedInputSection {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
         todo!()
     }
 

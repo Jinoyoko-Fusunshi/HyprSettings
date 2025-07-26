@@ -4,7 +4,7 @@ use gtk::{Button, ComboBoxText, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, ComboBoxExt, ComboBoxExtManual, EditableExt, WidgetExt};
 use crate::controls::panel::Panel;
 use crate::css_styles::CSSStyles;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct StartupProgramEntryRow {
     program_entry_box: gtk::Box,
@@ -12,7 +12,7 @@ pub struct StartupProgramEntryRow {
 }
 
 impl Panel for StartupProgramEntryRow {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
         let programs = settings.borrow_mut().program_settings
             .iter()
             .map(|(program_name, _)| {
@@ -29,7 +29,7 @@ impl Panel for StartupProgramEntryRow {
 
 impl StartupProgramEntryRow {
     pub fn new(
-        startup_entries_box: &gtk::Box, settings: &Rc<RefCell<SettingsContainer>>
+        startup_entries_box: &gtk::Box, settings: &Rc<RefCell<HyprlandSettings>>
     ) -> StartupProgramEntryRow {
         // Startup entry box
         let startup_entry_box = gtk::Box::new(Orientation::Horizontal, 10);

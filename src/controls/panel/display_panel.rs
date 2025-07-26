@@ -5,14 +5,14 @@ use gtk::prelude::{BoxExt, WidgetExt};
 use crate::controls::named_spin_button_section::NamedSpinButtonSection;
 use crate::controls::panel::Panel;
 use crate::monitor::monitor_setting::MonitorSetting;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct DisplayPanel {
     widget: gtk::Box
 }
 
 impl Panel for DisplayPanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
@@ -28,7 +28,7 @@ impl Clone for DisplayPanel {
 }
 
 impl DisplayPanel {
-    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
         let widget = gtk::Box::new(Orientation::Vertical, 10);
         widget.set_margin_top(10);
         widget.set_margin_bottom(10);

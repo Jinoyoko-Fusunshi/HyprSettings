@@ -7,14 +7,14 @@ use crate::controls::named_input_section::NamedInputSection;
 use crate::controls::named_selection_box::NamedSelectionBox;
 use crate::controls::named_spin_button_section::NamedSpinButtonSection;
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct AppearancePanel {
     widget: gtk::Box,
 }
 
 impl Panel for AppearancePanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
@@ -32,7 +32,7 @@ impl Clone for AppearancePanel {
 impl AppearancePanel {
     const APPEARANCE_LABEL_WIDTH: i32 = 180;
 
-    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
         let appearance_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
         appearance_scroll_box.set_vexpand(true);
 
@@ -74,7 +74,7 @@ impl AppearancePanel {
         }
     }
 
-    fn create_wallpaper_section(settings: &Rc<RefCell<SettingsContainer>>) -> gtk::Box {
+    fn create_wallpaper_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
         let wallpaper_box = gtk::Box::new(Orientation::Vertical, 10);
 
         // Wallpaper image path option
@@ -122,7 +122,7 @@ impl AppearancePanel {
         wallpaper_box
     }
 
-    fn create_general_section(settings: &Rc<RefCell<SettingsContainer>>) -> gtk::Box {
+    fn create_general_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
         let general_box = gtk::Box::new(Orientation::Vertical, 10);
 
         // Inner gap option
@@ -220,7 +220,7 @@ impl AppearancePanel {
         general_box
     }
 
-    fn create_decorations_section(settings: &Rc<RefCell<SettingsContainer>>) -> gtk::Box {
+    fn create_decorations_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
         let decorations_box = gtk::Box::new(Orientation::Vertical, 10);
 
         // Rounding option
@@ -400,11 +400,11 @@ impl AppearancePanel {
         decorations_box
     }
 
-    fn create_animations_section(settings: &Rc<RefCell<SettingsContainer>>) -> gtk::Box {
+    fn create_animations_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
         todo!("Implement the individual animation options")
     }
 
-    fn create_layouts_section(settings: &Rc<RefCell<SettingsContainer>>) -> gtk::Box {
+    fn create_layouts_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
         let layouts_box = gtk::Box::new(Orientation::Vertical, 10);
 
         // Layout option

@@ -1,11 +1,11 @@
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct SettingsReader<'a> {
-    settings: &'a mut SettingsContainer
+    settings: &'a mut HyprlandSettings
 }
 
 impl<'a> SettingsReader<'a> {
-    pub fn new(&mut self, settings: &'a mut SettingsContainer) -> Self {
+    pub fn new(&mut self, settings: &'a mut HyprlandSettings) -> Self {
         Self {
             settings
         }

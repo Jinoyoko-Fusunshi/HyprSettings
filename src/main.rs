@@ -1,5 +1,5 @@
 mod controls;
-mod settings_container;
+mod hyprland_settings;
 mod config;
 mod monitor;
 mod css_styles;
@@ -14,7 +14,7 @@ use gtk::gdk::Display;
 use gtk::gio::File;
 use controls::button::{create_button};
 use controls::panel::{display_panel, general_panel, info_panel, Panel};
-use settings_container::SettingsContainer;
+use hyprland_settings::HyprlandSettings;
 use monitor::monitor_info_parser::{MonitorInfoParser};
 use monitor::monitor_setting::MonitorSetting;
 use crate::controls::panel::{appearance_panel, key_binds_panel, startup_programs_panel};
@@ -49,7 +49,7 @@ fn main() {
             .build();
 
         // The settings container being updated by the individual panels
-        let settings_container = Rc::new(RefCell::new(SettingsContainer::new()));
+        let settings = Rc::new(RefCell::new(HyprlandSettings::new()));
 
         let output = Command::new("wlr-randr")
             .output()
@@ -73,7 +73,7 @@ fn main() {
             })
             .collect::<Vec<MonitorSetting>>();
 
-        settings_container.borrow_mut().monitor_settings = max_monitor_video_modes;
+        settings.borrow_mut().monitor_settings = max_monitor_video_modes;
 
         // Basic window layout of a navigation and content panel
         let window_container = gtk::Box::new(Orientation::Horizontal, 10);
@@ -91,7 +91,7 @@ fn main() {
         category_content_box.add_css_class(CSSStyles::CONTENT_PANEL);
 
         // The navigation buttons to toggle the individual category panel
-        let settings_clone = settings_container.clone();
+        let settings_clone = settings.clone();
         let category_panels = Rc::new(RefCell::new(CategoryContentHandler::new(&settings_clone)));
 
         let general_button = create_category_button("general", GENERAL_PANEL_NAME, &settings_clone, &category_panels);
@@ -101,7 +101,7 @@ fn main() {
         let keybinds_button = create_category_button("keybinds", KEYBINDS_PANEL_NAME, &settings_clone, &category_panels);
         let info_button = create_category_button("info", INFO_PANEL_NAME, &settings_clone, &category_panels);
 
-        let settings_clone = settings_container.clone();
+        let settings_clone = settings.clone();
         let save_button_click_callback = move |_: &Button| {
             println!("{:?}", settings_clone.borrow())
         };
@@ -144,7 +144,7 @@ struct CategoryContentHandler {
 }
 
 impl CategoryContentHandler {
-    pub fn new(settings: &Rc<RefCell<SettingsContainer>>) -> Self {
+    pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
         // The category panels to be individually displayed
         let general_panel = Box::new(general_panel::GeneralPanel::new(settings));
         let display_panel = Box::new(display_panel::DisplayPanel::new(settings));
@@ -176,7 +176,7 @@ impl CategoryContentHandler {
         }
     }
 
-    pub fn select_panel_active(&self, panel_name: &str, settings: &Rc<RefCell<SettingsContainer>>) {
+    pub fn select_panel_active(&self, panel_name: &str, settings: &Rc<RefCell<HyprlandSettings>>) {
         if let Some(panel) = self.category_panels_map.get(panel_name) {
             panel.reload_settings(settings)
         }
@@ -191,7 +191,7 @@ impl CategoryContentHandler {
 
 fn create_category_button(
     title: &str, click_element_name: &'static str,
-    settings: &Rc<RefCell<SettingsContainer>>, content_handler: &Rc<RefCell<CategoryContentHandler>>
+    settings: &Rc<RefCell<HyprlandSettings>>, content_handler: &Rc<RefCell<CategoryContentHandler>>
 ) -> Button {
     let content_handler_clone = content_handler.clone();
     let settings_clone = settings.clone();

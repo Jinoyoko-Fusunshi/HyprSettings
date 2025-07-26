@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::controls::panel::Panel;
-use crate::settings_container::SettingsContainer;
+use crate::hyprland_settings::HyprlandSettings;
 
 pub struct KeyBindsPanel {
     key_binds_panel: gtk::Box
@@ -16,7 +16,7 @@ impl KeyBindsPanel {
 }
 
 impl Panel for KeyBindsPanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<SettingsContainer>>) {}
+    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.key_binds_panel
