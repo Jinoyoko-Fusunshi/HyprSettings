@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct KeyBindsPanel {
     key_binds_panel: gtk::Box

@@ -1,8 +1,5 @@
-mod controls;
-mod hyprland_settings;
-mod config;
-mod monitor;
-mod css_styles;
+mod settings;
+mod ui;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -12,13 +9,12 @@ use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, Button, Orientation, Stack};
 use gtk::gdk::Display;
 use gtk::gio::File;
-use controls::button::{create_button};
-use controls::panel::{display_panel, general_panel, info_panel, Panel};
-use hyprland_settings::HyprlandSettings;
-use monitor::monitor_info_parser::{MonitorInfoParser};
-use monitor::monitor_setting::MonitorSetting;
-use crate::controls::panel::{appearance_panel, key_binds_panel, startup_programs_panel};
-use crate::css_styles::CSSStyles;
+use ui::controls::button::create_button;
+use ui::controls::panel::{appearance_panel, display_panel, general_panel, info_panel, key_binds_panel, startup_programs_panel, Panel};
+use settings::hyprland_settings::HyprlandSettings;
+use settings::monitor::monitor_info_parser::MonitorInfoParser;
+use settings::monitor::monitor_configuration::MonitorConfiguration;
+use ui::css_styles::CSSStyles;
 
 
 // Panel names
@@ -62,18 +58,18 @@ fn main() {
         monitor_info_parser.parse_output(&output_string);
         let monitor_information = monitor_info_parser.get_result();
 
-        let max_monitor_video_modes = monitor_information
+        let max_monitor_configurations = monitor_information
             .iter()
             .map(|monitor_information| {
-                MonitorSetting {
+                MonitorConfiguration {
                     enabled: true,
                     information: monitor_information.clone(),
                     video_mode: monitor_information.max_video_mode.clone()
                 }
             })
-            .collect::<Vec<MonitorSetting>>();
+            .collect::<Vec<MonitorConfiguration>>();
 
-        settings.borrow_mut().monitor_settings = max_monitor_video_modes;
+        settings.borrow_mut().monitor_configurations = max_monitor_configurations;
 
         // Basic window layout of a navigation and content panel
         let window_container = gtk::Box::new(Orientation::Horizontal, 10);

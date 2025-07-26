@@ -1,4 +1,4 @@
-use crate::monitor::video_mode::VideoMode;
+use crate::settings::monitor::video_mode::VideoMode;
 
 #[derive(Debug, Clone)]
 pub struct MonitorInformation {

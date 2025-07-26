@@ -2,10 +2,12 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, Button, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::controls::panel::startup_program_entry_row::StartupProgramEntryRow;
-use crate::css_styles::CSSStyles;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::ui::css_styles::CSSStyles;
+use crate::settings::hyprland_settings::HyprlandSettings;
+use startup_program_entry_row::StartupProgramEntryRow;
+
+mod startup_program_entry_row;
 
 pub struct StartupProgramsPanel {
     program_panel_box: gtk::Box,

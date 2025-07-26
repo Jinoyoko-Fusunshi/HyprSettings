@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use gtk::gdk::RGBA;
-use crate::config::appearance_settings::AppearanceSettings;
-use crate::monitor::monitor_setting::MonitorSetting;
+use crate::settings::appearance_settings::AppearanceSettings;
+use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
 
 #[derive(Debug)]
 pub struct HyprlandSettings {
     pub program_settings: HashMap<String, String>,
-    pub monitor_settings: Vec<MonitorSetting>,
+    pub monitor_configurations: Vec<MonitorConfiguration>,
     pub appearance_settings: AppearanceSettings,
 }
 
@@ -45,7 +45,7 @@ impl HyprlandSettings {
         
         Self {
             program_settings,
-            monitor_settings: Vec::new(),
+            monitor_configurations: Vec::new(),
             appearance_settings,
         }
     }

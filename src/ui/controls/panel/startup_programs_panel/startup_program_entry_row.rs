@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Button, ComboBoxText, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, ComboBoxExt, ComboBoxExtManual, EditableExt, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::css_styles::CSSStyles;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::ui::css_styles::CSSStyles;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct StartupProgramEntryRow {
     program_entry_box: gtk::Box,

@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, ComboBoxText, Label, Orientation};
 use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct NamedSelectionBox {
     selection_box: gtk::Box,

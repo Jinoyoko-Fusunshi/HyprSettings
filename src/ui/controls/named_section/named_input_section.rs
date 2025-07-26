@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct NamedInputSection {
     panel: gtk::Box

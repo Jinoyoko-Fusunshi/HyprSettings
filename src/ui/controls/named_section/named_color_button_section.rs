@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, ColorButton, Label};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct NamedColorButtonSection {
     color_button_box: gtk::Box,

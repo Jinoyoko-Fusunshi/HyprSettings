@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct SettingsWriter {
     settings: Rc<RefCell<HyprlandSettings>>

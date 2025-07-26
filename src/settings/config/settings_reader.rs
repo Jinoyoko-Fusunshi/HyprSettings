@@ -1,4 +1,4 @@
-use crate::hyprland_settings::HyprlandSettings;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct SettingsReader<'a> {
     settings: &'a mut HyprlandSettings

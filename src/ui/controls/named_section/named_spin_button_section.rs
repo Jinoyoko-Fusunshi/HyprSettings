@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Adjustment, Align, Label, Orientation, SpinButton};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct NamedSpinButtonSection {
     spin_button_box: gtk::Box,

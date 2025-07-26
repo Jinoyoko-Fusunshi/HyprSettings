@@ -2,12 +2,13 @@ use std::cell::{RefCell};
 use std::rc::Rc;
 use gtk::{ColorButton, ComboBoxText, Entry, Orientation, PolicyType, ScrolledWindow, Separator, SpinButton};
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
-use crate::controls::named_color_button_section::NamedColorButtonSection;
-use crate::controls::named_input_section::NamedInputSection;
-use crate::controls::named_selection_box::NamedSelectionBox;
-use crate::controls::named_spin_button_section::NamedSpinButtonSection;
-use crate::controls::panel::Panel;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::named_section::{
+    named_color_button_section::NamedColorButtonSection,
+    named_input_section::NamedInputSection,named_selection_box::NamedSelectionBox,
+    named_spin_button_section::NamedSpinButtonSection
+};
+use crate::ui::controls::panel::Panel;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct AppearancePanel {
     widget: gtk::Box,

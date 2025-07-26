@@ -2,10 +2,9 @@ use std::cell::{RefCell};
 use std::rc::Rc;
 use gtk::{glib, Align, Label, Orientation, Separator, SpinButton, Switch};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::controls::named_spin_button_section::NamedSpinButtonSection;
-use crate::controls::panel::Panel;
-use crate::monitor::monitor_setting::MonitorSetting;
-use crate::hyprland_settings::HyprlandSettings;
+use crate::ui::controls::{named_section::named_spin_button_section::NamedSpinButtonSection, panel::Panel};
+use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
+use crate::settings::hyprland_settings::HyprlandSettings;
 
 pub struct DisplayPanel {
     widget: gtk::Box
@@ -39,28 +38,28 @@ impl DisplayPanel {
         widget.append(&available_displays_label);
 
         let mut monitor_index: usize = 0;
-        for monitor_setting in settings.borrow_mut().monitor_settings.iter() {
+        for monitor_setting in settings.borrow_mut().monitor_configurations.iter() {
             let settings_clone = settings.clone();
             let status_action_callback = move |_: &Switch, state: bool| -> glib::Propagation {
-                settings_clone.borrow_mut().monitor_settings[monitor_index].enabled = state;
+                settings_clone.borrow_mut().monitor_configurations[monitor_index].enabled = state;
                 glib::Propagation::Proceed
             };
 
             let settings_clone = settings.clone();
             let width_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                settings_clone.borrow_mut().monitor_configurations[monitor_index]
                     .video_mode.width_resolution = spin_button.value() as u32;
             };
 
             let settings_clone = settings.clone();
             let height_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                settings_clone.borrow_mut().monitor_configurations[monitor_index]
                     .video_mode.height_resolution = spin_button.value() as u32;
             };
 
             let settings_clone = settings.clone();
             let refresh_rate_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_settings[monitor_index]
+                settings_clone.borrow_mut().monitor_configurations[monitor_index]
                     .video_mode.refresh_rate = spin_button.value() as u32;
             };
 
@@ -82,13 +81,13 @@ impl DisplayPanel {
     }
 
     fn create_display_entry(
-        monitor_setting: &MonitorSetting,
+        monitor_configuration: &MonitorConfiguration,
         status_action_callback: impl Fn(&Switch, bool) -> glib::Propagation + 'static,
         width_change_callback: impl Fn(&SpinButton) + 'static,
         height_change_callback: impl Fn(&SpinButton) + 'static,
         refresh_rate_change_callback: impl Fn(&SpinButton) + 'static,
     ) -> gtk::Box {
-        let monitor_information = &monitor_setting.information;
+        let monitor_information = &monitor_configuration.information;
         let min_video_mode = &monitor_information.min_video_mode;
         let max_video_mode = &monitor_information.max_video_mode;
 
