@@ -3,3 +3,4 @@ pub mod program_settings;
 pub mod hyprland_settings;
 pub mod config;
 pub mod monitor;
+mod program;
