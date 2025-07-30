@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use gtk::{Align, Label, LinkButton, Orientation};
+use gtk::{Align, Label, LinkButton, Orientation, Separator};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::controls::panel::Panel;
 use crate::ui::css_styles::CSSStyles;
@@ -28,11 +28,16 @@ impl Clone for InfoPanel {
 
 impl InfoPanel {
     pub fn new() -> Self {
-        let widget = gtk::Box::new(Orientation::Vertical, 10);
-        widget.set_margin_top(10);
-        widget.set_margin_bottom(10);
-        widget.set_margin_start(10);
-        widget.set_margin_end(10);
+        const INFO_PANEL_LABEL: &str = "Program information";
+
+        let info_panel_box = gtk::Box::new(Orientation::Vertical, 10);
+        info_panel_box.set_margin_top(10);
+        info_panel_box.set_margin_bottom(10);
+        info_panel_box.set_margin_start(10);
+        info_panel_box.set_margin_end(10);
+
+        let info_panel_label = Label::new(Some(INFO_PANEL_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
 
         let application_name = InfoPanel::create_label("HyprSettings");
         application_name.add_css_class(CSSStyles::APPLICATION_TITLE);
@@ -47,18 +52,20 @@ impl InfoPanel {
         let github_link_entry = InfoPanel::create_link_entry(
             "📄 Github:", "https://github.com/Jinoyoko-Fusunshi/HyprSettings"
         );
-        let horizontal_separator = gtk::Separator::new(Orientation::Horizontal);
+        let horizontal_separator = Separator::new(Orientation::Horizontal);
         let program_description_entry = InfoPanel::create_program_description_panel();
 
-        widget.append(&application_name);
-        widget.append(&application_version_entry);
-        widget.append(&author_entry);
-        widget.append(&github_link_entry);
-        widget.append(&horizontal_separator);
-        widget.append(&program_description_entry);
+        info_panel_box.append(&info_panel_label);
+        info_panel_box.append(&separator);
+        info_panel_box.append(&application_name);
+        info_panel_box.append(&application_version_entry);
+        info_panel_box.append(&author_entry);
+        info_panel_box.append(&github_link_entry);
+        info_panel_box.append(&horizontal_separator);
+        info_panel_box.append(&program_description_entry);
 
         Self {
-            widget
+            widget: info_panel_box
         }
     }
 

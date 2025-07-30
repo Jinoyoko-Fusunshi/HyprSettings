@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use gtk::{Align, Button, Orientation};
+use gtk::{Align, Button, Label, Orientation, Separator};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::ui::controls::panel::Panel;
 use crate::ui::css_styles::CSSStyles;
@@ -37,14 +37,17 @@ impl Clone for StartupProgramsPanel {
 
 impl StartupProgramsPanel {
     pub fn new(settings: &Rc<RefCell<HyprlandSettings>>) -> Self {
-        // Create programs startup panel
+        const PROGRAMS_ON_STARTUP_LABEL: &str = "Programs on system start";
+
         let program_panel_box = gtk::Box::new(Orientation::Vertical, 10);
         program_panel_box.set_margin_top(10);
         program_panel_box.set_margin_bottom(10);
         program_panel_box.set_margin_start(10);
         program_panel_box.set_margin_end(10);
 
-        // Create startup entry button
+        let startup_programs_label = Label::new(Some(PROGRAMS_ON_STARTUP_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
+
         let startup_entries_box = gtk::Box::new(Orientation::Vertical, 10);
         let startup_entries = Rc::new(RefCell::new(vec![]));
         let settings_clone = settings.clone();
@@ -62,6 +65,8 @@ impl StartupProgramsPanel {
         create_button.add_css_class(CSSStyles::CREATE_STARTUP_PROGRAM_BUTTON);
         create_button.connect_clicked(create_button_click_callback);
 
+        program_panel_box.append(&startup_programs_label);
+        program_panel_box.append(&separator);
         program_panel_box.append(&startup_entries_box);
         program_panel_box.append(&create_button);
 

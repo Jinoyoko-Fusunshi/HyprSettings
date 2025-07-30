@@ -1,6 +1,6 @@
 use std::cell::{RefCell};
 use std::rc::Rc;
-use gtk::{ColorButton, ComboBoxText, Entry, Orientation, PolicyType, ScrolledWindow, Separator, SpinButton};
+use gtk::{ColorButton, ComboBoxText, Entry, Label, Orientation, PolicyType, ScrolledWindow, Separator, SpinButton};
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
 use crate::ui::controls::named_section::{
     named_color_button_section::NamedColorButtonSection,
@@ -49,22 +49,13 @@ impl AppearancePanel {
 
         let settings_clone = settings.clone();
         let wallpaper_section = AppearancePanel::create_wallpaper_section(&settings_clone);
-        let general_section = AppearancePanel::create_general_section(&settings_clone);
+        let styling_section = AppearancePanel::create_styling_section(&settings_clone);
         let decoration_section = AppearancePanel::create_decorations_section(&settings_clone);
         let layouts_section = AppearancePanel::create_layouts_section(&settings_clone);
 
         appearance_box.append(&wallpaper_section);
-
-        let horizontal_separator = Separator::new(Orientation::Horizontal);
-        appearance_box.append(&horizontal_separator);
-        appearance_box.append(&general_section);
-
-        let horizontal_separator = Separator::new(Orientation::Horizontal);
-        appearance_box.append(&horizontal_separator);
+        appearance_box.append(&styling_section);
         appearance_box.append(&decoration_section);
-
-        let horizontal_separator = Separator::new(Orientation::Horizontal);
-        appearance_box.append(&horizontal_separator);
         appearance_box.append(&layouts_section);
 
         scrolled_window.set_child(Some(&appearance_box));
@@ -76,7 +67,11 @@ impl AppearancePanel {
     }
 
     fn create_wallpaper_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+        const WALLPAPER_LABEL: &str = "Wallpaper";
+
         let wallpaper_box = gtk::Box::new(Orientation::Vertical, 10);
+        let wallpaper_label = Label::new(Some(WALLPAPER_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
 
         // Wallpaper image path option
         let settings_clone = settings.clone();
@@ -117,14 +112,20 @@ impl AppearancePanel {
         );
         disable_hyprland_logo_selection.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
+        wallpaper_box.append(&wallpaper_label);
+        wallpaper_box.append(&separator);
         wallpaper_box.append(wallpaper_image_input_section.get_widget());
         wallpaper_box.append(force_default_wallpaper_selection.get_widget());
         wallpaper_box.append(disable_hyprland_logo_selection.get_widget());
         wallpaper_box
     }
 
-    fn create_general_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+    fn create_styling_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+        const STYLING_LABEL: &str = "Styling";
+
         let general_box = gtk::Box::new(Orientation::Vertical, 10);
+        let styling_label = Label::new(Some(STYLING_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
 
         // Inner gap option
         let settings_clone = settings.clone();
@@ -211,6 +212,8 @@ impl AppearancePanel {
         );
         allow_tearing_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
+        general_box.append(&styling_label);
+        general_box.append(&separator);
         general_box.append(inner_gap_spin_button_section.get_widget());
         general_box.append(outer_gap_spin_button_section.get_widget());
         general_box.append(border_size_spin_button_section.get_widget());
@@ -222,7 +225,11 @@ impl AppearancePanel {
     }
 
     fn create_decorations_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+        const DECORATION_LABEL: &str = "Decoration";
+
         let decorations_box = gtk::Box::new(Orientation::Vertical, 10);
+        let decoration_label = Label::new(Some(DECORATION_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
 
         // Rounding option
         let settings_clone = settings.clone();
@@ -385,6 +392,8 @@ impl AppearancePanel {
         );
         blur_vibrancy_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);     
 
+        decorations_box.append(&decoration_label);
+        decorations_box.append(&separator);
         decorations_box.append(rounding_spin_button.get_widget());
         decorations_box.append(rounding_spin_power_button.get_widget());
         decorations_box.append(dim_inactive_selection_box.get_widget());
@@ -406,7 +415,10 @@ impl AppearancePanel {
     }
 
     fn create_layouts_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+        const LAYOUT_LABEL: &str = "Layout";
         let layouts_box = gtk::Box::new(Orientation::Vertical, 10);
+        let layout_label = Label::new(Some(LAYOUT_LABEL));
+        let separator = Separator::new(Orientation::Horizontal);
 
         // Layout option
         let settings_clone = settings.clone();
@@ -454,6 +466,8 @@ impl AppearancePanel {
             Some(master_status_input_changed_callback)
         );
 
+        layouts_box.append(&layout_label);
+        layouts_box.append(&separator);
         layouts_box.append(layout_input_section.get_widget());
         layouts_box.append(master_status_input_section.get_widget());
         layouts_box.append(pseudo_tiling_selection_box.get_widget());
