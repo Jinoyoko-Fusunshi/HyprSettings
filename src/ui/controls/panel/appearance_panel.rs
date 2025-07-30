@@ -15,7 +15,7 @@ pub struct AppearancePanel {
 }
 
 impl Panel for AppearancePanel {
-    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {}
+    fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.widget
@@ -401,8 +401,8 @@ impl AppearancePanel {
         decorations_box
     }
 
-    fn create_animations_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
-        todo!("Implement the individual animation options")
+    fn create_animations_section(_: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {
+        gtk::Box::new(Orientation::Vertical, 10)
     }
 
     fn create_layouts_section(settings: &Rc<RefCell<HyprlandSettings>>) -> gtk::Box {

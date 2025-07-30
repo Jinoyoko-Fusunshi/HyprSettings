@@ -11,9 +11,7 @@ pub struct NamedSelectionBox {
 }
 
 impl Panel for NamedSelectionBox {
-    fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>) {
-        
-    }
+    fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
     fn get_widget(&self) -> &gtk::Box {
         &self.selection_box

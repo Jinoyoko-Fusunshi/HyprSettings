@@ -33,10 +33,35 @@ button.url-link > label {
 }
 
 button.cancel_startup_program {
-    padding: 4px;
 }
 
 button.create_startup_program {
     margin-top: 8px;
     padding: 4px 8px 4px 8px;
+}
+
+box.key-binds-entry {
+    padding: 8px;
+    background-color: #232323;
+    border: 1px solid black;
+    border-radius: 10px;
+    transition: 0.2s ease-in-out;
+}
+
+box.key-binds-entry:focus {
+    border: 1px solid #2196ff;
+}
+
+box.key-panel {
+    margin-bottom: 8px;
+    background: #333333;
+    box-shadow: 0 8px 4px 0 #000000;
+    border: 1px solid #000000;
+    border-radius: 10px;
+}
+
+label.key-panel {
+    font-size: 12px;
+    padding: 8px;
+    color: white;
 }
