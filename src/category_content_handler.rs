@@ -38,12 +38,12 @@ impl CategoryContentHandler {
         category_panels_map.insert(INFO_PANEL_NAME.to_string(), info_panel.clone());
 
         let category_boxes_stack = Stack::new();
-        category_boxes_stack.add_named(general_panel.get_widget(), Some(GENERAL_PANEL_NAME));
-        category_boxes_stack.add_named(display_panel.get_widget(), Some(DISPLAY_PANEL_NAME));
-        category_boxes_stack.add_named(appearance_panel.get_widget(), Some(APPEARANCE_PANEL_NAME));
-        category_boxes_stack.add_named(startup_programs_panel.get_widget(), Some(STARTUP_PROGRAM_PANEL_NAME));
-        category_boxes_stack.add_named(keybinds_panel.get_widget(), Some(KEYBINDS_PANEL_NAME));
-        category_boxes_stack.add_named(info_panel.get_widget(), Some(INFO_PANEL_NAME));
+        category_boxes_stack.add_named(general_panel.get_container_box(), Some(GENERAL_PANEL_NAME));
+        category_boxes_stack.add_named(display_panel.get_container_box(), Some(DISPLAY_PANEL_NAME));
+        category_boxes_stack.add_named(appearance_panel.get_container_box(), Some(APPEARANCE_PANEL_NAME));
+        category_boxes_stack.add_named(startup_programs_panel.get_container_box(), Some(STARTUP_PROGRAM_PANEL_NAME));
+        category_boxes_stack.add_named(keybinds_panel.get_container_box(), Some(KEYBINDS_PANEL_NAME));
+        category_boxes_stack.add_named(info_panel.get_container_box(), Some(INFO_PANEL_NAME));
 
         Self {
             category_panels_map,

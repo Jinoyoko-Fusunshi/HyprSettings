@@ -17,7 +17,7 @@ pub struct AppearancePanel {
 impl Panel for AppearancePanel {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.widget
     }
 }
@@ -114,9 +114,9 @@ impl AppearancePanel {
 
         wallpaper_box.append(&wallpaper_label);
         wallpaper_box.append(&separator);
-        wallpaper_box.append(wallpaper_image_input_section.get_widget());
-        wallpaper_box.append(force_default_wallpaper_selection.get_widget());
-        wallpaper_box.append(disable_hyprland_logo_selection.get_widget());
+        wallpaper_box.append(wallpaper_image_input_section.get_container_box());
+        wallpaper_box.append(force_default_wallpaper_selection.get_container_box());
+        wallpaper_box.append(disable_hyprland_logo_selection.get_container_box());
         wallpaper_box
     }
 
@@ -214,13 +214,13 @@ impl AppearancePanel {
 
         general_box.append(&styling_label);
         general_box.append(&separator);
-        general_box.append(inner_gap_spin_button_section.get_widget());
-        general_box.append(outer_gap_spin_button_section.get_widget());
-        general_box.append(border_size_spin_button_section.get_widget());
-        general_box.append(active_border_color_section.get_widget());
-        general_box.append(inactive_border_color_section.get_widget());
-        general_box.append(border_resize_selection_box.get_widget());
-        general_box.append(allow_tearing_selection_box.get_widget());
+        general_box.append(inner_gap_spin_button_section.get_container_box());
+        general_box.append(outer_gap_spin_button_section.get_container_box());
+        general_box.append(border_size_spin_button_section.get_container_box());
+        general_box.append(active_border_color_section.get_container_box());
+        general_box.append(inactive_border_color_section.get_container_box());
+        general_box.append(border_resize_selection_box.get_container_box());
+        general_box.append(allow_tearing_selection_box.get_container_box());
         general_box
     }
 
@@ -394,19 +394,19 @@ impl AppearancePanel {
 
         decorations_box.append(&decoration_label);
         decorations_box.append(&separator);
-        decorations_box.append(rounding_spin_button.get_widget());
-        decorations_box.append(rounding_spin_power_button.get_widget());
-        decorations_box.append(dim_inactive_selection_box.get_widget());
-        decorations_box.append(active_opacity_spin_button.get_widget());
-        decorations_box.append(inactive_opacity_spin_button.get_widget());
-        decorations_box.append(active_shadows_selection_box.get_widget());
-        decorations_box.append(shadow_range_spin_button.get_widget());
-        decorations_box.append(shadow_render_power_spin_button.get_widget());
-        decorations_box.append(shadow_color_button.get_widget());
-        decorations_box.append(active_blur_selection_box.get_widget());
-        decorations_box.append(blur_size_spin_button.get_widget());
-        decorations_box.append(blur_passes_spin_button.get_widget());
-        decorations_box.append(blur_vibrancy_spin_button.get_widget());
+        decorations_box.append(rounding_spin_button.get_container_box());
+        decorations_box.append(rounding_spin_power_button.get_container_box());
+        decorations_box.append(dim_inactive_selection_box.get_container_box());
+        decorations_box.append(active_opacity_spin_button.get_container_box());
+        decorations_box.append(inactive_opacity_spin_button.get_container_box());
+        decorations_box.append(active_shadows_selection_box.get_container_box());
+        decorations_box.append(shadow_range_spin_button.get_container_box());
+        decorations_box.append(shadow_render_power_spin_button.get_container_box());
+        decorations_box.append(shadow_color_button.get_container_box());
+        decorations_box.append(active_blur_selection_box.get_container_box());
+        decorations_box.append(blur_size_spin_button.get_container_box());
+        decorations_box.append(blur_passes_spin_button.get_container_box());
+        decorations_box.append(blur_vibrancy_spin_button.get_container_box());
         decorations_box
     }
 
@@ -468,10 +468,10 @@ impl AppearancePanel {
 
         layouts_box.append(&layout_label);
         layouts_box.append(&separator);
-        layouts_box.append(layout_input_section.get_widget());
-        layouts_box.append(master_status_input_section.get_widget());
-        layouts_box.append(pseudo_tiling_selection_box.get_widget());
-        layouts_box.append(split_preservation_selection_box.get_widget());
+        layouts_box.append(layout_input_section.get_container_box());
+        layouts_box.append(master_status_input_section.get_container_box());
+        layouts_box.append(pseudo_tiling_selection_box.get_container_box());
+        layouts_box.append(split_preservation_selection_box.get_container_box());
         layouts_box
     }
 }

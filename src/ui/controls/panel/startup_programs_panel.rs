@@ -21,7 +21,7 @@ impl Panel for StartupProgramsPanel {
         }
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.program_panel_box
     }
 }
@@ -56,7 +56,7 @@ impl StartupProgramsPanel {
 
         let create_button_click_callback = move |_ :&Button| {
             let startup_entry = StartupProgramEntryRow::new(&startup_entries_box_clone, &settings_clone);
-            startup_entries_box_clone.append(startup_entry.get_widget());
+            startup_entries_box_clone.append(startup_entry.get_container_box());
             startup_entries_copy.borrow_mut().push(startup_entry);
         };
         let create_button = Button::with_label("➕ Add startup program");

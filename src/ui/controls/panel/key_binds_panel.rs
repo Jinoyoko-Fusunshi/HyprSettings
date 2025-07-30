@@ -21,7 +21,7 @@ pub struct KeyBindsPanel {
 impl Panel for KeyBindsPanel {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.key_binds_panel_box
     }
 }
@@ -82,18 +82,18 @@ impl KeyBindsPanel {
         let lock_screen_key_bind_field = KeyBindEntryField::new("Lock screen".to_string());
         let emoji_selector_key_bind_field = KeyBindEntryField::new("Emoji Selector".to_string());
 
-        section_box.append(terminal_key_bind_field.get_widget());
-        section_box.append(close_window_key_bind_field.get_widget());
-        section_box.append(exit_hyprland_key_bind_field.get_widget());
-        section_box.append(file_manager_key_bind_field.get_widget());
-        section_box.append(toggle_floating_key_bind_field.get_widget());
-        section_box.append(run_program_key_bind_field.get_widget());
-        section_box.append(pseudo_key_bind_field.get_widget());
-        section_box.append(split_window_key_bind_field.get_widget());
-        section_box.append(screenshot_key_bind_field.get_widget());
-        section_box.append(screenshot_window_key_bind_field.get_widget());
-        section_box.append(lock_screen_key_bind_field.get_widget());
-        section_box.append(emoji_selector_key_bind_field.get_widget());
+        section_box.append(terminal_key_bind_field.get_container_box());
+        section_box.append(close_window_key_bind_field.get_container_box());
+        section_box.append(exit_hyprland_key_bind_field.get_container_box());
+        section_box.append(file_manager_key_bind_field.get_container_box());
+        section_box.append(toggle_floating_key_bind_field.get_container_box());
+        section_box.append(run_program_key_bind_field.get_container_box());
+        section_box.append(pseudo_key_bind_field.get_container_box());
+        section_box.append(split_window_key_bind_field.get_container_box());
+        section_box.append(screenshot_key_bind_field.get_container_box());
+        section_box.append(screenshot_window_key_bind_field.get_container_box());
+        section_box.append(lock_screen_key_bind_field.get_container_box());
+        section_box.append(emoji_selector_key_bind_field.get_container_box());
     }
 
     fn create_focus_key_binds_box(section_box: &gtk::Box) {
@@ -102,10 +102,10 @@ impl KeyBindsPanel {
         let focus_top_window_key_bind_field = KeyBindEntryField::new("Focus top window".to_string());
         let focus_bottom_window_key_bind_field = KeyBindEntryField::new("Focus bottom window".to_string());
 
-        section_box.append(focus_left_window_bind_field.get_widget());
-        section_box.append(focus_right_window_bind_field.get_widget());
-        section_box.append(focus_top_window_key_bind_field.get_widget());
-        section_box.append(focus_bottom_window_key_bind_field.get_widget());
+        section_box.append(focus_left_window_bind_field.get_container_box());
+        section_box.append(focus_right_window_bind_field.get_container_box());
+        section_box.append(focus_top_window_key_bind_field.get_container_box());
+        section_box.append(focus_bottom_window_key_bind_field.get_container_box());
     }
 
     fn create_workspace_key_binds_box(section_box: &gtk::Box) {
@@ -120,16 +120,16 @@ impl KeyBindsPanel {
         let switch_workspace_nine = KeyBindEntryField::new("Workspace 9".to_string());
         let switch_workspace_zero = KeyBindEntryField::new("Workspace 0".to_string());
 
-        section_box.append(switch_workspace_one.get_widget());
-        section_box.append(switch_workspace_two.get_widget());
-        section_box.append(switch_workspace_three.get_widget());
-        section_box.append(switch_workspace_four.get_widget());
-        section_box.append(switch_workspace_five.get_widget());
-        section_box.append(switch_workspace_six.get_widget());
-        section_box.append(switch_workspace_seven.get_widget());
-        section_box.append(switch_workspace_eight.get_widget());
-        section_box.append(switch_workspace_nine.get_widget());
-        section_box.append(switch_workspace_zero.get_widget());
+        section_box.append(switch_workspace_one.get_container_box());
+        section_box.append(switch_workspace_two.get_container_box());
+        section_box.append(switch_workspace_three.get_container_box());
+        section_box.append(switch_workspace_four.get_container_box());
+        section_box.append(switch_workspace_five.get_container_box());
+        section_box.append(switch_workspace_six.get_container_box());
+        section_box.append(switch_workspace_seven.get_container_box());
+        section_box.append(switch_workspace_eight.get_container_box());
+        section_box.append(switch_workspace_nine.get_container_box());
+        section_box.append(switch_workspace_zero.get_container_box());
     }
 
     fn create_move_window_key_binds_box(section_box: &gtk::Box) {
@@ -144,16 +144,16 @@ impl KeyBindsPanel {
         let switch_window_workspace_nine = KeyBindEntryField::new("Move to Workspace 9".to_string());
         let switch_window_workspace_zero = KeyBindEntryField::new("Move to Workspace 0".to_string());
 
-        section_box.append(switch_window_workspace_one.get_widget());
-        section_box.append(switch_window_workspace_two.get_widget());
-        section_box.append(switch_window_workspace_three.get_widget());
-        section_box.append(switch_window_workspace_four.get_widget());
-        section_box.append(switch_window_workspace_five.get_widget());
-        section_box.append(switch_window_workspace_six.get_widget());
-        section_box.append(switch_window_workspace_seven.get_widget());
-        section_box.append(switch_window_workspace_eight.get_widget());
-        section_box.append(switch_window_workspace_nine.get_widget());
-        section_box.append(switch_window_workspace_zero.get_widget());
+        section_box.append(switch_window_workspace_one.get_container_box());
+        section_box.append(switch_window_workspace_two.get_container_box());
+        section_box.append(switch_window_workspace_three.get_container_box());
+        section_box.append(switch_window_workspace_four.get_container_box());
+        section_box.append(switch_window_workspace_five.get_container_box());
+        section_box.append(switch_window_workspace_six.get_container_box());
+        section_box.append(switch_window_workspace_seven.get_container_box());
+        section_box.append(switch_window_workspace_eight.get_container_box());
+        section_box.append(switch_window_workspace_nine.get_container_box());
+        section_box.append(switch_window_workspace_zero.get_container_box());
     }
 
     fn create_custom_key_binds_box(section_box: &gtk::Box) {
@@ -162,7 +162,7 @@ impl KeyBindsPanel {
 
         let add_custom_key_bind_entry_button_callback = move |_: &Button| {
             let custom_key_bind_entry_field = CustomKeyBindEntryField::new(&custom_key_bind_entries_box_clone);
-            custom_key_bind_entries_box_clone.append(custom_key_bind_entry_field.get_widget());
+            custom_key_bind_entries_box_clone.append(custom_key_bind_entry_field.get_container_box());
         };
         let add_custom_key_bind_entry_button = Button::with_label("Add custom key bind");
         add_custom_key_bind_entry_button.connect_clicked(add_custom_key_bind_entry_button_callback);

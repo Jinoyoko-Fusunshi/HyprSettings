@@ -12,5 +12,5 @@ pub mod key_binds_panel;
 pub trait Panel {
     fn reload_settings(&self, settings: &Rc<RefCell<HyprlandSettings>>);
 
-    fn get_widget(&self) -> &gtk::Box;
+    fn get_container_box(&self) -> &gtk::Box;
 }

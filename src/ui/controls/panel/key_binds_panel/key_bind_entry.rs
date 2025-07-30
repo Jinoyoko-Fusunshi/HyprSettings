@@ -25,7 +25,7 @@ impl Clone for KeyBindEntry {
 impl Panel for KeyBindEntry {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.key_bind_entry_box
     }
 }
@@ -119,7 +119,7 @@ impl KeyBindEntry {
             Self::clear_input_box(&key_bind_input_box_clone);
             for key in captured_keys {
                 let key_symbol = KeySymbol::new(key);
-                key_bind_input_box_clone.append(key_symbol.get_widget());
+                key_bind_input_box_clone.append(key_symbol.get_container_box());
             }
 
             Propagation::Proceed

@@ -13,7 +13,7 @@ pub struct DisplayPanel {
 impl Panel for DisplayPanel {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.widget
     }
 }
@@ -132,9 +132,9 @@ impl DisplayPanel {
             Some(refresh_rate_change_callback)
         );
 
-        monitor_video_setting_box.append(width_resolution_spin_button_section.get_widget());
-        monitor_video_setting_box.append(height_resolution_spin_button_section.get_widget());
-        monitor_video_setting_box.append(refresh_rate_spin_button_section.get_widget());
+        monitor_video_setting_box.append(width_resolution_spin_button_section.get_container_box());
+        monitor_video_setting_box.append(height_resolution_spin_button_section.get_container_box());
+        monitor_video_setting_box.append(refresh_rate_spin_button_section.get_container_box());
 
         entry_box.append(&monitor_display_info_box);
         entry_box.append(&monitor_video_setting_box);

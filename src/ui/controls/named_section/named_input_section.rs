@@ -12,7 +12,7 @@ pub struct NamedInputSection {
 impl Panel for NamedInputSection {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.panel
     }
 }

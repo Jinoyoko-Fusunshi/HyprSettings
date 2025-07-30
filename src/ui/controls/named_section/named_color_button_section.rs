@@ -13,7 +13,7 @@ pub struct NamedColorButtonSection {
 impl Panel for NamedColorButtonSection {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.color_button_box
     }
 }

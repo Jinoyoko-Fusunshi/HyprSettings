@@ -25,7 +25,7 @@ impl Panel for KeyBindEntryField {
         self.key_bind_entry.reload_settings(settings);
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.key_binds_entry_field_box
     }
 }
@@ -41,7 +41,7 @@ impl KeyBindEntryField {
 
         let key_bind_entry = KeyBindEntry::new();
         key_binds_entry_field_box.append(&entry_label);
-        key_binds_entry_field_box.append(key_bind_entry.get_widget());
+        key_binds_entry_field_box.append(key_bind_entry.get_container_box());
 
         Self {
             key_bind_entry,

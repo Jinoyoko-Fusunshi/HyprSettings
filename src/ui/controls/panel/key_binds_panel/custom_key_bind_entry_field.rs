@@ -13,7 +13,7 @@ pub struct CustomKeyBindEntryField {
 impl Panel for CustomKeyBindEntryField {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.key_binds_entry_box
     }
 }
@@ -41,9 +41,9 @@ impl CustomKeyBindEntryField {
 
         let key_bind_entry = KeyBindEntry::new();
         custom_key_bind_entry_box.append(&cancel_button);
-        custom_key_bind_entry_box.append(named_key_bind_entry_name.get_widget());
-        custom_key_bind_entry_box.append(named_key_bind_entry_command.get_widget());
-        custom_key_bind_entry_box.append(key_bind_entry.get_widget());
+        custom_key_bind_entry_box.append(named_key_bind_entry_name.get_container_box());
+        custom_key_bind_entry_box.append(named_key_bind_entry_command.get_container_box());
+        custom_key_bind_entry_box.append(key_bind_entry.get_container_box());
 
         Self {
             key_binds_entry_box: custom_key_bind_entry_box

@@ -22,7 +22,7 @@ impl Panel for StartupProgramEntryRow {
         self.update_selection_box(&programs);
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.program_entry_box
     }
 }

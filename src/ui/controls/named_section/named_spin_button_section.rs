@@ -13,7 +13,7 @@ pub struct NamedSpinButtonSection {
 impl Panel for NamedSpinButtonSection {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.spin_button_box
     }
 }

@@ -12,7 +12,7 @@ pub struct GeneralPanel {
 impl Panel for GeneralPanel {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.widget
     }
 }
@@ -106,12 +106,12 @@ impl GeneralPanel{
 
         general_panel_box.append(&programs_label);
         general_panel_box.append(&separator);
-        general_panel_box.append(config_section.get_widget());
-        general_panel_box.append(terminal_section.get_widget());
-        general_panel_box.append(file_manager_section.get_widget());
-        general_panel_box.append(quick_search_section.get_widget());
-        general_panel_box.append(lock_screen_section.get_widget());
-        general_panel_box.append(notification_handler_section.get_widget());
+        general_panel_box.append(config_section.get_container_box());
+        general_panel_box.append(terminal_section.get_container_box());
+        general_panel_box.append(file_manager_section.get_container_box());
+        general_panel_box.append(quick_search_section.get_container_box());
+        general_panel_box.append(lock_screen_section.get_container_box());
+        general_panel_box.append(notification_handler_section.get_container_box());
 
         Self {
             widget: general_panel_box

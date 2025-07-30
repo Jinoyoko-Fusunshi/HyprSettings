@@ -12,7 +12,7 @@ pub struct KeySymbol {
 impl Panel for KeySymbol {
     fn reload_settings(&self, _: &Rc<RefCell<HyprlandSettings>>) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_container_box(&self) -> &gtk::Box {
         &self.key_symbol_box
     }
 }
