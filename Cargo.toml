@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 gtk = { version = "0.9.7", package = "gtk4", features = ["v4_6"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_yaml = "0.9.33"

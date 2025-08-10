@@ -9,6 +9,7 @@ use crate::ui::controls::named_section::{
 };
 use crate::ui::controls::panel::Panel;
 use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::settings::rgba_color::RGBAColor;
 
 pub struct AppearancePanel {
     widget: gtk::Box,
@@ -74,40 +75,49 @@ impl AppearancePanel {
         let separator = Separator::new(Orientation::Horizontal);
 
         // Wallpaper image path option
-        let settings_clone = settings.clone();
-        let wallpaper_image_input_action = move |entry: &Entry| {
-            settings_clone.borrow_mut().appearance_settings.wallpaper_path = entry.text().to_string();
+        let wallpaper_image_input_callback = {
+            let settings_clone = settings.clone();
+            move |entry: &Entry| {
+                settings_clone.borrow_mut().appearance_settings.wallpaper_path = entry.text().to_string();
+            }
         };
         let wallpaper_image_input_section = NamedInputSection::new(
             "wallpaper path:",
             "e.g. ~/Pictures/wallpaper.png",
-            Some(wallpaper_image_input_action)
+            Some(settings.clone().borrow().appearance_settings.wallpaper_path.clone())
         );
+        wallpaper_image_input_section.set_input_callback(wallpaper_image_input_callback);
 
         // Force default wallpaper option
-        let settings_clone = settings.clone();
-        let force_default_wallpaper_selection_changed_callback = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().appearance_settings.force_default_wallpaper = bool_value;
+        let force_default_wallpaper_selection_changed_callback = {
+            let settings_clone = settings.clone();
+            move |entry: &ComboBoxText| {
+                let selected_text = entry.active_text().expect("Cannot read active selection text");
+                let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
+                settings_clone.borrow_mut().appearance_settings.force_default_wallpaper = bool_value;
+            }
         };
         let force_default_wallpaper_options = vec!["false", "true"];
         let mut force_default_wallpaper_selection = NamedSelectionBox::new(
             "Force default wallpaper:", force_default_wallpaper_options,
+            Some(settings.clone().borrow().appearance_settings.force_default_wallpaper.to_string().as_str()),
             Some(force_default_wallpaper_selection_changed_callback)
         );
         force_default_wallpaper_selection.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
         // Disable hyprland logo option
-        let settings_clone = settings.clone();
-        let disable_hyprland_logo_selection_changed_callback = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            settings_clone.borrow_mut().appearance_settings.disable_hyprland_logo = bool_value;
+        let disable_hyprland_logo_selection_changed_callback = {
+            let settings_clone = settings.clone();
+            move |entry: &ComboBoxText| {
+                let selected_text = entry.active_text().expect("Cannot read active selection text");
+                let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
+                settings_clone.borrow_mut().appearance_settings.disable_hyprland_logo = bool_value;
+            }
         };
         let disable_hyprland_logo_options = vec!["false", "true"];
         let mut disable_hyprland_logo_selection = NamedSelectionBox::new(
             "Disable hyprland logo:", disable_hyprland_logo_options,
+            Some(settings.clone().borrow().appearance_settings.disable_hyprland_logo.to_string().as_str()),
             Some(disable_hyprland_logo_selection_changed_callback)
         );
         disable_hyprland_logo_selection.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
@@ -134,11 +144,13 @@ impl AppearancePanel {
         };
         let mut inner_gap_spin_button_section = NamedSpinButtonSection::new(
             "Inner gab:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(inner_gap_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.inner_gab,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
         inner_gap_spin_button_section.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        inner_gap_spin_button_section.set_change_callback(inner_gap_spin_button_changed_callback);
 
         // Outer gap option
         let settings_clone = settings.clone();
@@ -147,11 +159,13 @@ impl AppearancePanel {
         };
         let mut outer_gap_spin_button_section = NamedSpinButtonSection::new(
             "Outer gab:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(outer_gap_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.outer_gab,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
         outer_gap_spin_button_section.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        outer_gap_spin_button_section.set_change_callback(outer_gap_spin_button_changed_callback);
 
         // Border size option
         let settings_clone = settings.clone();
@@ -160,29 +174,35 @@ impl AppearancePanel {
         };
         let mut border_size_spin_button_section = NamedSpinButtonSection::new(
             "Border size:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(border_size_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.border_size,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
         border_size_spin_button_section.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        border_size_spin_button_section.set_change_callback(border_size_spin_button_changed_callback);
 
         // Active border option
         let settings_clone = settings.clone();
         let active_border_color_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().appearance_settings.active_border_color = color_button.rgba();
+            settings_clone.borrow_mut().appearance_settings.active_border_color = RGBAColor::new(color_button.rgba());
         };
         let mut active_border_color_section = NamedColorButtonSection::new(
-            "Active Border:", active_border_color_changed_callback
+            "Active Border:", 
+            Some(settings.clone().borrow().appearance_settings.active_border_color.clone()),
+            active_border_color_changed_callback
         );
         active_border_color_section.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
         // Inactive border option
         let settings_clone = settings.clone();
         let inactive_border_color_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().appearance_settings.inactive_border_color = color_button.rgba();
+            settings_clone.borrow_mut().appearance_settings.inactive_border_color = RGBAColor::new(color_button.rgba());
         };
         let mut inactive_border_color_section = NamedColorButtonSection::new(
-            "Inactive Border:", inactive_border_color_changed_callback
+            "Inactive Border:", 
+            Some(settings.clone().borrow().appearance_settings.inactive_border_color.clone()),
+            inactive_border_color_changed_callback
         );
         inactive_border_color_section.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -195,7 +215,9 @@ impl AppearancePanel {
         };
         let resize_options = vec!["false", "true"];
         let mut border_resize_selection_box = NamedSelectionBox::new(
-            "Resize on border:", resize_options, Some(border_resize_selection_changed_callback)
+            "Resize on border:", resize_options,
+            Some(settings.clone().borrow().appearance_settings.resize_on_border.to_string().as_str()),
+            Some(border_resize_selection_changed_callback)
         );
         border_resize_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -208,7 +230,9 @@ impl AppearancePanel {
         };
         let tearing_options = vec!["false", "true"];
         let mut allow_tearing_selection_box = NamedSelectionBox::new(
-            "Allow tearing:", tearing_options, Some(tearing_selection_changed_callback)
+            "Allow tearing:", tearing_options,
+            Some(settings.clone().borrow().appearance_settings.allow_tearing.to_string().as_str()),
+            Some(tearing_selection_changed_callback)
         );
         allow_tearing_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -238,11 +262,13 @@ impl AppearancePanel {
         };
         let mut rounding_spin_button = NamedSpinButtonSection::new(
             "Rounding:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(rounding_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.rounding,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
         rounding_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        rounding_spin_button.set_change_callback(rounding_spin_button_changed_callback);
 
         // Rounding power option
         let settings_clone = settings.clone();
@@ -251,11 +277,13 @@ impl AppearancePanel {
         };
         let mut rounding_spin_power_button = NamedSpinButtonSection::new(
             "Rounding power:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(rounding_spin_power_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.rounding_power,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
         rounding_spin_power_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        rounding_spin_power_button.set_change_callback(rounding_spin_power_button_changed_callback);
 
         // Dim inactive option
         let settings_clone = settings.clone();
@@ -266,7 +294,9 @@ impl AppearancePanel {
         };
         let dim_inactive_options = vec!["false", "true"];
         let mut dim_inactive_selection_box = NamedSelectionBox::new(
-            "Dim inactive:", dim_inactive_options, Some(dim_inactive_selection_changed_callback)
+            "Dim inactive:", dim_inactive_options,
+            Some(settings.clone().borrow().appearance_settings.dim_inactive.to_string().as_str()),
+            Some(dim_inactive_selection_changed_callback)
         );
         dim_inactive_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -277,11 +307,13 @@ impl AppearancePanel {
         };
         let mut active_opacity_spin_button = NamedSpinButtonSection::new(
             "Active opacity:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(active_opacity_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.active_opacity,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
-        active_opacity_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);      
+        active_opacity_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        active_opacity_spin_button.set_change_callback(active_opacity_spin_button_changed_callback);
 
         // Inactive opacity option
         let settings_clone = settings.clone();
@@ -290,11 +322,13 @@ impl AppearancePanel {
         };
         let mut inactive_opacity_spin_button = NamedSpinButtonSection::new(
             "Inactive opacity:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(inactive_opacity_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.inactive_opacity,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
-        inactive_opacity_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);      
+        inactive_opacity_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        inactive_opacity_spin_button.set_change_callback(inactive_opacity_spin_button_changed_callback);
 
         // Active shadows option
         let settings_clone = settings.clone();
@@ -305,6 +339,7 @@ impl AppearancePanel {
         };
         let mut active_shadows_selection_box = NamedSelectionBox::new(
           "Active shadows:", vec!["false", "true"],
+            Some(settings.clone().borrow().appearance_settings.active_shadow.to_string().as_str()),
             Some(active_shadows_selection_changed_callback)
         );
         active_shadows_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
@@ -316,11 +351,13 @@ impl AppearancePanel {
         };
         let mut shadow_range_spin_button = NamedSpinButtonSection::new(
             "Shadow range:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.shadow_range,
+            0.1, 1.0,
             0.0, 1.0, 1, false,
-            Some(shadow_range_spin_button_changed_callback)
         );
         shadow_range_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        shadow_range_spin_button.set_change_callback(shadow_range_spin_button_changed_callback);
 
         // Shadow render power option
         let settings_clone = settings.clone();
@@ -329,18 +366,24 @@ impl AppearancePanel {
         };
         let mut shadow_render_power_spin_button = NamedSpinButtonSection::new(
             "Shadow render power:",
-            0.0, 100.0, 10.0, 0.1, 1.0,
-            0.0, 1.0, 1, false,
-            Some(shadow_render_power_spin_button_changed_callback)
+            0.0, 100.0,
+            settings.clone().borrow().appearance_settings.shadow_render_power,
+            0.1, 1.0,
+            0.0, 1.0, 1, false
         );
-        shadow_render_power_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);      
+        shadow_render_power_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        shadow_render_power_spin_button.set_change_callback(shadow_render_power_spin_button_changed_callback);
 
         // Shadow color option
         let settings_clone = settings.clone();
         let shadow_color_button_changed_callback = move |color_button: &ColorButton| {
-            settings_clone.borrow_mut().appearance_settings.shadow_color = color_button.rgba();
+            settings_clone.borrow_mut().appearance_settings.shadow_color = RGBAColor::new(color_button.rgba());
         };
-        let mut shadow_color_button = NamedColorButtonSection::new("Shadow color:", shadow_color_button_changed_callback);
+        let mut shadow_color_button = NamedColorButtonSection::new(
+            "Shadow color:", 
+            Some(settings.clone().borrow().appearance_settings.shadow_color.clone()),
+            shadow_color_button_changed_callback
+        );
         shadow_color_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
         // Active blur option
@@ -352,7 +395,9 @@ impl AppearancePanel {
         };
         let active_blur_options = vec!["false", "true"];
         let mut active_blur_selection_box = NamedSelectionBox::new(
-            "Active blur:", active_blur_options, Some(active_blur_selection_changed_callback)
+            "Active blur:", active_blur_options,
+            Some(settings.clone().borrow().appearance_settings.active_blur.to_string().as_str()),
+            Some(active_blur_selection_changed_callback)
         );
         active_blur_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -362,11 +407,13 @@ impl AppearancePanel {
             settings_clone.borrow_mut().appearance_settings.blur_size = spin_button.value();
         };
         let mut blur_size_spin_button = NamedSpinButtonSection::new(
-            "Blur size:", 0.0, 100.0, 10.0, 0.1,
-            1.0, 0.0, 1.0, 1, false,
-            Some(blur_size_spin_button_changed_callback)
+            "Blur size:", 0.0, 100.0,
+            settings.clone().borrow().appearance_settings.blur_size,
+            0.1,
+            1.0, 0.0, 1.0, 1, false
         );
-        blur_size_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);      
+        blur_size_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        blur_size_spin_button.set_change_callback(blur_size_spin_button_changed_callback);
 
         // Blur passes option
         let settings_clone = settings.clone();
@@ -374,11 +421,13 @@ impl AppearancePanel {
             settings_clone.borrow_mut().appearance_settings.blur_passes = spin_button.value() as usize;
         };
         let mut blur_passes_spin_button = NamedSpinButtonSection::new(
-            "Blur passes:", 0.0, 100.0, 10.0, 0.1,
-            1.0, 0.0, 1.0, 1, false,
-            Some(blur_passes_spin_button_changed_callback)
+            "Blur passes:", 0.0, 100.0,
+            settings.clone().borrow().appearance_settings.blur_passes as f64,
+            0.1,
+            1.0, 0.0, 1.0, 1, false
         );
-        blur_passes_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);     
+        blur_passes_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        blur_passes_spin_button.set_change_callback(blur_passes_spin_button_changed_callback);
 
         // Blur vibrancy option
         let settings_clone = settings.clone();
@@ -386,11 +435,13 @@ impl AppearancePanel {
             settings_clone.borrow_mut().appearance_settings.blur_vibrancy = spin_button.value();
         };
         let mut blur_vibrancy_spin_button = NamedSpinButtonSection::new(
-            "Blur vibrancy:", 0.0, 100.0, 10.0, 0.1,
-            1.0, 0.0, 1.0, 1, false,
-            Some(blur_vibrancy_spin_button_changed_callback)
+            "Blur vibrancy:", 0.0, 100.0,
+            settings.clone().borrow().appearance_settings.blur_vibrancy,
+            0.1,
+            1.0, 0.0, 1.0, 1, false
         );
-        blur_vibrancy_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);     
+        blur_vibrancy_spin_button.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
+        blur_vibrancy_spin_button.set_change_callback(blur_vibrancy_spin_button_changed_callback);
 
         decorations_box.append(&decoration_label);
         decorations_box.append(&separator);
@@ -426,8 +477,10 @@ impl AppearancePanel {
           settings_clone.borrow_mut().appearance_settings.layout = entry.text().to_string();
         };
         let layout_input_section = NamedInputSection::new(
-            "Layout:", "e.g. dwindle, ", Some(layout_input_changed_callback)
+            "Layout:", "e.g. dwindle, ",
+            Some(settings.clone().borrow().appearance_settings.layout.clone())
         );
+        layout_input_section.set_input_callback(layout_input_changed_callback);
 
         // Pseudo tiling option
         let settings_clone = settings.clone();
@@ -438,7 +491,9 @@ impl AppearancePanel {
         };
         let pseudo_tiling_options = vec!["false", "true"];
         let mut pseudo_tiling_selection_box = NamedSelectionBox::new(
-          "Pseudo tiling:", pseudo_tiling_options, Some(pseudo_tiling_selection_changed_callback)
+          "Pseudo tiling:", pseudo_tiling_options,
+            Some(settings.clone().borrow().appearance_settings.pseudo_tiling.to_string().as_str()),
+            Some(pseudo_tiling_selection_changed_callback)
         );
         pseudo_tiling_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
 
@@ -452,6 +507,7 @@ impl AppearancePanel {
         let split_preservation_options = vec!["false", "true"];
         let mut split_preservation_selection_box = NamedSelectionBox::new(
             "Split preservation:", split_preservation_options,
+            Some(settings.clone().borrow().appearance_settings.force_default_wallpaper.to_string().as_str()),
             Some(split_preservation_selection_changed_callback)
         );
         split_preservation_selection_box.set_label_width(AppearancePanel::APPEARANCE_LABEL_WIDTH);
@@ -463,8 +519,9 @@ impl AppearancePanel {
         };
         let master_status_input_section = NamedInputSection::new(
             "Master status:", "e.g. master, ",
-            Some(master_status_input_changed_callback)
+            Some(settings.clone().borrow().appearance_settings.master_status.clone())
         );
+        master_status_input_section.set_input_callback(master_status_input_changed_callback);
 
         layouts_box.append(&layout_label);
         layouts_box.append(&separator);

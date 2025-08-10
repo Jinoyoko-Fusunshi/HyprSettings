@@ -25,7 +25,7 @@ impl CategoryContentHandler {
         let display_panel = Box::new(display_panel::DisplayPanel::new(settings));
         let appearance_panel = Box::new(appearance_panel::AppearancePanel::new(settings));
         let startup_programs_panel = Box::new(startup_programs_panel::StartupProgramsPanel::new(settings));
-        let keybinds_panel = Box::new(key_binds_panel::KeyBindsPanel::new());
+        let keybinds_panel = Box::new(key_binds_panel::KeyBindsPanel::new(settings));
         let info_panel = Box::new(info_panel::InfoPanel::new());
 
         let mut category_panels_map: HashMap<String, Box<dyn Panel>> = HashMap::new();

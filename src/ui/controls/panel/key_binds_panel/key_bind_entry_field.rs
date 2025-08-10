@@ -3,6 +3,7 @@ use std::rc::Rc;
 use gtk::{Label, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::settings::key_binds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::controls::panel::key_binds_panel::key_bind_entry::KeyBindEntry;
 use crate::ui::controls::panel::Panel;
 
@@ -31,7 +32,9 @@ impl Panel for KeyBindEntryField {
 }
 
 impl KeyBindEntryField {
-    pub fn new(entry_name: String) -> Self {
+    pub fn new(
+        entry_name: String, selected_key_bind: Option<KeyBindConfiguration>
+    ) -> Self {
         let key_binds_entry_field_box = gtk::Box::new(Orientation::Horizontal, 10);
         key_binds_entry_field_box.set_height_request(56);
 
@@ -39,7 +42,8 @@ impl KeyBindEntryField {
         entry_label.set_xalign(0.0);
         entry_label.set_width_request(200);
 
-        let key_bind_entry = KeyBindEntry::new();
+        let key_bind_entry: KeyBindEntry = KeyBindEntry::new(selected_key_bind);
+
         key_binds_entry_field_box.append(&entry_label);
         key_binds_entry_field_box.append(key_bind_entry.get_container_box());
 
@@ -47,5 +51,9 @@ impl KeyBindEntryField {
             key_bind_entry,
             key_binds_entry_field_box
         }
+    }
+
+    pub fn set_input_callback(&self, callback: impl Fn(KeyBindConfiguration) + 'static) {
+        self.key_bind_entry.set_input_callback(callback);
     }
 }

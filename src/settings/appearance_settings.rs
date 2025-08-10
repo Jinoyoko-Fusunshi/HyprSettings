@@ -1,6 +1,7 @@
-use gtk::gdk::RGBA;
+use serde::{Deserialize, Serialize};
+use crate::settings::rgba_color::RGBAColor;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppearanceSettings {
     pub wallpaper_path: String,
     pub force_default_wallpaper: bool,
@@ -8,8 +9,8 @@ pub struct AppearanceSettings {
     pub inner_gab: f64,
     pub outer_gab: f64,
     pub border_size: f64,
-    pub active_border_color: RGBA,
-    pub inactive_border_color: RGBA,
+    pub active_border_color: RGBAColor,
+    pub inactive_border_color: RGBAColor,
     pub resize_on_border: bool,
     pub allow_tearing: bool,
     pub rounding: f64,
@@ -20,7 +21,7 @@ pub struct AppearanceSettings {
     pub active_shadow: bool,
     pub shadow_range: f64,
     pub shadow_render_power: f64,
-    pub shadow_color: RGBA,
+    pub shadow_color: RGBAColor,
     pub active_blur: bool,
     pub blur_size: f64,
     pub blur_passes: usize,

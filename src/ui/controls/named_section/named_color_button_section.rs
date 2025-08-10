@@ -1,9 +1,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, ColorButton, Label};
-use gtk::prelude::{BoxExt, WidgetExt};
+use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
 use crate::ui::controls::panel::Panel;
 use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::settings::rgba_color::RGBAColor;
 
 pub struct NamedColorButtonSection {
     color_button_box: gtk::Box,
@@ -19,7 +20,7 @@ impl Panel for NamedColorButtonSection {
 }
 
 impl NamedColorButtonSection {
-    pub fn new(label_text: &str, color_changed_callback: impl Fn(&ColorButton) + 'static) -> NamedColorButtonSection {
+    pub fn new(label_text: &str, selected_color: Option<RGBAColor>, color_changed_callback: impl Fn(&ColorButton) + 'static) -> NamedColorButtonSection {
         let color_button_box = gtk::Box::new(gtk::Orientation::Horizontal, 10);
         
         let color_button_label = Label::new(Some(label_text));
@@ -27,6 +28,10 @@ impl NamedColorButtonSection {
         color_button_label.set_xalign(0.0);
         
         let color_button = ColorButton::new();
+        if let Some(color) = selected_color {
+            color_button.set_rgba(color.get_rgba())
+        }
+
         color_button.connect_color_set(color_changed_callback);
         
         color_button_box.append(&color_button_label);

@@ -20,7 +20,7 @@ impl Panel for NamedSelectionBox {
 
 impl NamedSelectionBox {
     pub fn new(
-        label_text: &str, options: Vec<&str>, 
+        label_text: &str, available_options: Vec<&str>, selected_option: Option<&str>,
         selection_changed_callback: Option<impl Fn(&ComboBoxText) + 'static>
     ) -> NamedSelectionBox {
         let selection_box = gtk::Box::new(Orientation::Horizontal, 10);
@@ -30,11 +30,19 @@ impl NamedSelectionBox {
         selection_box_label.set_xalign(0.0);
         
         let combobox = ComboBoxText::new();
-        for option in options {
+        for option in available_options.clone() {
             combobox.append_text(option);
         }
-        combobox.set_active(Some(0));
 
+        let mut selected_option_index = 0;
+        if let Some(option_text) = selected_option {
+            let selected_index = available_options.iter().position(|&option| option == option_text);
+            if let Some(index) = selected_index {
+                selected_option_index = index as u32;
+            }
+        }
+
+        combobox.set_active(Some(selected_option_index));
         if let Some(callback) = selection_changed_callback {
             combobox.connect_changed(callback);
         }

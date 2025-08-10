@@ -3,6 +3,8 @@ mod ui;
 mod category_content_handler;
 
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::fs;
 use std::process::Command;
 use std::rc::Rc;
 use gtk::prelude::*;
@@ -17,6 +19,10 @@ use crate::category_content_handler::{
     CategoryContentHandler, APPEARANCE_PANEL_NAME, DISPLAY_PANEL_NAME, GENERAL_PANEL_NAME,
     INFO_PANEL_NAME, KEYBINDS_PANEL_NAME, STARTUP_PROGRAM_PANEL_NAME
 };
+use crate::settings::config_files::settings_reader::SettingsReader;
+use crate::settings::config_files::settings_writer::SettingsWriter;
+use crate::settings::config_files::yaml_settings_reader::YamlSettingsReader;
+use crate::settings::config_files::yaml_settings_writer::YamlSettingsWriter;
 
 fn main() {
     // GTK application initialization
@@ -42,30 +48,9 @@ fn application_activation_setup(application: &Application) {
 
     // The settings container being updated by the individual panels
     let settings = Rc::new(RefCell::new(HyprlandSettings::new()));
-
-    let output = Command::new("wlr-randr")
-        .output()
-        .expect("Error during wlrandr execution");
-
-    let output_string = String::from_utf8(output.stdout)
-        .expect("Failed to parse wlr-randr output");
-
-    let mut monitor_info_parser = MonitorInfoParser::new();
-    monitor_info_parser.parse_output(&output_string);
-    let monitor_information = monitor_info_parser.get_result();
-
-    let max_monitor_configurations = monitor_information
-        .iter()
-        .map(|monitor_information| {
-            MonitorConfiguration {
-                enabled: true,
-                information: monitor_information.clone(),
-                video_mode: monitor_information.max_video_mode.clone()
-            }
-        })
-        .collect::<Vec<MonitorConfiguration>>();
-
-    settings.borrow_mut().monitor_configurations = max_monitor_configurations;
+    load_settings(&settings);
+    
+    
 
     // Basic window layout of a navigation and content panel
     let window_container = gtk::Box::new(Orientation::Horizontal, 10);
@@ -85,7 +70,6 @@ fn application_activation_setup(application: &Application) {
     // The navigation buttons to toggle the individual category panel
     let settings_clone = settings.clone();
     let category_panels = Rc::new(RefCell::new(CategoryContentHandler::new(&settings_clone)));
-
     let general_button = create_category_button("general", GENERAL_PANEL_NAME, &settings_clone, &category_panels);
     let display_button = create_category_button("display", DISPLAY_PANEL_NAME, &settings_clone, &category_panels);
     let appearance_button = create_category_button("appearance", APPEARANCE_PANEL_NAME, &settings_clone, &category_panels);
@@ -93,9 +77,10 @@ fn application_activation_setup(application: &Application) {
     let keybinds_button = create_category_button("keybinds", KEYBINDS_PANEL_NAME, &settings_clone, &category_panels);
     let info_button = create_category_button("info", INFO_PANEL_NAME, &settings_clone, &category_panels);
 
-    let settings_clone = settings.clone();
     let save_button_click_callback = move |_: &Button| {
-        println!("{:?}", settings_clone.borrow())
+        let mut toml_writer = YamlSettingsWriter::new(&settings);
+        toml_writer.serialize_settings();
+        let _ = toml_writer.write_to_config_file();
     };
     let save_button = create_button("Save", Some(save_button_click_callback));
     save_button.set_margin_top(10);
@@ -124,6 +109,46 @@ fn load_css_styles() {
 
     let display = Display::default().expect("Could not get default display");
     gtk::style_context_add_provider_for_display(&display, &provider, STYLE_PROVIDER_PRIORITY_USER);
+}
+
+fn load_settings(settings: &Rc<RefCell<HyprlandSettings>>) {
+    if fs::exists("hyprsettings.yaml").expect("Cannot verify existence of settings file") {
+        let mut settings_reader = YamlSettingsReader::new();
+        settings_reader.read_from_config();
+        settings_reader.apply_settings(settings);
+    } else {
+        load_monitor_default_settings(settings)
+    }
+}
+
+fn load_monitor_default_settings(settings: &Rc<RefCell<HyprlandSettings>>) {
+    let output = Command::new("wlr-randr")
+        .output()
+        .expect("Error during wlrandr execution");
+
+    let output_string = String::from_utf8(output.stdout)
+        .expect("Failed to parse wlr-randr output");
+
+    let mut monitor_info_parser = MonitorInfoParser::new();
+    monitor_info_parser.parse_output(&output_string);
+    let monitor_information = monitor_info_parser.get_result();
+
+    let max_monitor_configurations: HashMap<String, MonitorConfiguration> = monitor_information
+        .iter()
+        .map(|monitor_information| {
+
+            let port = monitor_information.port_name.clone();
+            let configuration = MonitorConfiguration {
+                enabled: true,
+                information: monitor_information.clone(),
+                video_mode: monitor_information.max_video_mode.clone()
+            };
+
+            (port, configuration)
+        })
+        .collect();
+
+    settings.borrow_mut().monitor_configurations = max_monitor_configurations;
 }
 
 fn create_category_button(

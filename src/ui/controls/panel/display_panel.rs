@@ -1,6 +1,7 @@
 use std::cell::{RefCell};
 use std::rc::Rc;
-use gtk::{glib, Align, Label, Orientation, Separator, SpinButton, Switch};
+use gtk::{Align, Label, Orientation, Separator, SpinButton, Switch};
+use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::controls::{named_section::named_spin_button_section::NamedSpinButtonSection, panel::Panel};
 use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
@@ -37,42 +38,25 @@ impl DisplayPanel {
         let available_displays_label = Label::new(Some("Available displays"));
         widget.append(&available_displays_label);
 
-        let mut monitor_index: usize = 0;
-        for monitor_setting in settings.borrow_mut().monitor_configurations.iter() {
+        let monitor_ports = settings.clone().borrow().get_monitor_ports();
+        for monitor_port in monitor_ports {
             let settings_clone = settings.clone();
-            let status_action_callback = move |_: &Switch, state: bool| -> glib::Propagation {
-                settings_clone.borrow_mut().monitor_configurations[monitor_index].enabled = state;
-                glib::Propagation::Proceed
-            };
-
-            let settings_clone = settings.clone();
-            let width_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_configurations[monitor_index]
-                    .video_mode.width_resolution = spin_button.value() as u32;
-            };
-
-            let settings_clone = settings.clone();
-            let height_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_configurations[monitor_index]
-                    .video_mode.height_resolution = spin_button.value() as u32;
-            };
-
-            let settings_clone = settings.clone();
-            let refresh_rate_change_callback = move |spin_button: &SpinButton| {
-                settings_clone.borrow_mut().monitor_configurations[monitor_index]
-                    .video_mode.refresh_rate = spin_button.value() as u32;
-            };
+            let mut hyprland_settings = settings_clone.borrow_mut();
+            let monitor_configuration = hyprland_settings.monitor_configurations
+                .get_mut(&monitor_port.clone())
+                .unwrap();
 
             let display_entry = DisplayPanel::create_display_entry(
-                monitor_setting, status_action_callback, width_change_callback,
-                height_change_callback, refresh_rate_change_callback
+                monitor_configuration.clone(),
+                DisplayPanel::create_status_action_callback(settings.clone(), monitor_port.clone()),
+                DisplayPanel::create_width_change_callback(settings.clone(), monitor_port.clone()),
+                DisplayPanel::create_height_change_callback(settings.clone(), monitor_port.clone()),
+                DisplayPanel::create_refresh_rate_change_callback(settings.clone(), monitor_port.clone())
             );
             let vertical_separator = Separator::new(Orientation::Vertical);
 
             widget.append(&vertical_separator);
             widget.append(&display_entry);
-
-            monitor_index += 1;
         }
 
         Self {
@@ -80,9 +64,10 @@ impl DisplayPanel {
         }
     }
 
+    //TODO: Extract the part in its own sub component and set each callback individually"
     fn create_display_entry(
-        monitor_configuration: &MonitorConfiguration,
-        status_action_callback: impl Fn(&Switch, bool) -> glib::Propagation + 'static,
+        monitor_configuration: MonitorConfiguration,
+        status_action_callback: impl Fn(&Switch, bool) -> Propagation + 'static,
         width_change_callback: impl Fn(&SpinButton) + 'static,
         height_change_callback: impl Fn(&SpinButton) + 'static,
         refresh_rate_change_callback: impl Fn(&SpinButton) + 'static,
@@ -117,20 +102,23 @@ impl DisplayPanel {
         // The toggle button to set the monitor width size
         let width_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
             "Width:", min_video_mode.width_resolution, max_video_mode.width_resolution,
-            Some(width_change_callback)
+            Some(monitor_configuration.video_mode.width_resolution)
         );
+        width_resolution_spin_button_section.set_change_callback(width_change_callback);
 
         // The toggle button to set the monitor height size
         let height_resolution_spin_button_section = DisplayPanel::create_display_spin_button(
             "Height:", min_video_mode.height_resolution, max_video_mode.height_resolution,
-            Some(height_change_callback)
+            Some(monitor_configuration.video_mode.height_resolution)
         );
+        height_resolution_spin_button_section.set_change_callback(height_change_callback);
 
         // The toggle button to set the monitor refresh rate
         let refresh_rate_spin_button_section = DisplayPanel::create_display_spin_button(
             "Refresh Rate:", min_video_mode.refresh_rate, max_video_mode.refresh_rate,
-            Some(refresh_rate_change_callback)
+            Some(monitor_configuration.video_mode.refresh_rate)
         );
+        refresh_rate_spin_button_section.set_change_callback(refresh_rate_change_callback);
 
         monitor_video_setting_box.append(width_resolution_spin_button_section.get_container_box());
         monitor_video_setting_box.append(height_resolution_spin_button_section.get_container_box());
@@ -151,18 +139,70 @@ impl DisplayPanel {
     }
 
     fn create_display_spin_button(
-        label_text: &str, min_value: u32, max_value: u32,
-        spin_button_change_callback: Option<impl Fn(&SpinButton) + 'static>
+        label_text: &str, min_value: u32, max_value: u32, current_value: Option<u32>,
     ) -> NamedSpinButtonSection {
         const NORMAL_INCREMENT_VALUE: f64 = 160.0;
         const PAGE_INCREMENT_VALUE: f64 = 320.0;
         const CLIMB_RATE: f64 = 1.0;
         const DISPLAYED_FLOAT_DIGITS: u32 = 0;
 
+        let selected_value = current_value.unwrap_or_else(|| max_value);
         NamedSpinButtonSection::new(
-            label_text, min_value as f64, max_value as f64, max_value as f64, NORMAL_INCREMENT_VALUE,
+            label_text, min_value as f64, max_value as f64, selected_value as f64, NORMAL_INCREMENT_VALUE,
             PAGE_INCREMENT_VALUE, 0.0, CLIMB_RATE, DISPLAYED_FLOAT_DIGITS,
-            false, spin_button_change_callback
+            false
         )
+    }
+
+    fn create_status_action_callback(
+        settings: Rc<RefCell<HyprlandSettings>>, monitor_port: String
+    ) -> impl Fn(&Switch, bool) -> Propagation {
+        move |_: &Switch, state: bool| -> Propagation {
+            let mut hyprland_settings = settings.borrow_mut();
+            let monitor_configuration = hyprland_settings.monitor_configurations
+                .get_mut(&monitor_port)
+                .unwrap();
+
+            monitor_configuration.enabled = state;
+            Propagation::Proceed
+        }
+    }
+
+    fn create_width_change_callback(
+        settings: Rc<RefCell<HyprlandSettings>>, monitor_port: String
+    ) -> impl Fn(&SpinButton) {
+        move |spin_button: &SpinButton| {
+            let mut hyprland_settings = settings.borrow_mut();
+            let monitor_configuration = hyprland_settings.monitor_configurations
+                .get_mut(&monitor_port)
+                .unwrap();
+            monitor_configuration.video_mode.width_resolution = spin_button.value() as u32;
+        }
+    }
+
+    fn create_height_change_callback(
+        settings: Rc<RefCell<HyprlandSettings>>, monitor_port: String
+    ) -> impl Fn(&SpinButton) {
+        move |spin_button: &SpinButton| {
+            let mut hyprland_settings = settings.borrow_mut();
+            let monitor_configuration = hyprland_settings.monitor_configurations
+                .get_mut(&monitor_port)
+                .unwrap();
+
+            monitor_configuration.video_mode.height_resolution = spin_button.value() as u32;
+        }
+    }
+
+    fn create_refresh_rate_change_callback(
+        settings: Rc<RefCell<HyprlandSettings>>, monitor_port: String
+    ) -> impl Fn(&SpinButton) {
+        move |spin_button: &SpinButton| {
+            let mut hyprland_settings = settings.borrow_mut();
+            let monitor_configuration = hyprland_settings.monitor_configurations
+                .get_mut(&monitor_port)
+                .unwrap();
+
+            monitor_configuration.video_mode.refresh_rate = spin_button.value() as u32;
+        }
     }
 }

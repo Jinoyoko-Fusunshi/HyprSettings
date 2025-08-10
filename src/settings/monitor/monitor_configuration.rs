@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use crate::settings::monitor::monitor_information::MonitorInformation;
 use crate::settings::monitor::video_mode::VideoMode;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitorConfiguration {
     pub enabled: bool,
     pub information: MonitorInformation,

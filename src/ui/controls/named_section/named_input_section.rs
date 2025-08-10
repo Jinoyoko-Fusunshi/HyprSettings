@@ -5,8 +5,10 @@ use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
 use crate::ui::controls::panel::Panel;
 use crate::settings::hyprland_settings::HyprlandSettings;
 
+#[derive(Clone)]
 pub struct NamedInputSection {
-    panel: gtk::Box
+    panel: gtk::Box,
+    input_box: Entry
 }
 
 impl Panel for NamedInputSection {
@@ -19,8 +21,9 @@ impl Panel for NamedInputSection {
 
 impl NamedInputSection {
     pub fn new (
-        label_text: &str, input_placeholder_text: &str,
-        input_change_callback: Option<impl Fn(&Entry) + 'static>
+        label_text: &str,
+        input_placeholder_text: &str,
+        input_text: Option<String>
     ) -> Self
     {
         let panel = gtk::Box::new(Orientation::Vertical, 0);
@@ -31,17 +34,27 @@ impl NamedInputSection {
         input_label.set_xalign(0.0);
 
         let input_box = Entry::new();
-        input_box.set_placeholder_text(Some(input_placeholder_text));
 
-        if let Some(callback) = input_change_callback {
-            input_box.connect_changed(callback);
+        if let Some(text) = input_text {
+            input_box.set_text(text.as_str());
+        } else {
+            input_box.set_placeholder_text(Some(input_placeholder_text));
         }
 
         panel.append(&input_label);
         panel.append(&input_box);
 
         Self {
-            panel
+            panel,
+            input_box
         }
+    }
+
+    pub fn set_input_callback(&self, callback: impl Fn(&Entry) + 'static) {
+        self.input_box.connect_changed(callback);
+    }
+
+    pub fn set_active(&self, active: bool) {
+        self.input_box.set_sensitive(active);
     }
 }

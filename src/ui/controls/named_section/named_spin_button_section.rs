@@ -8,6 +8,7 @@ use crate::settings::hyprland_settings::HyprlandSettings;
 pub struct NamedSpinButtonSection {
     spin_button_box: gtk::Box,
     spin_button_label: Label,
+    spin_button: SpinButton,
 }
 
 impl Panel for NamedSpinButtonSection {
@@ -23,8 +24,7 @@ impl NamedSpinButtonSection {
         label_text: &str,
         min_value: f64, max_value: f64, current_value: f64, increment_value: f64,
         page_increment_value: f64, page_size: f64, climb_rate: f64, digit_count: u32,
-        use_integral_numbers: bool,
-        spin_button_change_callback: Option<impl Fn(&SpinButton) + 'static>
+        use_integral_numbers: bool
     ) -> NamedSpinButtonSection {
         let spin_button_box = gtk::Box::new(Orientation::Horizontal, 10);
 
@@ -41,10 +41,6 @@ impl NamedSpinButtonSection {
         );
         spin_button.set_numeric(use_integral_numbers);
         spin_button.set_wrap(true);
-        
-        if let Some(callback) = spin_button_change_callback {
-            spin_button.connect_value_changed(callback);   
-        }
 
         let spin_button_label = Label::new(Some(label_text));
         spin_button_label.set_halign(Align::Start);
@@ -56,9 +52,14 @@ impl NamedSpinButtonSection {
         Self {
             spin_button_box,
             spin_button_label,
+            spin_button
         }
     }
-    
+
+    pub fn set_change_callback(&self, change_callback: impl Fn(&SpinButton) + 'static) {
+        self.spin_button.connect_value_changed(change_callback);
+    }
+
     pub fn set_label_width(&mut self, label_width: i32) {
         self.spin_button_label.set_width_request(label_width);   
     }
