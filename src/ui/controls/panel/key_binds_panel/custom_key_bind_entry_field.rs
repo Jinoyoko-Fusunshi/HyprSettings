@@ -5,29 +5,20 @@ use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::settings::hyprland_settings::HyprlandSettings;
 use crate::settings::key_binds::custom_keybind::CustomKeybind;
 use crate::settings::key_binds::key_bind_configuration::KeyBindConfiguration;
+use crate::ui::controls::editable_control::EditableControl;
 use crate::ui::controls::named_section::named_input_section::NamedInputSection;
 use crate::ui::controls::panel::{Panel, key_binds_panel::key_bind_entry::KeyBindEntry};
-use crate::ui::controls::panel::key_binds_panel::custom_key_bind_entry_field::CustomKeyBindMode::Edit;
-
-#[derive(Clone)]
-pub enum CustomKeyBindMode {
-    Locked,
-    Edit,
-}
 
 #[derive(Clone)]
 pub struct CustomKeyBindEntryFieldModel {
     previous_shortcut_name: String,
     shortcut_name: String,
     command: String,
-    keybind_configuration: KeyBindConfiguration,
-    mode: CustomKeyBindMode,
+    keybind_configuration: KeyBindConfiguration
 }
 
 impl CustomKeyBindEntryFieldModel {
-    pub fn new(
-        shortcut_name: String, custom_keybind: Option<CustomKeybind>, mode: CustomKeyBindMode,
-    ) -> Self {
+    pub fn new(shortcut_name: String, custom_keybind: Option<CustomKeybind>) -> Self {
         let command = match custom_keybind.clone() {
             Some(keybind) => keybind.get_command().clone(),
             None => "".to_string()
@@ -42,22 +33,18 @@ impl CustomKeyBindEntryFieldModel {
             previous_shortcut_name: shortcut_name.clone(),
             shortcut_name,
             command,
-            keybind_configuration,
-            mode
+            keybind_configuration
         }
     }
 }
 
 #[derive(Clone)]
 pub struct CustomKeyBindEntryField {
-    settings: Rc<RefCell<HyprlandSettings>>,
-    parent_box: gtk::Box,
     key_bind_entry_box: gtk::Box,
-    cancel_button: Button,
+    delete_button: Button,
     named_key_bind_entry_name: NamedInputSection,
     named_key_bind_entry_command: NamedInputSection,
     key_bind_entry: KeyBindEntry,
-    toggle_action_button: Button,
     model: Rc<RefCell<CustomKeyBindEntryFieldModel>>,
 }
 
@@ -69,23 +56,39 @@ impl Panel for CustomKeyBindEntryField {
     }
 }
 
+impl EditableControl for CustomKeyBindEntryField {
+    fn enable_control(&self) {
+        self.delete_button.set_sensitive(false);
+        self.named_key_bind_entry_name.set_active(true);
+        self.named_key_bind_entry_command.set_active(true);
+        self.key_bind_entry.set_active(true);
+    }
+
+    fn disable_control(&self) {
+        self.delete_button.set_sensitive(true);
+        self.named_key_bind_entry_name.set_active(false);
+        self.named_key_bind_entry_command.set_active(false);
+        self.key_bind_entry.set_active(false);
+    }
+}
+
 impl CustomKeyBindEntryField {
     pub fn new(
-        parent_box: &gtk::Box, settings: &Rc<RefCell<HyprlandSettings>>,
         shortcut_name: Option<String>,
-        selected_keybind: Option<CustomKeybind>,
-        mode: CustomKeyBindMode,
+        selected_keybind: Option<CustomKeybind>
     ) -> Self {
         let key_bind_entry_box = gtk::Box::new(Orientation::Horizontal, 10);
         key_bind_entry_box.set_height_request(56);
 
-        let cancel_button = Button::with_label("🗑️");
-        cancel_button.set_vexpand(false);
-        cancel_button.set_valign(Align::Center);
+        let delete_button = Button::with_label("❌");
+        delete_button.set_vexpand(false);
+        delete_button.set_valign(Align::Center);
 
-        let model = Rc::new(RefCell::new(CustomKeyBindEntryFieldModel::new(
-            shortcut_name.unwrap_or("".to_string()), selected_keybind.clone(), mode.clone()
-        )));
+        let model = Rc::new(
+            RefCell::new(
+                CustomKeyBindEntryFieldModel::new(shortcut_name.unwrap_or("".to_string()), selected_keybind.clone())
+            )
+        );
         let named_key_bind_entry_name = NamedInputSection::new(
             "Shortcut name:", "Open program", Some(model.borrow().shortcut_name.clone())
         );
@@ -99,36 +102,20 @@ impl CustomKeyBindEntryField {
             None => None
         };
         let key_bind_entry = KeyBindEntry::new(configuration);
-        let toggle_action_button_label = match mode {
-            CustomKeyBindMode::Locked => "✏️",
-            Edit => "✅"
-        };
-        let toggle_action_button = Button::with_label(toggle_action_button_label);
-        toggle_action_button.set_vexpand(false);
-        toggle_action_button.set_valign(Align::Center);
 
-        key_bind_entry_box.append(&cancel_button);
+        key_bind_entry_box.append(&delete_button);
         key_bind_entry_box.append(named_key_bind_entry_name.get_container_box());
         key_bind_entry_box.append(named_key_bind_entry_command.get_container_box());
         key_bind_entry_box.append(key_bind_entry.get_container_box());
-        key_bind_entry_box.append(&toggle_action_button);
 
         let custom_keybind_entry_field = Self {
-            settings: settings.clone(),
-            parent_box: parent_box.clone(),
             key_bind_entry_box,
-            cancel_button,
+            delete_button,
             named_key_bind_entry_name,
             named_key_bind_entry_command,
             key_bind_entry,
-            toggle_action_button,
             model
         };
-
-        match mode {
-            CustomKeyBindMode::Locked => custom_keybind_entry_field.set_fields_active(false),
-            Edit => custom_keybind_entry_field.set_fields_active(true)
-        }
 
         custom_keybind_entry_field.init_events();
         custom_keybind_entry_field
@@ -153,52 +140,31 @@ impl CustomKeyBindEntryField {
         self.named_key_bind_entry_name.set_input_callback(shortcut_name_entry_callback);
         self.named_key_bind_entry_command.set_input_callback(command_entry_callback);
         self.key_bind_entry.set_input_callback(key_bind_entry_callback);
-
-        let this = self.clone();
-        let cancel_button_callback = move |_: &Button| {
-            this.parent_box.remove(&this.key_bind_entry_box);
-            this.settings.borrow_mut().key_bind_settings
-                .remove_custom_key_bind(this.model.borrow().shortcut_name.clone());
-        };
-        this.cancel_button.connect_clicked(cancel_button_callback);
-
-        let this = self.clone();
-        let toggle_action_button_callback = move |_: &Button| {
-            let mut model = this.model.borrow_mut();
-            match model.mode {
-                CustomKeyBindMode::Locked => {
-                    this.toggle_action_button.set_label("✅");
-                    model.mode = Edit;
-                    this.set_fields_active(true);
-                },
-                Edit => {
-                    this.toggle_action_button.set_label("✏️");
-                    model.mode = CustomKeyBindMode::Locked;
-                    this.set_fields_active(false);
-
-                    this.settings.borrow_mut().key_bind_settings
-                        .remove_custom_key_bind(model.previous_shortcut_name.clone());
-
-                    this.settings.borrow_mut().key_bind_settings.set_custom_key_bind(
-                        model.shortcut_name.clone(),
-                        CustomKeybind::new(
-                            model.command.clone(),
-                            model.keybind_configuration.clone()
-                        ),
-                    );
-
-                    model.previous_shortcut_name = model.shortcut_name.clone();
-                }
-            }
-        };
-
-        self.toggle_action_button.connect_clicked(toggle_action_button_callback);
     }
 
-    pub fn set_fields_active(&self, state: bool) {
-        self.cancel_button.set_sensitive(!state);
-        self.named_key_bind_entry_name.set_active(state);
-        self.named_key_bind_entry_command.set_active(state);
-        self.key_bind_entry.set_active(state);
+    pub fn set_delete_button_callback(&self, delete_button_click_callback: impl Fn(&Button) + 'static) {
+        self.delete_button.connect_clicked(delete_button_click_callback);
+    }
+
+    pub fn save_setting(&self, settings: Rc<RefCell<HyprlandSettings>>) {
+        let mut model = self.model.borrow_mut();
+        settings.borrow_mut().key_bind_settings
+            .remove_custom_key_bind(model.previous_shortcut_name.clone());
+
+        settings.borrow_mut().key_bind_settings.set_custom_key_bind(
+            model.shortcut_name.clone(),
+            CustomKeybind::new(
+                model.command.clone(),
+                model.keybind_configuration.clone()
+            ),
+        );
+
+        model.previous_shortcut_name = model.shortcut_name.clone();
+    }
+
+    pub fn remove_setting(&self, settings: Rc<RefCell<HyprlandSettings>>) {
+        let model_ref = self.model.borrow();
+        let shortcut_name = model_ref.shortcut_name.clone();
+        settings.borrow_mut().key_bind_settings.remove_custom_key_bind(shortcut_name);
     }
 }

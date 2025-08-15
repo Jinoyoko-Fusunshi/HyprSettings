@@ -9,11 +9,13 @@ use std::rc::Rc;
 use gtk::{Label, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::settings::key_binds::custom_keybind::CustomKeybind;
 use crate::settings::key_binds::key_bind_configuration::KeyBindConfiguration;
 use crate::settings::key_binds::system_keybind::SystemKeybind;
+use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement};
 use crate::ui::controls::panel::Panel;
 use crate::ui::controls::panel::key_binds_panel::key_bind_entry_field::KeyBindEntryField;
-use crate::ui::controls::panel::key_binds_panel::custom_key_bind_entry_field::{CustomKeyBindEntryField, CustomKeyBindMode};
+use crate::ui::controls::panel::key_binds_panel::custom_key_bind_entry_field::{CustomKeyBindEntryField};
 
 pub struct KeyBindsPanel {
     key_binds_panel_box: gtk::Box
@@ -240,31 +242,63 @@ impl KeyBindsPanel {
 
     fn create_custom_key_binds_box(section_box: &gtk::Box, settings: &Rc<RefCell<HyprlandSettings>>) {
         let custom_key_bind_entries_box = gtk::Box::new(Orientation::Vertical, 10);
+
         let custom_key_bind_entries_box_clone = custom_key_bind_entries_box.clone();
-
         let settings_clone = settings.clone();
-        let add_custom_key_bind_entry_button_callback = move |_: &Button| {
-            let custom_key_bind_entry_field = CustomKeyBindEntryField::new(
-                &custom_key_bind_entries_box_clone, &settings_clone, None, None, CustomKeyBindMode::Edit
+        let create_custom_key_bind_entry_button_callback = move |_: &Button| {
+            Self::create_custom_keybind(
+                &settings_clone, &custom_key_bind_entries_box_clone, None, None, EditMode::Edit
             );
-            custom_key_bind_entries_box_clone.append(custom_key_bind_entry_field.get_container_box());
         };
-        let add_custom_key_bind_entry_button = Button::with_label("Add custom key bind");
-        add_custom_key_bind_entry_button.connect_clicked(add_custom_key_bind_entry_button_callback);
+        let add_custom_key_bind_entry_button = Button::with_label("➕ Add custom keybind");
+        add_custom_key_bind_entry_button.connect_clicked(create_custom_key_bind_entry_button_callback);
 
-        Self::create_custom_keybinds(&settings, &custom_key_bind_entries_box);
-        section_box.append(&custom_key_bind_entries_box);
+        let custom_key_bind_entries_box_clone = custom_key_bind_entries_box.clone();
+        Self::create_custom_keybinds_from_settings(&settings, &custom_key_bind_entries_box_clone);
+        section_box.append(&custom_key_bind_entries_box_clone);
         section_box.append(&add_custom_key_bind_entry_button);
     }
 
-    fn create_custom_keybinds(settings: &Rc<RefCell<HyprlandSettings>>, custom_keybind_entries_box: &gtk::Box) {
+    fn create_custom_keybinds_from_settings(
+        settings: &Rc<RefCell<HyprlandSettings>>, custom_keybind_entries_box: &gtk::Box
+    ) {
         for (custom_keybind_name, custom_keybind) in settings.borrow().key_bind_settings.get_custom_key_binds() {
-            let custom_key_bind_entry_field = CustomKeyBindEntryField::new(
-                custom_keybind_entries_box, settings,
-                Some(custom_keybind_name), Some(custom_keybind), CustomKeyBindMode::Locked
-            );
-            custom_keybind_entries_box.append(custom_key_bind_entry_field.get_container_box());
+            Self::create_custom_keybind(settings, custom_keybind_entries_box,
+            Some(custom_keybind_name.clone()), Some(custom_keybind.clone()), EditMode::Locked);
         }
+    }
+
+    fn create_custom_keybind(
+        settings: &Rc<RefCell<HyprlandSettings>>, custom_keybind_entries_box: &gtk::Box,
+        custom_keybind_name: Option<String>, custom_keybind: Option<CustomKeybind>, edit_mode: EditMode
+    ) {
+        let custom_keybind_entry_field = CustomKeyBindEntryField::new(
+            custom_keybind_name, custom_keybind
+        );
+        custom_keybind_entry_field.init_events();
+
+        let editable_control_element = EditableControlElement::new(
+            custom_keybind_entry_field.clone(), edit_mode
+        );
+
+        let custom_keybind_entry_field_clone = custom_keybind_entry_field.clone();
+        let editable_control_element_button_click_callback = move |settings: Rc<RefCell<HyprlandSettings>>| {
+            custom_keybind_entry_field_clone.save_setting(settings);
+        };
+        editable_control_element.set_toggle_button_click_callback(
+            settings.clone(), editable_control_element_button_click_callback
+        );
+
+        let custom_keybind_entries_box_clone = custom_keybind_entries_box.clone();
+        let editable_control_element_clone = editable_control_element.clone();
+        let settings_clone = settings.clone();
+        let custom_keybind_entry_field_clone = custom_keybind_entry_field.clone();
+        let delete_button_click_callback = move |_: &Button| {
+            custom_keybind_entries_box_clone.remove(editable_control_element_clone.get_container_box());
+            custom_keybind_entry_field_clone.remove_setting(settings_clone.clone());
+        };
+        custom_keybind_entry_field.set_delete_button_callback(delete_button_click_callback);
+        custom_keybind_entries_box.append(editable_control_element.get_container_box());
     }
 
     fn create_keybinds_section_box(

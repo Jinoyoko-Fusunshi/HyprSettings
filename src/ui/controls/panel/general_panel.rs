@@ -99,14 +99,14 @@ impl GeneralPanel{
             let settings_clone = settings.clone();
             let program_name_string = program_name.to_string();
             move |input: &Entry| {
-                settings_clone.borrow_mut().program_settings
+                settings_clone.borrow_mut().programs
                     .insert(program_name_string.clone(), input.text().to_string());
             }
         };
 
         let settings_clone = settings.clone();
         let hyprland_settings = settings_clone.borrow();
-        let input_text = hyprland_settings.program_settings.get(program_name).cloned();
+        let input_text = hyprland_settings.programs.get(program_name).cloned();
 
         let input_section = NamedInputSection::new(
             label_text,

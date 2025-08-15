@@ -6,3 +6,6 @@
 
 # cargo files
 *.lock
+
+# config files
+*.yaml

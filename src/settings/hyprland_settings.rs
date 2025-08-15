@@ -15,15 +15,16 @@ pub const NOTIFICATION_HANDLER_ENTRY: &str = "NotificationHandler";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HyprlandSettings {
-    pub program_settings: HashMap<String, String>,
+    pub programs: HashMap<String, String>,
     pub monitor_configurations: HashMap<String, MonitorConfiguration>,
     pub appearance_settings: AppearanceSettings,
     pub key_bind_settings: KeyBindsSettings,
+    pub startup_programs: HashMap<String, String>,
 }
 
 impl HyprlandSettings {
     pub fn new() -> Self {
-        let program_settings = HashMap::new();
+        let programs = HashMap::new();
         let appearance_settings = AppearanceSettings {
             wallpaper_path: String::new(),
             force_default_wallpaper: false,
@@ -55,10 +56,11 @@ impl HyprlandSettings {
         };
         
         Self {
-            program_settings,
+            programs,
             monitor_configurations: HashMap::new(),
             appearance_settings,
-            key_bind_settings: KeyBindsSettings::new()
+            key_bind_settings: KeyBindsSettings::new(),
+            startup_programs: HashMap::new(),       
         }
     }
 
