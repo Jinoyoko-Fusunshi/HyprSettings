@@ -8,6 +8,14 @@ pub struct RGBAColor {
     rgba: RGBA,
 }
 
+impl Default for RGBAColor {
+    fn default() -> Self {
+        Self {
+            rgba: RGBA::new(0.0, 0.0, 0.0, 0.0)
+        }
+    }
+}
+
 impl Serialize for RGBAColor {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

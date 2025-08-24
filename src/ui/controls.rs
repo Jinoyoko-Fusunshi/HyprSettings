@@ -1,5 +1,11 @@
-pub mod panel;
-pub mod button;
-mod named_section;
-mod editable_control;
-mod editable_control_element;
+pub mod activable_control;
+pub mod editable_control_element;
+pub mod color_selector;
+pub mod input_field;
+pub mod selection_box;
+pub mod spin_button;
+pub mod display_field;
+pub mod keybinds;
+pub mod startup_program_field;
+pub mod settings_navigation;
+pub mod settings_switcher;

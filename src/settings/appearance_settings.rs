@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::settings::rgba_color::RGBAColor;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AppearanceSettings {
     pub wallpaper_path: String,
     pub force_default_wallpaper: bool,

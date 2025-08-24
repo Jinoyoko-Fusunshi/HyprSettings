@@ -10,19 +10,17 @@ pub struct HyprlandSettingsWriter {
     config_lines: Vec<String>
 }
 
-impl SettingsWriter for HyprlandSettingsWriter {
-    fn serialize_settings(&mut self) {
+impl SettingsWriter<HyprlandSettings> for HyprlandSettingsWriter {
+    fn serialize_settings(&mut self, _: HyprlandSettings) {
         self.serialize_program_settings();
         self.serialize_appearance_settings();
         self.serialize_monitor_settings();
     }
 
-    fn write_to_config_file(&self) -> Result<(), String> {
+    fn write_to_config(&self) {
         if self.config_lines.len() == 0 {
-            return Err("Settings could either not be serialized or they are missing.".to_string());
+            return;
         }
-
-        Ok(())
     }
 }
 
