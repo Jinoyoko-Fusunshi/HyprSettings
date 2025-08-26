@@ -4,6 +4,13 @@ use crate::settings::appearance_settings::AppearanceSettings;
 use crate::settings::keybinds_settings::KeyBindsSettings;
 use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
 
+pub const HYPRLAND_CONFIG_ENTRY: &str = "HyprLandConfig";
+pub const VIRTUAL_TERMINAL_ENTRY: &str = "VirtualTerminal";
+pub const FILE_MANAGER_ENTRY: &str = "FileManager";
+pub const QUICK_SEARCH_ENTRY: &str = "QuickSearch";
+pub const LOCK_SCREEN_ENTRY: &str = "LockScreen";
+pub const NOTIFICATION_HANDLER_ENTRY: &str = "NotificationHandler";
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct HyprlandSettings {
     pub programs: HashMap<String, String>,

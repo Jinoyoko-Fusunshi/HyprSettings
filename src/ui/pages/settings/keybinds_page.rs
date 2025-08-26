@@ -215,6 +215,7 @@ impl KeyBindsSettings {
         let switch_window_workspace_one = Self::create_keybind_input_field(
             settings_manager, "Move to Workspace 1".to_string(), SystemKeybind::MoveWorkspaceOne
         );
+
         let switch_window_workspace_two = Self::create_keybind_input_field(
             settings_manager, "Move to Workspace 2".to_string(), SystemKeybind::MoveWorkspaceTwo
         );

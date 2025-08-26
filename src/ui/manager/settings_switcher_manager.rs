@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::settings::config_files::hyprland_settings_writer::HyprlandSettingsWriter;
 use crate::settings::config_files::settings_writer::SettingsWriter;
 use crate::settings::config_files::yaml_settings_writer::YamlSettingsWriter;
 use crate::settings::settings_manager::SettingsManager;
@@ -40,9 +41,13 @@ impl SettingsSwitcherManager {
                 let settings_manager = self.settings_manager.borrow();
                 let settings = settings_manager.get_settings();
 
-                let mut settings_writer = YamlSettingsWriter::new();
-                settings_writer.serialize_settings(settings.clone());
-                settings_writer.write_to_config();
+                let mut yaml_settings_writer = YamlSettingsWriter::new();
+                yaml_settings_writer.serialize_settings(settings.clone());
+                yaml_settings_writer.write_to_config();
+                
+                let mut conf_settings_writer = HyprlandSettingsWriter::new();
+                conf_settings_writer.serialize_settings(settings.clone());
+                conf_settings_writer.write_to_config();
             }
         }
     }

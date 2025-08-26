@@ -1,4 +1,5 @@
 use std::fmt;
+use std::fmt::Display;
 use gtk::gdk::RGBA;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::Visitor;
@@ -23,6 +24,12 @@ impl Serialize for RGBAColor {
     {
         let rgba_string = self.rgba.to_str();
         serializer.serialize_str(&rgba_string)
+    }
+}
+
+impl Display for RGBAColor {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "{}", self.rgba.to_string())
     }
 }
 

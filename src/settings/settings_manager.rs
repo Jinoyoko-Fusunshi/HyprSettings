@@ -3,20 +3,16 @@ use std::fs;
 use std::process::Command;
 use crate::settings::config_files::settings_reader::SettingsReader;
 use crate::settings::config_files::yaml_settings_reader::YamlSettingsReader;
-use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::settings::hyprland_settings::{
+    HyprlandSettings, FILE_MANAGER_ENTRY, HYPRLAND_CONFIG_ENTRY, LOCK_SCREEN_ENTRY,
+    NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
+};
 use crate::settings::keybinds::custom_keybind::CustomKeybind;
 use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::settings::keybinds::system_keybind::SystemKeybind;
 use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
 use crate::settings::monitor::monitor_info_parser::MonitorInfoParser;
 use crate::settings::rgba_color::RGBAColor;
-
-const HYPRLAND_CONFIG_ENTRY: &str = "HyprLandConfig";
-const VIRTUAL_TERMINAL_ENTRY: &str = "VirtualTerminal";
-const FILE_MANAGER_ENTRY: &str = "FileManager";
-const QUICK_SEARCH_ENTRY: &str = "QuickSearch";
-const LOCK_SCREEN_ENTRY: &str = "LockScreen";
-const NOTIFICATION_HANDLER_ENTRY: &str = "NotificationHandler";
 
 pub struct SettingsManager {
     settings: HyprlandSettings
@@ -163,19 +159,19 @@ impl SettingsManager {
     }
 
     pub fn set_keybind(&mut self, system_keybind: SystemKeybind, keybind_configuration: KeyBindConfiguration) {
-        self.settings.key_bind_settings.set_program_key_bind(system_keybind, keybind_configuration)
+        self.settings.key_bind_settings.set_keybind(system_keybind, keybind_configuration)
     }
 
     pub fn get_keybind(&self, system_keybind: SystemKeybind) -> Option<KeyBindConfiguration> {
-        self.settings.key_bind_settings.get_program_key_bind(system_keybind)
+        self.settings.key_bind_settings.get_keybind(system_keybind)
     }
 
     pub fn set_custom_keybind(&mut self, shortcut_name: Option<String>, keybind: Option<CustomKeybind>) {
-        self.settings.key_bind_settings.set_custom_key_bind(shortcut_name, keybind);
+        self.settings.key_bind_settings.set_custom_keybind(shortcut_name, keybind);
     }
     
     pub fn remove_custom_keybind(&mut self, shortcut_name: String) {
-        self.settings.key_bind_settings.remove_custom_key_bind(shortcut_name);
+        self.settings.key_bind_settings.remove_custom_keybind(shortcut_name);
     }
 
     pub fn get_custom_keybinds(&self) -> Vec<(String, CustomKeybind)> {
