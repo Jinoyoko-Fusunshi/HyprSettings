@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
+use crate::ui::statable_component::StatableComponent;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_component::UpdatableComponent;
 
@@ -27,7 +28,8 @@ impl KeybindInputManager {
                 let state = KeybindInputState {
                     configuration
                 };
-                self.keybind_input.borrow_mut().update_ui(state);
+                self.keybind_input.borrow_mut().update_state(state.clone());
+                self.keybind_input.borrow_mut().update_ui(state.clone());
             }
         }
     }

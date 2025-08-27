@@ -15,6 +15,7 @@ use crate::ui::controls::keybinds::keybind_input_field::KeybindInputField;
 use crate::ui::statable_component::StatableComponent;
 use crate::ui::state_savable_component::StateSavableComponent;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
+use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
 use crate::ui::updatable_component::UpdatableComponent;
 
 pub const CUSTOM_ITEM: &str = "Custom";
@@ -320,7 +321,6 @@ impl KeyBindsSettings {
         custom_keybind_input_field.init_events();
 
         let custom_keybind_input_field_rc = Rc::new(RefCell::new(custom_keybind_input_field));
-
         let editable_control_element_state = EditableControlElementState {
             edit_mode
         };
@@ -355,12 +355,15 @@ impl KeyBindsSettings {
             settings_manager.clone(), system_keybind.clone()
         );
 
-        let program_keybind = settings_manager.borrow().get_keybind(system_keybind);
-        let keybind_entry_field = KeybindInputField::new(
-            entry_field_name, program_keybind
-        );
-        keybind_entry_field.set_input_callback(keybind_entry_changed_callback);
-        keybind_entry_field
+        let program_keybind = settings_manager.borrow().get_keybind(system_keybind.clone());
+        let mut keybind_iput_field = KeybindInputField::new();
+        let state = KeybindInputFieldState {
+            input_text: entry_field_name,
+            configuration: program_keybind,
+        };
+        keybind_iput_field.update_ui(state);
+        keybind_iput_field.set_input_callback(keybind_entry_changed_callback);
+        keybind_iput_field
     }
 
     fn create_keybind_input_field_change(

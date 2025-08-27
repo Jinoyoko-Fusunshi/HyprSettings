@@ -114,14 +114,14 @@ impl ActivableControl for CustomKeyBindInputField {
         self.delete_button.set_sensitive(false);
         self.shortcut_input_field.enable_control();
         self.command_input_field.enable_control();
-        self.keybind_input.borrow().set_active(true);
+        self.keybind_input.borrow().enable_control();
     }
 
     fn disable_control(&self) {
         self.delete_button.set_sensitive(true);
         self.shortcut_input_field.disable_control();
         self.command_input_field.disable_control();
-        self.keybind_input.borrow().set_active(false);
+        self.keybind_input.borrow().disable_control();
     }
 }
 
@@ -145,13 +145,17 @@ impl CustomKeyBindInputField {
         let command_input_field = InputField::new();
 
         let keybind_input = Rc::new(RefCell::new(KeybindInput::new()));
+        keybind_input.borrow().init_events();
+
         let keybind_input_manager = KeybindInputManager::new(keybind_input.clone());
 
         let state_clone = state.clone();
         let reset_button_action = move || {
             state_clone.borrow_mut().keybind = None;
         };
-        keybind_input.borrow().set_reset_button_click(keybind_input_manager, reset_button_action);
+        keybind_input.borrow().set_reset_button_click(
+            keybind_input_manager, Some(reset_button_action)
+        );
 
         key_bind_entry_box.append(&delete_button);
         key_bind_entry_box.append(shortcut_input_field.get_widget());

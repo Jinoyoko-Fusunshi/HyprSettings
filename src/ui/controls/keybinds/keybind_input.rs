@@ -1,22 +1,54 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use gtk::{Align, Button, EventControllerKey, GestureClick, Label, Orientation};
 use gtk::gdk::{Key, ModifierType};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::component::Component;
+use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputManager};
 use crate::ui::controls::keybinds::key_symbol::KeySymbol;
+use crate::ui::statable_component::StatableComponent;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_component::UpdatableComponent;
 
+struct KeybindConverter;
+
+impl KeybindConverter {
+    pub fn convert_to_real_name(key: String) -> String {
+        match key.as_str() {
+            "CONTROL_L" => "CTRL".to_string(),
+            "SHIFT_L" => "SHIFT".to_string(),
+            "ALT_L" => "ALT".to_string(),
+            _ => key,
+        }
+    }
+}
+
 pub struct KeybindInput {
+    state: Rc<RefCell<KeybindInputState>>,
     keybind_input_box: gtk::Box,
     keybind_symbols_box: gtk::Box,
     reset_key_button: Button,
 }
 
 impl Component for KeybindInput {
-    fn init_events(&self) {}
+    fn init_events(&self) {
+        let keybind_symbols_box = self.keybind_symbols_box.clone();
+        let click_input_controller = GestureClick::new();
+        let state = self.state.clone();
+
+        click_input_controller.connect_pressed(move |_, _, _, _| {
+            keybind_symbols_box.grab_focus();
+
+            if let None = state.borrow().configuration.clone() {
+                Self::set_keybind_symbols_text(&keybind_symbols_box, "Record keys individually ...");
+            }
+        });
+
+        self.keybind_symbols_box.add_controller(click_input_controller);
+    }
 
     fn get_widget(&self) -> &gtk::Box {
         &self.keybind_input_box
@@ -33,6 +65,22 @@ impl UpdatableComponent<KeybindInputState> for KeybindInput {
     }
 }
 
+impl StatableComponent<KeybindInputState> for KeybindInput {
+    fn update_state(&mut self, state: KeybindInputState) {
+        *self.state.borrow_mut() = state;
+    }
+}
+
+impl ActivableControl for KeybindInput {
+    fn enable_control(&self) {
+        self.keybind_input_box.set_sensitive(true);
+    }
+
+    fn disable_control(&self) {
+        self.keybind_input_box.set_sensitive(false);
+    }
+}
+
 impl KeybindInput {
     pub fn new() -> Self {
         let keybind_input_box = gtk::Box::new(Orientation::Horizontal, 10);
@@ -45,7 +93,12 @@ impl KeybindInput {
         keybind_input_box.append(&keybind_symbols_box);
         keybind_input_box.append(&reset_key_button);
 
+        let state = Rc::new(RefCell::new(KeybindInputState {
+            configuration: None,
+        }));
+
         Self {
+            state,
             keybind_input_box,
             keybind_symbols_box,
             reset_key_button
@@ -54,41 +107,31 @@ impl KeybindInput {
 
     pub fn set_input_change(&self, input_change: impl Fn(KeyBindConfiguration) + 'static) {
         let key_input_controller = EventControllerKey::new();
-        let key_pressed_callback = Self::create_key_bind_change_callback(self.keybind_symbols_box.clone(), input_change);
+        let key_pressed_callback = Self::create_keybind_change_callback(
+            self.keybind_symbols_box.clone(), self.state.clone(), input_change
+        );
         key_input_controller.connect_key_pressed(key_pressed_callback);
         self.keybind_symbols_box.add_controller(key_input_controller);
     }
 
     pub fn set_reset_button_click(
-        &self, keybind_input_manager: KeybindInputManager, input_cleared: impl Fn() + 'static
+        &self,
+        keybind_input_manager: KeybindInputManager,
+        input_clear: Option<impl Fn() + 'static>
     ) {
-        let reset_button_click = Self::create_reset_button_click(keybind_input_manager, input_cleared);
-        self.reset_key_button.connect_clicked(reset_button_click);
+        if let Some(input_clear) = input_clear {
+            self.reset_key_button.connect_clicked(Self::create_custom_reset_button_click(keybind_input_manager, input_clear));
+        } else {
+            self.reset_key_button.connect_clicked(Self::create_reset_button_click(keybind_input_manager));
+        };
     }
 
     pub fn set_keybind(&self, keybind_configuration: KeyBindConfiguration) {
-        Self::create_key_bind_display(
-            self.keybind_symbols_box.clone(), keybind_configuration.get_key_names().clone()
-        );
-    }
-
-    pub fn clear_input(&self) {
-        Self::clear_input_box(&self.keybind_symbols_box)
+        Self::create_key_bind_display(self.keybind_symbols_box.clone(), keybind_configuration);
     }
 
     pub fn reset_input(&self) {
-        const INITIAL_TEXT: &str = "Click to bind key";
-
-        self.clear_input();
-        let label = Label::new(Some(INITIAL_TEXT));
-        label.set_hexpand(true);
-        label.set_xalign(0.5);
-
-        self.keybind_symbols_box.append(&label);
-    }
-
-    pub fn set_active(&self, active: bool) {
-        self.keybind_input_box.set_sensitive(active);
+        Self::set_keybind_symbols_text(&self.keybind_symbols_box, "Click to bind key");
     }
 
     fn clear_input_box(input_box: &gtk::Box) {
@@ -99,6 +142,20 @@ impl KeybindInput {
         }
     }
 
+    fn set_keybind_symbols_text(keybind_symbols_box: &gtk::Box, text: &str) {
+        Self::clear_input(keybind_symbols_box);
+
+        let label = Label::new(Some(text));
+        label.set_hexpand(true);
+        label.set_xalign(0.5);
+
+        keybind_symbols_box.append(&label);
+    }
+
+    fn clear_input(keybind_symbols_box: &gtk::Box) {
+        Self::clear_input_box(keybind_symbols_box)
+    }
+
     fn create_keybind_symbols_box() -> gtk::Box {
         let key_bind_input_box = gtk::Box::new(Orientation::Horizontal, 10);
         key_bind_input_box.add_css_class("key-binds-entry");
@@ -106,69 +163,69 @@ impl KeybindInput {
         key_bind_input_box.set_hexpand(false);
         key_bind_input_box.set_focusable(true);
         key_bind_input_box.set_can_focus(true);
-
-        let key_bind_input_box_clone = key_bind_input_box.clone();
-        let click_input_controller = GestureClick::new();
-        click_input_controller.connect_pressed(move |_, _, _, _| {
-            key_bind_input_box_clone.grab_focus();
-        });
-
-        key_bind_input_box.add_controller(click_input_controller);
         key_bind_input_box
     }
 
-    fn create_key_bind_change_callback(
-        key_bind_input_box: gtk::Box,
+    fn create_keybind_change_callback(
+        keybind_symbols_box: gtk::Box,
+        state: Rc<RefCell<KeybindInputState>>,
         key_bind_changed_callback: impl Fn(KeyBindConfiguration)
     ) -> impl Fn(&EventControllerKey, Key, u32, ModifierType) -> Propagation {
-        let key_pressed_callback = move |_: &EventControllerKey, key: Key, _: u32, modifier_state: ModifierType| {
-            let control_name = "CTRL".to_string();
-            let shift_name = "SHIFT".to_string();
-            let alt_name = "ALT".to_string();
-
+        let key_pressed_callback = move |_: &EventControllerKey, key: Key, _: u32, _: ModifierType| {
             let key_name = key.name()
                 .expect("Cannot get key name")
                 .to_string()
                 .to_uppercase();
+            let real_key_name = KeybindConverter::convert_to_real_name(key_name.clone());
 
-            let mut captured_keys: Vec<String> = vec![];
-            if modifier_state.contains(ModifierType::SHIFT_MASK) || key_name.contains(&shift_name) {
-                captured_keys.push(shift_name.clone());
-            }
+            let old_configuration = state.borrow().configuration.clone();
+            let keybind_configuration = if let Some(configuration) = old_configuration.clone() {
+                if !configuration.has_key(real_key_name.clone()) {
+                    let mut new_configuration = configuration.clone();
+                    new_configuration.append_key(real_key_name.clone());
+                    new_configuration
+                } else {
+                    configuration.clone()
+                }
+            } else {
+                let mut new_configuration = KeyBindConfiguration::new();
+                new_configuration.append_key(real_key_name.clone());
+                new_configuration
+            };
 
-            if modifier_state.contains(ModifierType::CONTROL_MASK) || key_name.contains("CONTROL") {
-                captured_keys.push(control_name.clone());
-            }
+            state.borrow_mut().configuration = Some(keybind_configuration.clone());
+            key_bind_changed_callback(keybind_configuration.clone());
 
-            if modifier_state.contains(ModifierType::ALT_MASK) || key_name.contains(&alt_name) {
-                captured_keys.push(alt_name.clone());
-            }
-
-            if !key_name.contains(&shift_name) && !key_name.contains(&alt_name) && !key_name.contains("CONTROL") {
-                captured_keys.push(key_name);
-            }
-
-            let key_bind_configuration = KeyBindConfiguration::new(captured_keys.clone());
-            key_bind_changed_callback(key_bind_configuration);
-
-            Self::create_key_bind_display(key_bind_input_box.clone(), captured_keys.clone());
+            Self::create_key_bind_display(keybind_symbols_box.clone(), keybind_configuration);
             Propagation::Proceed
         };
         key_pressed_callback
     }
 
-    fn create_key_bind_display(key_bind_input_box: gtk::Box, keys: Vec<String>) {
-        Self::clear_input_box(&key_bind_input_box);
-        for key in keys {
+    fn create_key_bind_display(keybind_symbols_box: gtk::Box, configuration: KeyBindConfiguration) {
+        Self::clear_input_box(&keybind_symbols_box);
+        for key in configuration.get_key_names() {
             let key_symbol = KeySymbol::new(key.clone());
-            key_bind_input_box.append(key_symbol.get_widget());
+            keybind_symbols_box.append(key_symbol.get_widget());
         }
     }
 
-    fn create_reset_button_click(keybind_input_manager: KeybindInputManager, reset_action: impl Fn() + 'static) -> impl Fn(&Button) + 'static {
+    fn create_custom_reset_button_click(
+        keybind_input_manager: KeybindInputManager,
+        reset_action: impl Fn() + 'static
+    ) -> impl Fn(&Button) + 'static {
         let reset_button_click = move |_: &Button| {
             keybind_input_manager.send_event(KeybindInputEvent::ConfigurationChanged(None));
             reset_action();
+        };
+        reset_button_click
+    }
+
+    fn create_reset_button_click(
+        keybind_input_manager: KeybindInputManager
+    ) -> impl Fn(&Button) + 'static {
+        let reset_button_click = move |_: &Button| {
+            keybind_input_manager.send_event(KeybindInputEvent::ConfigurationChanged(None));
         };
         reset_button_click
     }

@@ -6,3 +6,4 @@ pub mod spin_button_state;
 pub mod keybind_input_state;
 pub mod custom_keybind_input_field_state;
 pub mod startup_program_field_state;
+pub mod keybind_input_field_state;
