@@ -6,6 +6,7 @@ use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::component::Component;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
+use crate::ui::statable_component::StatableComponent;
 use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_component::UpdatableComponent;
@@ -32,7 +33,8 @@ impl UpdatableComponent<KeybindInputFieldState> for KeybindInputField {
             configuration: state.configuration.clone(),
         };
 
-        self.keybind_input.borrow_mut().update_ui(keybind_input_state);
+        self.keybind_input.borrow_mut().update_state(keybind_input_state.clone());
+        self.keybind_input.borrow_mut().update_ui(keybind_input_state.clone());
     }
 }
 

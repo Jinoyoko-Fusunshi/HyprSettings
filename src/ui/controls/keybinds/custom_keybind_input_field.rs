@@ -77,7 +77,13 @@ impl UpdatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputFiel
 
 impl StatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputField {
     fn update_state(&mut self, state: CustomKeybindInputFieldState) {
-        *self.state.borrow_mut() = state;
+        *self.state.borrow_mut() = state.clone();
+
+        let keybind_input_state = KeybindInputState {
+            configuration: state.keybind,
+        };
+
+        self.keybind_input.borrow_mut().update_state(keybind_input_state);
     }
 }
 

@@ -9,22 +9,10 @@ use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputManager};
 use crate::ui::controls::keybinds::key_symbol::KeySymbol;
+use crate::ui::controls::keybinds::keybind_converter::KeybindConverter;
 use crate::ui::statable_component::StatableComponent;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_component::UpdatableComponent;
-
-struct KeybindConverter;
-
-impl KeybindConverter {
-    pub fn convert_to_real_name(key: String) -> String {
-        match key.as_str() {
-            "CONTROL_L" => "CTRL".to_string(),
-            "SHIFT_L" => "SHIFT".to_string(),
-            "ALT_L" => "ALT".to_string(),
-            _ => key,
-        }
-    }
-}
 
 pub struct KeybindInput {
     state: Rc<RefCell<KeybindInputState>>,

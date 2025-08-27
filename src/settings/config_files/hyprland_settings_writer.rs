@@ -195,7 +195,12 @@ impl HyprlandSettingsWriter {
     }
 
     fn create_keybind_entry(keybind_configuration: KeyBindConfiguration, arguments: Vec<&str>) -> String {
-        let key_arguments = keybind_configuration.get_key_names().join(", ");
+        let key_modifiers = keybind_configuration.get_modifier_keys().join(" ");
+        let mut key_arguments = key_modifiers;
+        if let Some(key) = keybind_configuration.get_key() {
+            key_arguments.push_str(format!(", {}", key).as_str());
+        }
+        
         let command_arguments = arguments.join(", ");
         format!("bind = {}, {}", key_arguments, command_arguments)
     }
