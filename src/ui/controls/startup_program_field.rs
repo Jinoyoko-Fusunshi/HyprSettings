@@ -118,7 +118,6 @@ impl StartupProgramField {
 
         let startup_entry_box = gtk::Box::new(Orientation::Horizontal, 10);
         let delete_button = Button::with_label("❌");
-        delete_button.add_css_class(CSSStyles::CANCEL_STARTUP_PROGRAM_BUTTON);
 
         let program_name_input = Entry::new();
         let program_path_input = Entry::new();

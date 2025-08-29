@@ -76,31 +76,13 @@ impl InfoSettings {
         const USAGE_DESCRIPTION_TEXT: &str = "\
             HyprSettings is a simple Hyprland settings manager for configuring your hyprland instance.\n\
             All hyprland settings will be read and written into its dedicated config file path.\n\
-            It accepts configuration settings for the hyprland components:\
-        ";
+            It accepts configurations for the hyprland modules listed in the overview page.";
+
         let usage_description_label = Label::new(Some(USAGE_DESCRIPTION_TEXT));
         usage_description_label.set_xalign(0.0);
         usage_description_label.set_wrap(true);
 
-        const HYPRLAND_COMPONENTS: [(&str, &str); 4] = [
-            ("hyprland (core)", "https://wiki.hypr.land/"),
-            ("hyprpaper", "https://wiki.hypr.land/Hypr-Ecosystem/hyprpaper/"),
-            ("hyprlock", "https://wiki.hypr.land/Hypr-Ecosystem/hyprlock/"),
-            ("hyprpolkitagent", "https://wiki.hypr.land/Hypr-Ecosystem/hyprpolkitagent/"),
-        ];
-        let hyprland_component_box = gtk::Box::new(Orientation::Vertical, 6);
-        hyprland_component_box.set_hexpand(false);
-        hyprland_component_box.set_halign(Align::Start);
-        for (component_name, component_link) in HYPRLAND_COMPONENTS {
-            let component_link_name = format!("• {}", component_name);
-            let component_link_button = InfoSettings::create_link_button(
-                component_link_name.as_str(), component_link
-            );
-            hyprland_component_box.append(&component_link_button);
-        }
-
         program_description_box.append(&usage_description_label);
-        program_description_box.append(&hyprland_component_box);
         program_description_box
     }
 

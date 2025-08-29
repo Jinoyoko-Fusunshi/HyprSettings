@@ -5,7 +5,7 @@ use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
 use crate::settings::settings_manager::SettingsManager;
 use crate::ui::pages::settings::general_page::GeneralSettings;
-use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, STARTUP_PROGRAM_SETTINGS};
+use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS};
 use crate::ui::controls::settings_navigation::SettingsNavigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
@@ -14,6 +14,7 @@ use crate::ui::pages::settings::appearance_page::AppearanceSettings;
 use crate::ui::pages::settings::display_page::DisplaySettings;
 use crate::ui::pages::settings::info_page::InfoSettings;
 use crate::ui::pages::settings::keybinds_page::KeyBindsSettings;
+use crate::ui::pages::settings::overview_page::OverviewPage;
 use crate::ui::pages::settings::startups_page::StartupProgramsSettings;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
@@ -41,7 +42,9 @@ impl App {
         app_box.set_margin_end(10);
         app_box.set_margin_top(10);
         app_box.set_margin_bottom(10);
-    
+
+        let overview_settings = Box::new(OverviewPage::new());
+
         let state = GeneralSettingsState::from(&settings_manager);
         let mut general_settings = Box::new(GeneralSettings::new(settings_manager.clone()));
         general_settings.init_events();
@@ -66,6 +69,7 @@ impl App {
 
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
+            .insert_component(OVERVIEW_SETTINGS.to_string(), overview_settings)
             .insert_component(GENERAL_SETTINGS.to_string(), general_settings)
             .insert_component(DISPLAY_SETTINGS.to_string(), display_settings)
             .insert_component(APPEARANCE_SETTINGS.to_string(), appearance_settings)

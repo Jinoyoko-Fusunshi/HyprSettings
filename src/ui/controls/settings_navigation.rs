@@ -2,15 +2,13 @@ use gtk::{Button, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::pages::settings::{
-    APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS,
-    STARTUP_PROGRAM_SETTINGS
-};
+use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS};
 use crate::ui::component::Component;
 
 pub struct SettingsNavigation {
     settings_switcher_manager: SettingsSwitcherManager,
     settings_navigation_box: gtk::Box,
+    overview_button: Button,
     general_button: Button,
     display_button: Button,
     appearance_button: Button,
@@ -35,6 +33,9 @@ impl SettingsNavigation {
         settings_navigation_box.set_width_request(320);
         settings_navigation_box.add_css_class(CSSStyles::NAVIGATION_PANEL);
 
+        let overview_button = Button::with_label("overview");
+        overview_button.set_height_request(48);
+
         let general_button = Button::with_label("general");
         general_button.set_height_request(48);
 
@@ -58,6 +59,7 @@ impl SettingsNavigation {
         save_button.set_margin_top(10);
         save_button.add_css_class(CSSStyles::SAVE_BUTTON);
         
+        settings_navigation_box.append(&overview_button);
         settings_navigation_box.append(&general_button);
         settings_navigation_box.append(&display_button);
         settings_navigation_box.append(&appearance_button);
@@ -69,6 +71,7 @@ impl SettingsNavigation {
         Self {
             settings_switcher_manager,
             settings_navigation_box,
+            overview_button,
             general_button,
             display_button,
             appearance_button,
@@ -80,6 +83,14 @@ impl SettingsNavigation {
     }
 
     pub fn init_events(&self) {
+        let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
+        let overview_button_click = move |_: &Button| {
+            settings_switcher_manager_clone.notify_event(
+                SettingsSwitcherEvent::NewComponentName(OVERVIEW_SETTINGS.to_string())
+            );
+        };
+        self.overview_button.connect_clicked(overview_button_click);
+
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let general_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
