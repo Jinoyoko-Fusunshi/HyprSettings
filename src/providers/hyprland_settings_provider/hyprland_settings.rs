@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::settings::appearance_settings::AppearanceSettings;
-use crate::settings::keybinds_settings::KeyBindsSettings;
-use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
+use crate::models::monitor::monitor_configuration::MonitorConfiguration;
+use crate::providers::hyprland_settings_provider::appearance_settings::AppearanceSettings;
+use crate::providers::hyprland_settings_provider::keybinds_settings::KeyBindsSettings;
 
 pub const HYPRLAND_CONFIG_ENTRY: &str = "HyprLandConfig";
 pub const VIRTUAL_TERMINAL_ENTRY: &str = "VirtualTerminal";

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::settings::keybinds::{system_keybind::SystemKeybind};
-use crate::settings::keybinds::custom_keybind::CustomKeybind;
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::custom_keybind::CustomKeybind;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::system_keybind::SystemKeybind;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct KeyBindsSettings {

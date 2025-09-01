@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, Button, Label, Orientation, Separator};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::startup_program_field::StartupProgramField;
-use crate::settings::settings_manager::SettingsManager;
 use crate::ui::component::Component;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
@@ -60,27 +60,31 @@ impl StartupProgramsSettings {
         }
     }
 
-    pub fn init_ui(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
-        let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut settings_manager.borrow().get_program_names());
+    pub fn init_ui(&self, application_provider: ApplicationProvider) {
+        let settings_provider = application_provider.get_settings_provider();
 
-        for (program_name, program_path) in settings_manager.borrow().get_startup_programs() {
+        let mut programs = vec![CUSTOM_ITEM.to_string()];
+        programs.append(&mut settings_provider.borrow().get_program_names());
+
+        for (program_name, program_path) in settings_provider.borrow().get_startup_programs() {
             let startup_program_field = Self::create_editable_startup_program_field(
-                settings_manager.clone(), self.startup_program_entries_box.clone(),  program_name,
+                application_provider.clone(), self.startup_program_entries_box.clone(),  program_name,
                 program_path, programs.clone(), EditMode::Locked
             );
             self.startup_program_entries_box.append(startup_program_field.borrow().get_widget());
         }
     }
 
-    pub fn init_events(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
+    pub fn init_events(&self, application_provider: ApplicationProvider) {
+        let settings_provider = application_provider.get_settings_provider();
+
         let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut settings_manager.borrow().get_program_names());
+        programs.append(&mut settings_provider.borrow().get_program_names());
 
         let startup_program_entries_box = self.startup_program_entries_box.clone();
         let create_startup_program_button_click = move |_ :&Button| {
             let editable_control_element = Self::create_editable_startup_program_field(
-                settings_manager.clone(),
+                application_provider.clone(),
                 startup_program_entries_box.clone(),
                 CUSTOM_ITEM.to_string(),
                 "".to_string(),
@@ -95,7 +99,7 @@ impl StartupProgramsSettings {
     }
 
     fn create_editable_startup_program_field(
-        settings_manager: Rc<RefCell<SettingsManager>>, startup_program_entries_box: gtk::Box, program_name: String, program_path: String,
+        application_provider: ApplicationProvider, startup_program_entries_box: gtk::Box, program_name: String, program_path: String,
         programs: Vec<String>, edit_mode: EditMode,
     ) -> Rc<RefCell<EditableControlElement<StartupProgramField>>>{
         let state = StartupProgramFieldState {
@@ -105,7 +109,7 @@ impl StartupProgramsSettings {
             programs,
         };
 
-        let startup_program_field = Rc::new(RefCell::new(StartupProgramField::new(settings_manager.clone())));
+        let startup_program_field = Rc::new(RefCell::new(StartupProgramField::new(application_provider.clone())));
         let startup_program_field_manager = StartupProgramFieldManager::new(startup_program_field.clone());
         startup_program_field.borrow_mut().update_state(state.clone());
         startup_program_field.borrow_mut().update_ui(state.clone());
@@ -122,7 +126,7 @@ impl StartupProgramsSettings {
 
         let editable_control_element_rc = Rc::new(RefCell::new(editable_control_element));
         let editable_control_element_manager = EditableControlElementManager::new(
-            editable_control_element_rc.clone(), settings_manager.clone()
+            editable_control_element_rc.clone(), application_provider.clone()
         );
         editable_control_element_rc.borrow_mut().init_events(editable_control_element_manager);
 
@@ -131,7 +135,7 @@ impl StartupProgramsSettings {
 
         let startup_program_field_delete_click = move |_: &Button| {
             startup_program_entries_box.remove(editable_control_element_rc_clone.borrow().get_widget());
-            startup_program_field_clone.borrow().remove_settings(settings_manager.clone());
+            startup_program_field_clone.borrow().remove_settings(application_provider.clone());
         };
         startup_program_field.borrow().set_deletion_click_callback(startup_program_field_delete_click);
         editable_control_element_rc

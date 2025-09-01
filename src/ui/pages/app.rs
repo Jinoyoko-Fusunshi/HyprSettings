@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::Orientation;
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
-use crate::settings::settings_manager::SettingsManager;
 use crate::ui::pages::settings::general_page::GeneralSettings;
 use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS};
 use crate::ui::controls::settings_navigation::SettingsNavigation;
@@ -36,7 +36,8 @@ impl Component for App {
 
 impl App {
     pub fn new() -> Self {
-        let settings_manager = Rc::new(RefCell::new(SettingsManager::new()));
+        let application_provider = ApplicationProvider::new();
+        
         let app_box = gtk::Box::new(Orientation::Horizontal, 10);
         app_box.set_margin_start(10);
         app_box.set_margin_end(10);
@@ -45,25 +46,25 @@ impl App {
 
         let overview_settings = Box::new(OverviewPage::new());
 
-        let state = GeneralSettingsState::from(&settings_manager);
-        let mut general_settings = Box::new(GeneralSettings::new(settings_manager.clone()));
+        let state = GeneralSettingsState::from(&application_provider);
+        let mut general_settings = Box::new(GeneralSettings::new(application_provider.clone()));
         general_settings.init_events();
         general_settings.update_ui(state);
 
-        let state = DisplaySettingsState::from(&settings_manager);
-        let mut display_settings = Box::new(DisplaySettings::new(settings_manager.clone()));
+        let state = DisplaySettingsState::from(&application_provider);
+        let mut display_settings = Box::new(DisplaySettings::new(application_provider.clone()));
         display_settings.init_events();
         display_settings.update_ui(state);
 
-        let appearance_settings = Box::new(AppearanceSettings::new(settings_manager.clone()));
+        let appearance_settings = Box::new(AppearanceSettings::new(application_provider.clone()));
         appearance_settings.init_events();
 
-        let keybinds_settings = Box::new(KeyBindsSettings::new(settings_manager.clone()));
+        let keybinds_settings = Box::new(KeyBindsSettings::new(application_provider.clone()));
         keybinds_settings.init_events();
 
         let startup_program_settings = Box::new(StartupProgramsSettings::new());
-        startup_program_settings.init_events(settings_manager.clone());
-        startup_program_settings.init_ui(settings_manager.clone());
+        startup_program_settings.init_events(application_provider.clone());
+        startup_program_settings.init_ui(application_provider.clone());
         
         let info_settings = Box::new(InfoSettings::new());
 
@@ -80,7 +81,7 @@ impl App {
         let settings_switcher_state = SettingsSwitcherState::new(GENERAL_SETTINGS.to_string());
         settings_switcher.borrow_mut().update_ui(settings_switcher_state);
         
-        let settings_switcher_manager = SettingsSwitcherManager::new(settings_switcher.clone(), settings_manager.clone());
+        let settings_switcher_manager = SettingsSwitcherManager::new(settings_switcher.clone(), application_provider.clone());
         let settings_navigation = SettingsNavigation::new(settings_switcher_manager.clone());
         settings_navigation.init_events();
 

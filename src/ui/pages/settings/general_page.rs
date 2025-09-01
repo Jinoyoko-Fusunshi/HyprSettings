@@ -1,15 +1,13 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use gtk::{Entry, Label, Orientation, Separator};
 use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
-use crate::settings::settings_manager::SettingsManager;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::controls::input_field::{InputField, InputFieldState};
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::component::Component;
 use crate::ui::updatable_component::UpdatableComponent;
 
 pub struct GeneralSettings {
-    settings_manager: Rc<RefCell<SettingsManager>>,
+    application_provider: ApplicationProvider,
     general_box: gtk::Box,
     config_input_field: InputField,
     terminal_input_field: InputField,
@@ -21,39 +19,39 @@ pub struct GeneralSettings {
 
 impl Component for GeneralSettings {
     fn init_events(&self) {
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider = self.application_provider.get_settings_provider();
         let config_input_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_hyprland_config_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_hyprland_config_program_path(input.text().to_string());
         };
         self.config_input_field.set_input_callback(config_input_change);
 
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider =  self.application_provider.get_settings_provider();
         let terminal_input_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_terminal_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_terminal_program_path(input.text().to_string());
         };
         self.terminal_input_field.set_input_callback(terminal_input_change);
 
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider = self.application_provider.get_settings_provider();
         let files_input_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_files_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_files_program_path(input.text().to_string());
         };
         self.files_input_field.set_input_callback(files_input_change);
 
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider =  self.application_provider.get_settings_provider();
         let quick_search_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_quick_search_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_quick_search_program_path(input.text().to_string());
         };
         self.quick_search_input_field.set_input_callback(quick_search_change);
 
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider =  self.application_provider.get_settings_provider();
         let lockscreen_input_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_lockscreen_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_lockscreen_program_path(input.text().to_string());
         };
         self.lockscreen_input_field.set_input_callback(lockscreen_input_change);
 
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider =  self.application_provider.get_settings_provider();
         let notifications_input_change = move |input: &Entry| {
-            settings_manager.borrow_mut().set_notifications_program_path(input.text().to_string());
+            settings_provider.borrow_mut().set_notifications_program_path(input.text().to_string());
         };
         self.notifications_input_field.set_input_callback(notifications_input_change);
     }
@@ -110,7 +108,7 @@ impl UpdatableComponent<GeneralSettingsState> for GeneralSettings {
 }
 
 impl GeneralSettings {
-    pub fn new(settings_manager: Rc<RefCell<SettingsManager>>) -> Self {
+    pub fn new(application_provider: ApplicationProvider) -> Self {
         const PROGRAMS_LABEL: &str = "Programs";
         
         let general_box = gtk::Box::new(Orientation::Vertical, 10);
@@ -173,7 +171,7 @@ impl GeneralSettings {
         general_box.append(notifications_input_field.get_widget());
 
         Self {
-            settings_manager,
+            application_provider,
             general_box,
             config_input_field,
             terminal_input_field,

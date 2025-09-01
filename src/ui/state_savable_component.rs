@@ -1,8 +1,6 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-use crate::settings::settings_manager::SettingsManager;
+use crate::providers::application_provider::ApplicationProvider;
 
 pub trait StateSavableComponent {
-    fn save_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>);
-    fn remove_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>);
+    fn save_settings(&self, application_provider: ApplicationProvider);
+    fn remove_settings(&self, application_provider: ApplicationProvider);
 }

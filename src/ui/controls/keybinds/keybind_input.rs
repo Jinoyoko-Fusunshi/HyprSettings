@@ -4,7 +4,7 @@ use gtk::{Align, Button, EventControllerKey, GestureClick, Label, Orientation};
 use gtk::gdk::{Key, ModifierType};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputManager};

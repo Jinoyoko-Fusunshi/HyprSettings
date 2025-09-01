@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Label, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::component::Component;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;

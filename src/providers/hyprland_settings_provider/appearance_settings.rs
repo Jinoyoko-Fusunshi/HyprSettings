@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::settings::rgba_color::RGBAColor;
+use crate::models::rgba_color::RGBAColor;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AppearanceSettings {

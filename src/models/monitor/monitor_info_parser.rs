@@ -2,8 +2,8 @@
 // Based on the output, the display information will be estimated, since no core packages exist to easily
 // retrieve monitor information in wayland as in of July 2025.
 
-use crate::settings::monitor::monitor_information::MonitorInformation;
-use crate::settings::monitor::video_mode::VideoMode;
+use crate::models::monitor::monitor_information::MonitorInformation;
+use crate::models::monitor::video_mode::VideoMode;
 
 #[derive(Debug)]
 pub struct MonitorInfoParser {

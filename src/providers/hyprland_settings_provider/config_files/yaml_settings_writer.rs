@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Write;
-use crate::settings::config_files::settings_writer::SettingsWriter;
-use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::providers::hyprland_settings_provider::config_files::settings_writer::SettingsWriter;
+use crate::providers::hyprland_settings_provider::hyprland_settings::HyprlandSettings;
 
 pub struct YamlSettingsWriter {
     serialized_settings: String

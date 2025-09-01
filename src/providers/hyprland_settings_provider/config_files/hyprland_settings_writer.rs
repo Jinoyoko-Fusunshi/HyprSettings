@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
-use crate::settings::config_files::settings_writer::SettingsWriter;
-use crate::settings::hyprland_settings::{
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::system_keybind::SystemKeybind;
+use crate::providers::hyprland_settings_provider::config_files::settings_writer::SettingsWriter;
+use crate::providers::hyprland_settings_provider::hyprland_settings::{
     HyprlandSettings, FILE_MANAGER_ENTRY, LOCK_SCREEN_ENTRY, NOTIFICATION_HANDLER_ENTRY,
     QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::settings::keybinds::system_keybind::SystemKeybind;
 
 const COMMENT_CHARACTER: char = '#';
 

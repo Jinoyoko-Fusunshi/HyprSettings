@@ -1,6 +1,4 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-use crate::settings::settings_manager::SettingsManager;
+use crate::providers::application_provider::ApplicationProvider;
 
 pub struct GeneralSettingsState {
     pub hyprland_config_path: Option<String>,
@@ -11,15 +9,18 @@ pub struct GeneralSettingsState {
     pub notification_handler_path: Option<String>,
 }
 
-impl From<&Rc<RefCell<SettingsManager>>> for GeneralSettingsState {
-    fn from(value: &Rc<RefCell<SettingsManager>>) -> Self {
+impl From<&ApplicationProvider> for GeneralSettingsState {
+    fn from(value: &ApplicationProvider) -> Self {
+        let settings_provider = value.get_settings_provider();
+        let settings_provider_ref = settings_provider.borrow();
+
         Self {
-            hyprland_config_path: value.borrow().get_hyprland_config_program_path(),
-            terminal_path: value.borrow().get_terminal_program_path(),
-            file_manager_path: value.borrow().get_files_program_path(),
-            quick_search_path: value.borrow().get_quick_search_program_path(),
-            lock_screen_path: value.borrow().get_lockscreen_program_path(),
-            notification_handler_path: value.borrow().get_notifications_program_path(),
+            hyprland_config_path: settings_provider_ref.get_hyprland_config_program_path(),
+            terminal_path: settings_provider_ref.get_terminal_program_path(),
+            file_manager_path: settings_provider_ref.get_files_program_path(),
+            quick_search_path: settings_provider_ref.get_quick_search_program_path(),
+            lock_screen_path: settings_provider_ref.get_lockscreen_program_path(),
+            notification_handler_path: settings_provider_ref.get_notifications_program_path(),
         }
     }
 }

@@ -1,5 +1,6 @@
-mod settings;
 mod ui;
+mod providers;
+mod models;
 
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, STYLE_PROVIDER_PRIORITY_USER};

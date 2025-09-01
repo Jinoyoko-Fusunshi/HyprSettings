@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::settings::monitor::video_mode::VideoMode;
+use crate::models::monitor::video_mode::VideoMode;
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MonitorInformation {
     pub port_name: String,

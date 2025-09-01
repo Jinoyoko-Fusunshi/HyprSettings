@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, Button, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
-use crate::settings::keybinds::custom_keybind::CustomKeybind;
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::settings::settings_manager::SettingsManager;
+use crate::models::keybinds::custom_keybind::CustomKeybind;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::input_field::{InputField, InputFieldState};
@@ -88,29 +88,31 @@ impl StatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputField
 }
 
 impl StateSavableComponent for CustomKeyBindInputField {
-    fn save_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
-        let mut settings_manager_mut = settings_manager.borrow_mut();
+    fn save_settings(&self, application_provider: ApplicationProvider) {
+        let settings_provider = application_provider.get_settings_provider();
+        let mut settings_provider_mut = settings_provider.borrow_mut();
         let mut state_mut = self.state.borrow_mut();
         if let Some(name) = state_mut.previous_shortcut_name.clone() {
-            settings_manager_mut.remove_custom_keybind(name)
+            settings_provider_mut.remove_custom_keybind(name)
         }
 
         if let Some(name) = state_mut.shortcut_name.clone() {
             if let Some(command) = state_mut.command.clone() {
                 if let Some(keybind) = state_mut.keybind.clone() {
                     let custom_keybind = CustomKeybind::new(command, keybind);
-                    settings_manager_mut.set_custom_keybind(state_mut.shortcut_name.clone(), Some(custom_keybind));
+                    settings_provider_mut.set_custom_keybind(state_mut.shortcut_name.clone(), Some(custom_keybind));
                     state_mut.previous_shortcut_name = Some(name);
                 }
             }
         }
     }
 
-    fn remove_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
-        let mut settings_manager_mut = settings_manager.borrow_mut();
+    fn remove_settings(&self, application_provider: ApplicationProvider) {
+        let settings_provider = application_provider.get_settings_provider();
+        let mut settings_provider_mut = settings_provider.borrow_mut();
         let state_ref = self.state.borrow();
         if let Some(name) = state_ref.previous_shortcut_name.clone() {
-            settings_manager_mut.remove_custom_keybind(name)
+            settings_provider_mut.remove_custom_keybind(name)
         }
     }
 }

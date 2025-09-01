@@ -1,4 +1,4 @@
-use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
+use crate::models::monitor::monitor_configuration::MonitorConfiguration;
 
 pub struct DisplayFieldState {
     pub monitor_port: String,

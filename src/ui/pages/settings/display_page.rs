@@ -1,10 +1,8 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 use gtk::{Label, Orientation, Separator, SpinButton, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::settings::settings_manager::SettingsManager;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::controls::display_field::DisplayField;
 use crate::ui::states::display_field_state::DisplayFieldState;
@@ -12,7 +10,7 @@ use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_component::UpdatableComponent;
 
 pub struct DisplaySettings {
-    settings_manager: Rc<RefCell<SettingsManager>>,
+    application_provider: ApplicationProvider,
     display_box: gtk::Box,
     display_fields_box: gtk::Box,
     display_fields: HashMap<String, DisplayField>,
@@ -39,33 +37,33 @@ impl UpdatableComponent<DisplaySettingsState> for DisplaySettings {
             };
             display_field.update_ui(display_field_state);
 
-            let settings_manager = self.settings_manager.clone();
+            let settings_provider = self.application_provider.get_settings_provider();
             let port_clone = port.clone();
             let spin_button_active_change = move |_: &Switch, state: bool| -> Propagation {
-                settings_manager.borrow_mut().set_monitor_state(port_clone.clone(), state);
+                settings_provider.borrow_mut().set_monitor_state(port_clone.clone(), state);
 
                 Propagation::Proceed
             };
             display_field.set_active_change(spin_button_active_change);
 
-            let settings_manager = self.settings_manager.clone();
+            let settings_provider = self.application_provider.get_settings_provider();
             let port_clone = port.clone();
             let spin_button_width_change = move |spin_button: &SpinButton| {
-                settings_manager.borrow_mut().set_monitor_width(port_clone.clone(), spin_button.value() as u32);
+                settings_provider.borrow_mut().set_monitor_width(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_width_change(spin_button_width_change);
 
-            let settings_manager = self.settings_manager.clone();
+            let settings_provider = self.application_provider.get_settings_provider();
             let port_clone = port.clone();
             let spin_button_height_change = move |spin_button: &SpinButton| {
-                settings_manager.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
+                settings_provider.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_height_change(spin_button_height_change);
 
-            let settings_manager = self.settings_manager.clone();
+            let settings_provider = self.application_provider.get_settings_provider();
             let port_clone = port.clone();
             let spin_button_refresh_rate_change = move |spin_button: &SpinButton| {
-                settings_manager.borrow_mut().set_monitor_refresh_rate(port_clone.clone(), spin_button.value() as u32);
+                settings_provider.borrow_mut().set_monitor_refresh_rate(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_refresh_rate_change(spin_button_refresh_rate_change);
 
@@ -77,7 +75,7 @@ impl UpdatableComponent<DisplaySettingsState> for DisplaySettings {
 }
 
 impl DisplaySettings {
-    pub fn new(settings_manager: Rc<RefCell<SettingsManager>>) -> Self {
+    pub fn new(application_provider: ApplicationProvider) -> Self {
         let display_box = gtk::Box::new(Orientation::Vertical, 10);
         display_box.set_margin_top(10);
         display_box.set_margin_bottom(10);
@@ -91,7 +89,7 @@ impl DisplaySettings {
         display_box.append(&display_fields_box);
 
         Self {
-            settings_manager,
+            application_provider,
             display_box,
             display_fields_box,
             display_fields: HashMap::new(),

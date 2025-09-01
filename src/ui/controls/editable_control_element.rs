@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Align, Button};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
-use crate::settings::settings_manager::SettingsManager;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::statable_component::StatableComponent;
@@ -21,21 +21,22 @@ pub enum EditableControlElementEvent {
 
 pub struct EditableControlElementManager<Element: ActivableControl + Component + StateSavableComponent + 'static> {
     editable_control_element: Rc<RefCell<EditableControlElement<Element>>>,
-    settings_manager: Rc<RefCell<SettingsManager>>
+    application_provider: ApplicationProvider
 }
 
 impl<Element: ActivableControl + Component +  StateSavableComponent + 'static> EditableControlElementManager<Element> {
     pub fn new(
         editable_control_element: Rc<RefCell<EditableControlElement<Element>>>,
-        settings_manager: Rc<RefCell<SettingsManager>>
+        application_provider: ApplicationProvider
     ) -> Self {
         Self {
             editable_control_element,
-            settings_manager
+            application_provider
         }
     }
 
     pub fn send_event(&self, event: EditableControlElementEvent) {
+        let application_provider = self.application_provider.clone();
         match event {
             EditableControlElementEvent::ChangeEditMode(mode) => {
                 let mut editable_control_element_mut = self.editable_control_element.borrow_mut();
@@ -45,7 +46,8 @@ impl<Element: ActivableControl + Component +  StateSavableComponent + 'static> E
                 });
 
                 if let EditMode::Locked = mode {
-                    editable_control_element_mut.editable_control.borrow().save_settings(self.settings_manager.clone());
+                    editable_control_element_mut.editable_control.borrow()
+                        .save_settings(application_provider);
                 }
             }
         }

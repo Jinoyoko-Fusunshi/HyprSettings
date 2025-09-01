@@ -1,6 +1,6 @@
 use gtk::{Align, ColorButton, Label};
 use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
-use crate::settings::rgba_color::RGBAColor;
+use crate::models::rgba_color::RGBAColor;
 use crate::ui::component::Component;
 use crate::ui::labeled_component::LabeledComponent;
 use crate::ui::updatable_component::UpdatableComponent;

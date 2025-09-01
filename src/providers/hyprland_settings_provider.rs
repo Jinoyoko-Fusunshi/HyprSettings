@@ -1,24 +1,26 @@
+pub mod appearance_settings;
+pub mod hyprland_settings;
+pub mod keybinds_settings;
+pub mod config_files;
+
 use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
-use crate::settings::config_files::settings_reader::SettingsReader;
-use crate::settings::config_files::yaml_settings_reader::YamlSettingsReader;
-use crate::settings::hyprland_settings::{
-    HyprlandSettings, FILE_MANAGER_ENTRY, HYPRLAND_CONFIG_ENTRY, LOCK_SCREEN_ENTRY,
-    NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
-};
-use crate::settings::keybinds::custom_keybind::CustomKeybind;
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::settings::keybinds::system_keybind::SystemKeybind;
-use crate::settings::monitor::monitor_configuration::MonitorConfiguration;
-use crate::settings::monitor::monitor_info_parser::MonitorInfoParser;
-use crate::settings::rgba_color::RGBAColor;
+use crate::models::keybinds::custom_keybind::CustomKeybind;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::system_keybind::SystemKeybind;
+use crate::models::monitor::monitor_configuration::MonitorConfiguration;
+use crate::models::monitor::monitor_info_parser::MonitorInfoParser;
+use crate::models::rgba_color::RGBAColor;
+use config_files::settings_reader::SettingsReader;
+use config_files::yaml_settings_reader::YamlSettingsReader;
+use crate::providers::hyprland_settings_provider::hyprland_settings::{HyprlandSettings, FILE_MANAGER_ENTRY, HYPRLAND_CONFIG_ENTRY, LOCK_SCREEN_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY};
 
-pub struct SettingsManager {
+pub struct HyprlandSettingsProvider {
     settings: HyprlandSettings
 }
 
-impl SettingsManager {
+impl HyprlandSettingsProvider {
     pub fn new() -> Self {
         let settings = Self::get_yaml_config_settings();
 

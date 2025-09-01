@@ -3,10 +3,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::Orientation;
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
-use crate::settings::keybinds::custom_keybind::CustomKeybind;
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::settings::keybinds::system_keybind::SystemKeybind;
-use crate::settings::settings_manager::SettingsManager;
+use crate::models::keybinds::custom_keybind::CustomKeybind;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::system_keybind::SystemKeybind;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::component_section_builder::SectionBoxBuilder;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
@@ -41,7 +41,7 @@ impl Clone for KeyBindsSettings {
 }
 
 impl KeyBindsSettings {
-    pub fn new(settings_manager: Rc<RefCell<SettingsManager>>) -> Self {
+    pub fn new(application_provider: ApplicationProvider) -> Self {
         let key_binds_panel_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
         key_binds_panel_scroll_box.set_margin_top(10);
         key_binds_panel_scroll_box.set_margin_bottom(10);
@@ -52,13 +52,13 @@ impl KeyBindsSettings {
         let scroll_window = ScrolledWindow::new();
         scroll_window.set_vexpand(true);
 
-        let key_binds_panel_box = gtk::Box::new(Orientation::Vertical, 10);
-        let system_keybinds_section_box = Self::create_system_keybinds_box(&settings_manager);
-        let focus_keybinds_section_box = Self::create_focus_keybinds_box(&settings_manager);
-        let workspace_keybinds_section_box = Self::create_workspace_keybinds_box(&settings_manager);
-        let move_window_keybinds_section_box = Self::create_move_window_keybinds_box(&settings_manager);
-        let custom_keybinds_section_box = Self::create_custom_keybinds_box(&settings_manager);
+        let system_keybinds_section_box = Self::create_system_keybinds_box(&application_provider);
+        let focus_keybinds_section_box = Self::create_focus_keybinds_box(&application_provider);
+        let workspace_keybinds_section_box = Self::create_workspace_keybinds_box(&application_provider);
+        let move_window_keybinds_section_box = Self::create_move_window_keybinds_box(&application_provider);
+        let custom_keybinds_section_box = Self::create_custom_keybinds_box(&application_provider);
 
+        let key_binds_panel_box = gtk::Box::new(Orientation::Vertical, 10);
         key_binds_panel_box.append(&system_keybinds_section_box);
         key_binds_panel_box.append(&focus_keybinds_section_box);
         key_binds_panel_box.append(&workspace_keybinds_section_box);
@@ -73,47 +73,47 @@ impl KeyBindsSettings {
         }
     }
 
-    fn create_system_keybinds_box(settings_manager: &Rc<RefCell<SettingsManager>>) -> gtk::Box {
+    fn create_system_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
         let system_keybinds_section_box = SectionBoxBuilder::new()
             .create_header_elements("System keybinds")
             .build()
             .expect("Cannot build system keybinds section box");
 
         let terminal_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Terminal".to_string(), SystemKeybind::Terminal
+            application_provider, "Terminal".to_string(), SystemKeybind::Terminal
         );
         let close_window_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Close window".to_string(), SystemKeybind::CloseWindow
+            application_provider, "Close window".to_string(), SystemKeybind::CloseWindow
         );
         let exit_hyprland_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Exit hyprland".to_string(), SystemKeybind::ExitHyprland
+            application_provider, "Exit hyprland".to_string(), SystemKeybind::ExitHyprland
         );
         let file_manager_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "File manager".to_string(), SystemKeybind::FileManager
+            application_provider, "File manager".to_string(), SystemKeybind::FileManager
         );
         let toggle_floating_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Toggle floating window".to_string(), SystemKeybind::ToggleFloatingWindow
+            application_provider, "Toggle floating window".to_string(), SystemKeybind::ToggleFloatingWindow
         );
         let run_program_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Run program".to_string(), SystemKeybind::RunProgram
+            application_provider, "Run program".to_string(), SystemKeybind::RunProgram
         );
         let pseudo_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Pseudo".to_string(), SystemKeybind::Pseudo
+            application_provider, "Pseudo".to_string(), SystemKeybind::Pseudo
         );
         let split_window_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Split window".to_string(), SystemKeybind::SplitWindow
+            application_provider, "Split window".to_string(), SystemKeybind::SplitWindow
         );
         let screenshot_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Screenshot".to_string(), SystemKeybind::Screenshot
+            application_provider, "Screenshot".to_string(), SystemKeybind::Screenshot
         );
         let screenshot_window_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Screenshot window".to_string(), SystemKeybind::ScreenshotWindow
+            application_provider, "Screenshot window".to_string(), SystemKeybind::ScreenshotWindow
         );
         let lock_screen_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Lock screen".to_string(), SystemKeybind::LockScreen
+            application_provider, "Lock screen".to_string(), SystemKeybind::LockScreen
         );
         let emoji_selector_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Emoji selector".to_string(), SystemKeybind::EmojiSelector
+            application_provider, "Emoji selector".to_string(), SystemKeybind::EmojiSelector
         );
 
         system_keybinds_section_box.append(terminal_key_bind_field.get_widget());
@@ -131,23 +131,23 @@ impl KeyBindsSettings {
         system_keybinds_section_box
     }
 
-    fn create_focus_keybinds_box(settings_manager: &Rc<RefCell<SettingsManager>>) -> gtk::Box {
+    fn create_focus_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
         let focus_window_keybinds_section_box = SectionBoxBuilder::new()
             .create_header_elements("Focus window")
             .build()
             .expect("Cannot build system keybinds section box");
 
         let focus_left_window_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Focus left window".to_string(), SystemKeybind::FocusLeftWindow
+            application_provider, "Focus left window".to_string(), SystemKeybind::FocusLeftWindow
         );
         let focus_right_window_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Focus right window".to_string(), SystemKeybind::FocusRightWindow
+            application_provider, "Focus right window".to_string(), SystemKeybind::FocusRightWindow
         );
         let focus_top_window_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Focus top window".to_string(), SystemKeybind::FocusTopWindow
+            application_provider, "Focus top window".to_string(), SystemKeybind::FocusTopWindow
         );
         let focus_bottom_window_key_bind_field = Self::create_keybind_input_field(
-            settings_manager, "Focus bottom window".to_string(), SystemKeybind::FocusBottomWindow
+            application_provider, "Focus bottom window".to_string(), SystemKeybind::FocusBottomWindow
         );
 
         focus_window_keybinds_section_box.append(focus_left_window_bind_field.get_widget());
@@ -157,41 +157,41 @@ impl KeyBindsSettings {
         focus_window_keybinds_section_box
     }
 
-    fn create_workspace_keybinds_box(settings_manager: &Rc<RefCell<SettingsManager>>) -> gtk::Box {
+    fn create_workspace_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
         let switch_workspace_keybinds_section_box = SectionBoxBuilder::new()
             .create_header_elements("Workspace")
             .build()
             .expect("Cannot build system keybinds section box");
 
         let switch_workspace_one = Self::create_keybind_input_field(
-            settings_manager, "Workspace 1".to_string(), SystemKeybind::SwitchWorkspaceOne
+            application_provider, "Workspace 1".to_string(), SystemKeybind::SwitchWorkspaceOne
         );
         let switch_workspace_two = Self::create_keybind_input_field(
-            settings_manager, "Workspace 2".to_string(), SystemKeybind::SwitchWorkspaceTwo
+            application_provider, "Workspace 2".to_string(), SystemKeybind::SwitchWorkspaceTwo
         );
         let switch_workspace_three = Self::create_keybind_input_field(
-            settings_manager, "Workspace 3".to_string(), SystemKeybind::SwitchWorkspaceThree
+            application_provider, "Workspace 3".to_string(), SystemKeybind::SwitchWorkspaceThree
         );
         let switch_workspace_four = Self::create_keybind_input_field(
-            settings_manager, "Workspace 4".to_string(), SystemKeybind::SwitchWorkspaceFour
+            application_provider, "Workspace 4".to_string(), SystemKeybind::SwitchWorkspaceFour
         );
         let switch_workspace_five = Self::create_keybind_input_field(
-            settings_manager, "Workspace 5".to_string(), SystemKeybind::SwitchWorkspaceFive
+            application_provider, "Workspace 5".to_string(), SystemKeybind::SwitchWorkspaceFive
         );
         let switch_workspace_six = Self::create_keybind_input_field(
-            settings_manager, "Workspace 6".to_string(), SystemKeybind::SwitchWorkspaceSix
+            application_provider, "Workspace 6".to_string(), SystemKeybind::SwitchWorkspaceSix
         );
         let switch_workspace_seven = Self::create_keybind_input_field(
-            settings_manager, "Workspace 7".to_string(), SystemKeybind::SwitchWorkspaceSeven
+            application_provider, "Workspace 7".to_string(), SystemKeybind::SwitchWorkspaceSeven
         );
         let switch_workspace_eight = Self::create_keybind_input_field(
-            settings_manager, "Workspace 8".to_string(), SystemKeybind::SwitchWorkspaceEight
+            application_provider, "Workspace 8".to_string(), SystemKeybind::SwitchWorkspaceEight
         );
         let switch_workspace_nine = Self::create_keybind_input_field(
-            settings_manager, "Workspace 9".to_string(), SystemKeybind::SwitchWorkspaceNine
+            application_provider, "Workspace 9".to_string(), SystemKeybind::SwitchWorkspaceNine
         );
         let switch_workspace_zero = Self::create_keybind_input_field(
-            settings_manager, "Workspace 0".to_string(), SystemKeybind::SwitchWorkspaceZero
+            application_provider, "Workspace 0".to_string(), SystemKeybind::SwitchWorkspaceZero
         );
 
         switch_workspace_keybinds_section_box.append(switch_workspace_one.get_widget());
@@ -207,42 +207,42 @@ impl KeyBindsSettings {
         switch_workspace_keybinds_section_box
     }
 
-    fn create_move_window_keybinds_box(settings_manager: &Rc<RefCell<SettingsManager>>) -> gtk::Box {
+    fn create_move_window_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
         let move_window_keybinds_section_box = SectionBoxBuilder::new()
             .create_header_elements("Move window")
             .build()
             .expect("Cannot build system keybinds section box");
 
         let switch_window_workspace_one = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 1".to_string(), SystemKeybind::MoveWorkspaceOne
+            application_provider, "Move to Workspace 1".to_string(), SystemKeybind::MoveWorkspaceOne
         );
 
         let switch_window_workspace_two = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 2".to_string(), SystemKeybind::MoveWorkspaceTwo
+            application_provider, "Move to Workspace 2".to_string(), SystemKeybind::MoveWorkspaceTwo
         );
         let switch_window_workspace_three = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 3".to_string(), SystemKeybind::MoveWorkspaceThree
+            application_provider, "Move to Workspace 3".to_string(), SystemKeybind::MoveWorkspaceThree
         );
         let switch_window_workspace_four = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 4".to_string(), SystemKeybind::MoveWorkspaceFour
+            application_provider, "Move to Workspace 4".to_string(), SystemKeybind::MoveWorkspaceFour
         );
         let switch_window_workspace_five = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 5".to_string(), SystemKeybind::MoveWorkspaceFive
+            application_provider, "Move to Workspace 5".to_string(), SystemKeybind::MoveWorkspaceFive
         );
         let switch_window_workspace_six = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 6".to_string(), SystemKeybind::MoveWorkspaceSix
+            application_provider, "Move to Workspace 6".to_string(), SystemKeybind::MoveWorkspaceSix
         );
         let switch_window_workspace_seven = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 7".to_string(), SystemKeybind::MoveWorkspaceSeven
+            application_provider, "Move to Workspace 7".to_string(), SystemKeybind::MoveWorkspaceSeven
         );
         let switch_window_workspace_eight = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 8".to_string(), SystemKeybind::MoveWorkspaceEight
+            application_provider, "Move to Workspace 8".to_string(), SystemKeybind::MoveWorkspaceEight
         );
         let switch_window_workspace_nine = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 9".to_string(), SystemKeybind::MoveWorkspaceNine
+            application_provider, "Move to Workspace 9".to_string(), SystemKeybind::MoveWorkspaceNine
         );
         let switch_window_workspace_zero = Self::create_keybind_input_field(
-            settings_manager, "Move to Workspace 0".to_string(), SystemKeybind::MoveWorkspaceZero
+            application_provider, "Move to Workspace 0".to_string(), SystemKeybind::MoveWorkspaceZero
         );
 
         move_window_keybinds_section_box.append(switch_window_workspace_one.get_widget());
@@ -258,7 +258,7 @@ impl KeyBindsSettings {
         move_window_keybinds_section_box
     }
 
-    fn create_custom_keybinds_box(settings_manager: &Rc<RefCell<SettingsManager>>) -> gtk::Box {
+    fn create_custom_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
         let custom_keybinds_section_box = SectionBoxBuilder::new()
             .create_header_elements(CUSTOM_ITEM)
             .build()
@@ -267,10 +267,10 @@ impl KeyBindsSettings {
         let custom_keybind_entries_box = gtk::Box::new(Orientation::Vertical, 10);
 
         let custom_keybind_entries_box_clone = custom_keybind_entries_box.clone();
-        let settings_manager_clone = settings_manager.clone();
+        let application_provider_clone = application_provider.clone();
         let create_custom_keybind_entry_button_callback = move |_: &Button| {
             Self::create_custom_keybind(
-                settings_manager_clone.clone(), &custom_keybind_entries_box_clone, None, None, EditMode::Edit
+                application_provider_clone.clone(), &custom_keybind_entries_box_clone, None, None, EditMode::Edit
             );
         };
 
@@ -278,25 +278,26 @@ impl KeyBindsSettings {
         add_custom_key_bind_entry_button.connect_clicked(create_custom_keybind_entry_button_callback);
 
         let custom_key_bind_entries_box_clone = custom_keybind_entries_box.clone();
-        Self::create_custom_keybinds_from_settings(settings_manager.clone(), &custom_key_bind_entries_box_clone);
+        Self::create_custom_keybinds_from_settings(application_provider.clone(), &custom_key_bind_entries_box_clone);
         custom_keybinds_section_box.append(&custom_key_bind_entries_box_clone);
         custom_keybinds_section_box.append(&add_custom_key_bind_entry_button);
         custom_keybinds_section_box
     }
 
     fn create_custom_keybinds_from_settings(
-        settings_manager: Rc<RefCell<SettingsManager>>, custom_keybind_entries_box: &gtk::Box
+        application_manager: ApplicationProvider, custom_keybind_entries_box: &gtk::Box
     ) {
-        let custom_keybinds = settings_manager.borrow().get_custom_keybinds();
+        let settings_provider = application_manager.get_settings_provider();
+        let custom_keybinds = settings_provider.borrow().get_custom_keybinds();
 
         for (keybind_name, keybind) in custom_keybinds {
-            Self::create_custom_keybind(settings_manager.clone(), custom_keybind_entries_box,
+            Self::create_custom_keybind(application_manager.clone(), custom_keybind_entries_box,
             Some(keybind_name.clone()), Some(keybind.clone()), EditMode::Locked);
         }
     }
 
     fn create_custom_keybind(
-        settings_manager: Rc<RefCell<SettingsManager>>, custom_keybind_entries_box: &gtk::Box,
+        application_provider: ApplicationProvider, custom_keybind_entries_box: &gtk::Box,
         custom_keybind_name: Option<String>, custom_keybind: Option<CustomKeybind>, edit_mode: EditMode
     ) {
         let mut custom_keybind_input_field = CustomKeyBindInputField::new();
@@ -333,29 +334,30 @@ impl KeyBindsSettings {
         ));
 
         let editable_control_element_manager =
-            EditableControlElementManager::new(editable_control_element_rc.clone(), settings_manager.clone());
+            EditableControlElementManager::new(editable_control_element_rc.clone(), application_provider.clone());
         editable_control_element_rc.borrow_mut().init_events(editable_control_element_manager);
 
         let custom_keybind_entries_box_clone = custom_keybind_entries_box.clone();
         let editable_control_element_clone = editable_control_element_rc.clone();
         let custom_keybind_entry_field_clone = custom_keybind_input_field_rc.clone();
-
+        let application_provider_clone = application_provider.clone();
         let delete_button_click = move |_: &Button| {
             custom_keybind_entries_box_clone.remove(editable_control_element_clone.borrow().get_widget());
-            custom_keybind_entry_field_clone.borrow().remove_settings(settings_manager.clone());
+            custom_keybind_entry_field_clone.borrow().remove_settings(application_provider_clone.clone());
         };
         custom_keybind_input_field_rc.borrow().set_delete_button_callback(delete_button_click);
         custom_keybind_entries_box.append(editable_control_element_rc.borrow().get_widget());
     }
 
     fn create_keybind_input_field(
-        settings_manager: &Rc<RefCell<SettingsManager>>, entry_field_name: String, system_keybind: SystemKeybind
+        application_provider: &ApplicationProvider, entry_field_name: String, system_keybind: SystemKeybind
     ) -> KeybindInputField {
         let keybind_entry_changed_callback = Self::create_keybind_input_field_change(
-            settings_manager.clone(), system_keybind.clone()
+            application_provider.clone(), system_keybind.clone()
         );
 
-        let program_keybind = settings_manager.borrow().get_keybind(system_keybind.clone());
+        let settings_provider = application_provider.get_settings_provider();
+        let program_keybind = settings_provider.borrow().get_keybind(system_keybind.clone());
         let mut keybind_iput_field = KeybindInputField::new();
         let state = KeybindInputFieldState {
             input_text: entry_field_name,
@@ -367,11 +369,12 @@ impl KeyBindsSettings {
     }
 
     fn create_keybind_input_field_change(
-        settings_manager: Rc<RefCell<SettingsManager>>,
+        application_provider: ApplicationProvider,
         system_keybind: SystemKeybind
     ) -> impl Fn(KeyBindConfiguration) {
+        let settings_provider = application_provider.get_settings_provider();
         let input_field_change = move |keybind_configuration: KeyBindConfiguration| {
-            settings_manager.borrow_mut().set_keybind(system_keybind.clone(), keybind_configuration.clone());
+            settings_provider.borrow_mut().set_keybind(system_keybind.clone(), keybind_configuration.clone());
         };
         input_field_change
     }

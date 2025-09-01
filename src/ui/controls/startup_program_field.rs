@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::{Button, ComboBoxText, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::css_styles::CSSStyles;
-use crate::settings::settings_manager::SettingsManager;
 use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::selection_box::{SelectionBox, SelectionBoxState};
@@ -15,7 +15,7 @@ use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_component::UpdatableComponent;
 
 pub struct StartupProgramField {
-    settings_manager: Rc<RefCell<SettingsManager>>,
+    application_provider: ApplicationProvider,
     state: Rc<RefCell<StartupProgramFieldState>>,
     startup_entry_box: gtk::Box,
     delete_button: Button,
@@ -66,28 +66,30 @@ impl StatableComponent<StartupProgramFieldState> for StartupProgramField {
 }
 
 impl StateSavableComponent for StartupProgramField {
-    fn save_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
+    fn save_settings(&self, application_provider: ApplicationProvider) {
         let mut state_mut = self.state.borrow_mut();
         let previous_program_name = state_mut.previous_program_name.clone();
         let program_name = state_mut.program_name.clone();
         let program_path = state_mut.program_path.clone();
 
-        let mut settings_manager_mut = settings_manager.borrow_mut();
-        settings_manager_mut.remove_program(previous_program_name.clone());
-        settings_manager_mut.add_program(program_name.clone(), program_path.clone());
+        let settings_provider = application_provider.get_settings_provider();
+        let mut settings_provider_mut = settings_provider.borrow_mut();
+        settings_provider_mut.remove_program(previous_program_name.clone());
+        settings_provider_mut.add_program(program_name.clone(), program_path.clone());
 
-        settings_manager_mut.remove_startup_program(program_name.clone());
-        settings_manager_mut.add_startup_program(program_name.clone(), program_path.clone());
+        settings_provider_mut.remove_startup_program(program_name.clone());
+        settings_provider_mut.add_startup_program(program_name.clone(), program_path.clone());
         state_mut.previous_program_name = program_name.clone();
     }
 
-    fn remove_settings(&self, settings_manager: Rc<RefCell<SettingsManager>>) {
+    fn remove_settings(&self, application_provider: ApplicationProvider) {
         let state_ref = self.state.borrow();
         let program_name = state_ref.program_name.clone();
-        let mut settings_manager_mut = settings_manager.borrow_mut();
 
-        settings_manager_mut.remove_program(program_name.clone());
-        settings_manager_mut.remove_startup_program(program_name.clone());
+        let settings_provider = application_provider.get_settings_provider();
+        let mut settings_provider_mut = settings_provider.borrow_mut();
+        settings_provider_mut.remove_program(program_name.clone());
+        settings_provider_mut.remove_startup_program(program_name.clone());
     }
 }
 
@@ -108,7 +110,7 @@ impl ActivableControl for StartupProgramField {
 }
 
 impl StartupProgramField {
-    pub fn new(settings_manager: Rc<RefCell<SettingsManager>>) -> StartupProgramField {
+    pub fn new(application_provider: ApplicationProvider) -> StartupProgramField {
         let state = Rc::new(RefCell::new(StartupProgramFieldState {
             previous_program_name: "".to_string(),
             program_path: String::new(),
@@ -129,7 +131,7 @@ impl StartupProgramField {
         startup_entry_box.append(&program_path_input);
 
         Self {
-            settings_manager,
+            application_provider,
             state,
             startup_entry_box,
             delete_button,
@@ -160,10 +162,10 @@ impl StartupProgramField {
     }
 
     pub fn set_program_fields(&self, selected_program: Option<String>) {
-        let settings_manager = self.settings_manager.clone();
+        let settings_provider = self.application_provider.get_settings_provider();
 
         let program_name = match selected_program.clone() {
-            Some(program) => match settings_manager.borrow().get_program(program.as_str()) {
+            Some(program) => match settings_provider.borrow().get_program(program.as_str()) {
                 Some(_) => program,
                 None => "".to_string(),
             }
@@ -171,7 +173,7 @@ impl StartupProgramField {
         };
 
         let command = match selected_program.clone() {
-            Some(program) => settings_manager.borrow()
+            Some(program) => settings_provider.borrow()
                 .get_program(program.as_str())
                 .unwrap_or_else(|| "".to_string()),
             None => "".to_string(),

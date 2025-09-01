@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::settings::keybinds::key_bind_configuration::KeyBindConfiguration;
+use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomKeybind {

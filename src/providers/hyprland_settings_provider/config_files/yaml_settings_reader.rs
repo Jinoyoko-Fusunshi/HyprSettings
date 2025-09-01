@@ -1,6 +1,6 @@
 use std::fs;
-use crate::settings::config_files::settings_reader::SettingsReader;
-use crate::settings::hyprland_settings::HyprlandSettings;
+use crate::providers::hyprland_settings_provider::config_files::settings_reader::SettingsReader;
+use crate::providers::hyprland_settings_provider::hyprland_settings::HyprlandSettings;
 
 pub struct YamlSettingsReader {
     deserialized_settings: HyprlandSettings
