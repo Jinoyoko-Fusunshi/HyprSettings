@@ -67,3 +67,9 @@ label.module-name {
     font-weight: bold;
     font-size: 14px;
 }
+
+label.module-warning {
+    font-weight: bold;
+    font-size: 16px;
+    color: yellow;
+}

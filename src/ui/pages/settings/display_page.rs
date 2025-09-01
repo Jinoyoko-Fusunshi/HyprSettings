@@ -5,6 +5,7 @@ use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::controls::display_field::DisplayField;
+use crate::ui::css_styles::CSSStyles;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_component::UpdatableComponent;
@@ -28,6 +29,48 @@ impl UpdatableComponent<DisplaySettingsState> for DisplaySettings {
     fn update_ui(&mut self, state: DisplaySettingsState) {
         self.clear_display_fields();
 
+        if state.enabled {
+            Self::create_display_fields(self, state);
+        } else {
+            Self::create_display_error(self);
+        }
+    }
+}
+
+impl DisplaySettings {
+    pub fn new(application_provider: ApplicationProvider) -> Self {
+        let display_box = gtk::Box::new(Orientation::Vertical, 10);
+        display_box.set_margin_top(10);
+        display_box.set_margin_bottom(10);
+        display_box.set_margin_start(10);
+        display_box.set_margin_end(10);
+
+        let available_displays_label = Label::new(Some("Available displays"));
+        let display_fields_box = gtk::Box::new(Orientation::Vertical, 10);
+
+        display_box.append(&available_displays_label);
+        display_box.append(&Separator::new(Orientation::Horizontal));
+        display_box.append(&display_fields_box);
+
+        Self {
+            application_provider,
+            display_box,
+            display_fields_box,
+            display_fields: HashMap::new(),
+        }
+    }
+
+    fn clear_display_fields(&mut self) {
+        self.display_fields.clear();
+
+        let mut current_child = self.display_fields_box.first_child();
+        while let Some(child) = current_child.clone() {
+            self.display_fields_box.remove(&child);
+            current_child = self.display_fields_box.next_sibling();
+        }
+    }
+
+    fn create_display_fields(&mut self, state: DisplaySettingsState) {
         for (port, configuration) in state.monitor_configurations {
             let separator = Separator::new(Orientation::Horizontal);
             let mut display_field = DisplayField::new();
@@ -72,37 +115,13 @@ impl UpdatableComponent<DisplaySettingsState> for DisplaySettings {
             self.display_fields.insert(port, display_field);
         }
     }
-}
 
-impl DisplaySettings {
-    pub fn new(application_provider: ApplicationProvider) -> Self {
-        let display_box = gtk::Box::new(Orientation::Vertical, 10);
-        display_box.set_margin_top(10);
-        display_box.set_margin_bottom(10);
-        display_box.set_margin_start(10);
-        display_box.set_margin_end(10);
+    fn create_display_error(&mut self) {
+        let display_error_box = gtk::Box::new(Orientation::Vertical, 10);
+        let display_error_label = Label::new(Some("⚠️ wlr-randr program not found. Without the program module no displays can be found and therefore configured."));
+        display_error_label.add_css_class(CSSStyles::MODULE_WARNING_LABEL);
 
-        let available_displays_label = Label::new(Some("Available displays"));
-
-        let display_fields_box = gtk::Box::new(Orientation::Vertical, 10);
-        display_box.append(&available_displays_label);
-        display_box.append(&display_fields_box);
-
-        Self {
-            application_provider,
-            display_box,
-            display_fields_box,
-            display_fields: HashMap::new(),
-        }
-    }
-
-    fn clear_display_fields(&mut self) {
-        self.display_fields.clear();
-
-        let mut current_child = self.display_fields_box.first_child();
-        while let Some(child) = current_child.clone() {
-            self.display_fields_box.remove(&child);
-            current_child = self.display_fields_box.next_sibling();
-        }
+        display_error_box.append(&display_error_label);
+        self.display_fields_box.append(&display_error_box);
     }
 }

@@ -44,7 +44,7 @@ impl App {
         app_box.set_margin_top(10);
         app_box.set_margin_bottom(10);
 
-        let overview_settings = Box::new(OverviewPage::new());
+        let overview_settings = Box::new(OverviewPage::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
         let mut general_settings = Box::new(GeneralSettings::new(application_provider.clone()));

@@ -1,21 +1,10 @@
-use std::process::Command;
 use gtk::{Label, LinkButton, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::models::modules::program_module::ProgramModule;
+use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::component::Component;
 use crate::ui::component_section_builder::SectionBoxBuilder;
 use crate::ui::css_styles::CSSStyles;
-
-#[derive(Clone)]
-struct ProgramModule {
-    info: ProgramModuleInfo,
-    version: Option<String>,
-}
-
-#[derive(Clone)]
-struct ProgramModuleInfo {
-    name: String,
-    link: String,
-}
 
 pub struct OverviewPage {
     overview_box: gtk::Box,
@@ -30,15 +19,15 @@ impl Component for OverviewPage {
 }
 
 impl OverviewPage {
-    pub fn new() -> Self {
+    pub fn new(application_provider: ApplicationProvider) -> Self {
         let overview_box = gtk::Box::new(Orientation::Vertical, 10);
         overview_box.set_margin_top(10);
         overview_box.set_margin_bottom(10);
         overview_box.set_margin_start(10);
         overview_box.set_margin_end(10);
 
-        let hyprland_modules_box = Self::create_hyprland_modules_box();
-        let dependency_modules_box = Self::create_dependency_program_modules_box();
+        let hyprland_modules_box = Self::create_hyprland_modules_box(&application_provider);
+        let dependency_modules_box = Self::create_dependency_program_modules_box(&application_provider);
         overview_box.append(&hyprland_modules_box);
         overview_box.append(&dependency_modules_box);
 
@@ -47,68 +36,43 @@ impl OverviewPage {
         }
     }
 
-    fn create_hyprland_modules_box() -> gtk::Box {
+    fn create_hyprland_modules_box(application_provider: &ApplicationProvider) -> gtk::Box {
         const HYPRLAND_MODULES_LABEL: &str = "Hyprland modules";
         let hyprland_modules_section_box = SectionBoxBuilder::new()
             .create_header_elements(HYPRLAND_MODULES_LABEL)
             .build()
             .expect("Failed to create hyprland modules section box");
 
-        let hyprland_module_infos: Vec<ProgramModuleInfo> = vec![
-            ProgramModuleInfo {
-                name: "hyprland".to_string(),
-                link: "https://wiki.hypr.land/".to_string()
-            },
-            ProgramModuleInfo {
-                name: "hypridle".to_string(),
-                link: "https://wiki.hypr.land/Hypr-Ecosystem/hypridle/".to_string()
-            },
-            ProgramModuleInfo {
-                name: "hyprpaper".to_string(),
-                link: "https://wiki.hypr.land/Hypr-Ecosystem/hyprpaper/".to_string()
-            },
-            ProgramModuleInfo {
-                name: "hyprlock".to_string(),
-                link: "https://wiki.hypr.land/Hypr-Ecosystem/hyprlock/".to_string()
-            },
-            ProgramModuleInfo {
-                name: "hyprpolkitagent".to_string(),
-                link: "https://wiki.hypr.land/Hypr-Ecosystem/hyprpolkitagent/".to_string()
-            },
-        ];
+        let module_provider = application_provider.get_module_provider();
+        let hyprland_modules = module_provider.borrow().get_hyprland_modules();
 
-        for module_name in hyprland_module_infos {
-            let module_entry_box = Self::create_module_entry_box(module_name);
+        for module in hyprland_modules {
+            let module_entry_box = Self::create_module_entry_box(module);
             hyprland_modules_section_box.append(&module_entry_box);
         }
 
         hyprland_modules_section_box
     }
 
-    fn create_dependency_program_modules_box() -> gtk::Box {
+    fn create_dependency_program_modules_box(application_provider: &ApplicationProvider) -> gtk::Box {
         const DEPENDENCY_MODULES_LABEL: &str = "Program dependency modules";
         let dependency_modules_section_box = SectionBoxBuilder::new()
             .create_header_elements(DEPENDENCY_MODULES_LABEL)
             .build()
             .expect("Failed to create dependant modules section box");
 
-        let dependency_module_infos: Vec<ProgramModuleInfo> = vec![
-            ProgramModuleInfo {
-                name: "wlr-randr".to_string(),
-                link: "https://man.archlinux.org/man/extra/wlr-randr/wlr-randr.1.en".to_string()
-            },
-        ];
+        let module_provider = application_provider.get_module_provider();
+        let dependency_modules = module_provider.borrow().get_dependency_modules();
 
-        for module_name in dependency_module_infos {
-            let module_entry_box = Self::create_module_entry_box(module_name);
+        for module in dependency_modules {
+            let module_entry_box = Self::create_module_entry_box(module);
             dependency_modules_section_box.append(&module_entry_box);
         }
 
         dependency_modules_section_box
     }
 
-    fn create_module_entry_box(module_info: ProgramModuleInfo) -> gtk::Box {
-        let program_module = Self::get_program_module(module_info.clone());
+    fn create_module_entry_box(program_module: ProgramModule) -> gtk::Box {
         let module_name = program_module.info.name.clone();
         let module_version = program_module.version.unwrap_or("not installed".to_string());
 
@@ -125,7 +89,7 @@ impl OverviewPage {
         let module_version_label = Label::new(Some(module_version.as_str()));
         module_version_label.set_valign(gtk::Align::Center);
 
-        let module_link = LinkButton::new(module_info.link.as_str());
+        let module_link = LinkButton::new(program_module.info.link.as_str());
         module_link.set_halign(gtk::Align::Start);
         module_link.set_valign(gtk::Align::Center);
         module_link.add_css_class(CSSStyles::LINK_BUTTON_TEXT);
@@ -135,39 +99,5 @@ impl OverviewPage {
         module_entry_box.append(&module_information_box);
         module_entry_box.append(&module_link);
         module_entry_box
-    }
-
-    fn get_program_module(module_info: ProgramModuleInfo) -> ProgramModule {
-        let program_result = Command::new("pacman")
-            .arg("-Q")
-            .arg(module_info.name.clone())
-            .output();
-
-        match program_result {
-            Ok(output) => {
-                if output.status.success() {
-                    let output_string = String::from_utf8(output.stdout).unwrap();
-                    let split_output_string = output_string.split(" ")
-                        .collect::<Vec<&str>>();
-
-                    let hyprland_module_version = split_output_string[1].to_string()
-                        .replace("\n", "");
-
-                    ProgramModule {
-                        info: module_info,
-                        version: Some(hyprland_module_version)
-                    }
-                } else {
-                    ProgramModule {
-                        info: module_info,
-                        version: None
-                    }
-                }
-            }
-            Err(_) => ProgramModule {
-                info: module_info,
-                version: None
-            }
-        }
     }
 }
