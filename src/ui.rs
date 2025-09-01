@@ -1,11 +1,11 @@
 pub mod controls;
 pub mod css_styles;
-pub mod component;
-pub mod updatable_component;
+pub mod control;
+pub mod updatable_control;
 pub mod states;
-mod statable_component;
-mod component_section_builder;
-mod state_savable_component;
-mod labeled_component;
+mod statable_control;
+mod section_box_builder;
+mod state_savable_control;
+mod labeled_control;
 mod manager;
 pub mod pages;

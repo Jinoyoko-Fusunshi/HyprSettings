@@ -3,13 +3,13 @@ use std::rc::Rc;
 use gtk::{Label, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
-use crate::ui::statable_component::StatableComponent;
+use crate::ui::statable_control::StatableControl;
 use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct KeybindInputField {
     keybind_input_field_box: gtk::Box,
@@ -17,7 +17,7 @@ pub struct KeybindInputField {
     keybind_input: Rc<RefCell<KeybindInput>>
 }
 
-impl Component for KeybindInputField {
+impl Control for KeybindInputField {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -25,7 +25,7 @@ impl Component for KeybindInputField {
     }
 }
 
-impl UpdatableComponent<KeybindInputFieldState> for KeybindInputField {
+impl UpdatableControl<KeybindInputFieldState> for KeybindInputField {
     fn update_ui(&mut self, state: KeybindInputFieldState) {
         self.keybind_input_label.set_text(state.input_text.as_str());
 

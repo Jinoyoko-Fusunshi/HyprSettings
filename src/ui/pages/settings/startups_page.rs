@@ -5,14 +5,14 @@ use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::startup_program_field::StartupProgramField;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
 use crate::ui::pages::settings::keybinds_page::CUSTOM_ITEM;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::state_savable_component::StateSavableComponent;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct StartupProgramsSettings {
     startup_program_box: gtk::Box,
@@ -20,7 +20,7 @@ pub struct StartupProgramsSettings {
     create_button: Button,
 }
 
-impl Component for StartupProgramsSettings {
+impl Control for StartupProgramsSettings {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {

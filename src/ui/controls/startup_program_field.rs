@@ -4,15 +4,15 @@ use gtk::{Button, ComboBoxText, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::selection_box::{SelectionBox, SelectionBoxState};
 use crate::ui::manager::startup_program_field_manager::{StartupProgramFieldEvent, StartupProgramFieldManager};
 use crate::ui::pages::settings::keybinds_page::CUSTOM_ITEM;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::state_savable_component::StateSavableComponent;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct StartupProgramField {
     application_provider: ApplicationProvider,
@@ -24,7 +24,7 @@ pub struct StartupProgramField {
     selection_box: SelectionBox,
 }
 
-impl Component for StartupProgramField {
+impl Control for StartupProgramField {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -32,7 +32,7 @@ impl Component for StartupProgramField {
     }
 }
 
-impl UpdatableComponent<StartupProgramFieldState> for StartupProgramField {
+impl UpdatableControl<StartupProgramFieldState> for StartupProgramField {
     fn update_ui(&mut self, state: StartupProgramFieldState) {
         let program = if state.program_name == CUSTOM_ITEM {
             None
@@ -52,7 +52,7 @@ impl UpdatableComponent<StartupProgramFieldState> for StartupProgramField {
     }
 }
 
-impl StatableComponent<StartupProgramFieldState> for StartupProgramField {
+impl StatableControl<StartupProgramFieldState> for StartupProgramField {
     fn update_state(&mut self, state: StartupProgramFieldState) {
         *self.state.borrow_mut() = state.clone();
 
@@ -65,7 +65,7 @@ impl StatableComponent<StartupProgramFieldState> for StartupProgramField {
     }
 }
 
-impl StateSavableComponent for StartupProgramField {
+impl StateSavableControl for StartupProgramField {
     fn save_settings(&self, application_provider: ApplicationProvider) {
         let mut state_mut = self.state.borrow_mut();
         let previous_program_name = state_mut.previous_program_name.clone();

@@ -2,15 +2,15 @@ use gtk::{Label, LinkButton, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::modules::program_module::ProgramModule;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::component::Component;
-use crate::ui::component_section_builder::SectionBoxBuilder;
+use crate::ui::controls::Control;
+use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::css_styles::CSSStyles;
 
 pub struct OverviewPage {
     overview_box: gtk::Box,
 }
 
-impl Component for OverviewPage {
+impl Control for OverviewPage {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {

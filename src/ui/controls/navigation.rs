@@ -3,9 +3,9 @@ use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS};
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 
-pub struct SettingsNavigation {
+pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
     settings_navigation_box: gtk::Box,
     overview_button: Button,
@@ -18,7 +18,7 @@ pub struct SettingsNavigation {
     save_button: Button,
 }
 
-impl Component for SettingsNavigation {
+impl Control for Navigation {
     fn init_events(&self) {
     }
 
@@ -27,7 +27,7 @@ impl Component for SettingsNavigation {
     }
 }
 
-impl SettingsNavigation {
+impl Navigation {
     pub fn new(settings_switcher_manager: SettingsSwitcherManager) -> Self {
         let settings_navigation_box = gtk::Box::new(Orientation::Vertical, 10);
         settings_navigation_box.set_width_request(320);
@@ -86,7 +86,7 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let overview_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(OVERVIEW_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(OVERVIEW_SETTINGS.to_string())
             );
         };
         self.overview_button.connect_clicked(overview_button_click);
@@ -94,7 +94,7 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let general_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(GENERAL_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(GENERAL_SETTINGS.to_string())
             );
         };
         self.general_button.connect_clicked(general_button_click);
@@ -102,7 +102,7 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let display_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(DISPLAY_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(DISPLAY_SETTINGS.to_string())
             );
         };
         self.display_button.connect_clicked(display_button_click);
@@ -110,7 +110,7 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let appearance_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(APPEARANCE_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(APPEARANCE_SETTINGS.to_string())
             );
         };
         self.appearance_button.connect_clicked(appearance_button_click);
@@ -118,7 +118,7 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let startup_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(STARTUP_PROGRAM_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(STARTUP_PROGRAM_SETTINGS.to_string())
             );
         };
         self.startup_button.connect_clicked(startup_button_click);
@@ -126,15 +126,15 @@ impl SettingsNavigation {
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let keybinds_button_click = move |_: &Button| {
             settings_switcher_manager_clone.notify_event(
-                SettingsSwitcherEvent::NewComponentName(KEYBINDS_SETTINGS.to_string())
+                SettingsSwitcherEvent::NewControlName(KEYBINDS_SETTINGS.to_string())
             );
         };
         self.keybinds_button.connect_clicked(keybinds_button_click);
 
         let settings_switcher_manager_clone = self.settings_switcher_manager.clone();
         let info_button_click = move |_: &Button| {
-            let new_component_name = SettingsSwitcherEvent::NewComponentName(INFO_SETTINGS.to_string());
-            settings_switcher_manager_clone.notify_event(new_component_name);
+            let new_control_name = SettingsSwitcherEvent::NewControlName(INFO_SETTINGS.to_string());
+            settings_switcher_manager_clone.notify_event(new_control_name);
         };
         self.info_button.connect_clicked(info_button_click);
 

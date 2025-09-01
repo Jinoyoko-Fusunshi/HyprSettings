@@ -1,9 +1,9 @@
 use gtk::{Adjustment, Align, Label, Orientation, SpinButton as GTKSpinButton};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::ui::component::Component;
-use crate::ui::labeled_component::LabeledComponent;
+use crate::ui::controls::Control;
+use crate::ui::labeled_control::LabeledControl;
 use crate::ui::states::spin_button_state::SpinButtonState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SpinButton {
     spin_button_box: gtk::Box,
@@ -11,7 +11,7 @@ pub struct SpinButton {
     spin_button: GTKSpinButton,
 }
 
-impl Component for SpinButton {
+impl Control for SpinButton {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -19,7 +19,7 @@ impl Component for SpinButton {
     }
 }
 
-impl UpdatableComponent<SpinButtonState> for SpinButton {
+impl UpdatableControl<SpinButtonState> for SpinButton {
     fn update_ui(&mut self, state: SpinButtonState) {
         self.spin_button_label.set_text(state.label_text.as_str());
 
@@ -38,7 +38,11 @@ impl UpdatableComponent<SpinButtonState> for SpinButton {
     }
 }
 
-impl LabeledComponent for SpinButton {
+impl LabeledControl for SpinButton {
+    fn set_text(&self, text: &str) {
+        self.spin_button_label.set_text(text);   
+    }
+
     fn set_text_width(&self, width: u32) {
         self.spin_button_label.set_width_request(width as i32);
     }

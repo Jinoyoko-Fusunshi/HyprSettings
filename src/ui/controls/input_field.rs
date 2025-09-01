@@ -1,8 +1,8 @@
 use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct InputFieldState {
     pub label_text: String,
@@ -16,7 +16,7 @@ pub struct InputField {
     input_entry: Entry
 }
 
-impl Component for InputField {
+impl Control for InputField {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -24,7 +24,7 @@ impl Component for InputField {
     }
 }
 
-impl UpdatableComponent<InputFieldState> for InputField {
+impl UpdatableControl<InputFieldState> for InputField {
     fn update_ui(&mut self, state: InputFieldState) {
         self.input_label.set_text(state.label_text.as_str());
 

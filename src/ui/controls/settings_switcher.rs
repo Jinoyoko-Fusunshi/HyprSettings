@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use gtk::{Orientation, Stack};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SettingsSwitcher {
     settings_switcher_box: gtk::Box,
     settings_switcher_stack: Stack,
-    components: HashMap<String, Box<dyn Component>>,
+    controls: HashMap<String, Box<dyn Control>>,
 }
 
-impl Component for SettingsSwitcher {
+impl Control for SettingsSwitcher {
     fn init_events(&self) {
 
     }
@@ -22,9 +22,9 @@ impl Component for SettingsSwitcher {
     }
 }
 
-impl UpdatableComponent<SettingsSwitcherState> for SettingsSwitcher {
+impl UpdatableControl<SettingsSwitcherState> for SettingsSwitcher {
     fn update_ui(&mut self, state: SettingsSwitcherState) {
-        self.set_component_visible(state.active_settings_name.as_str());
+        self.set_control_visible(state.active_settings_name.as_str());
     }
 }
 
@@ -40,21 +40,21 @@ impl SettingsSwitcher {
         Self {
             settings_switcher_box,
             settings_switcher_stack,
-            components: HashMap::new(),
+            controls: HashMap::new(),
         }
     }
 
-    pub fn insert_component(&mut self, name: String, component: Box<dyn Component>) -> &mut Self {
-        self.settings_switcher_stack.add_named(component.get_widget(), Some(name.as_str()));
-        self.components.insert(name, component);
+    pub fn insert_control(&mut self, name: String, control: Box<dyn Control>) -> &mut Self {
+        self.settings_switcher_stack.add_named(control.get_widget(), Some(name.as_str()));
+        self.controls.insert(name, control);
         self
     }
 
-    pub fn set_component_visible(&self, component_name: &str) {
-        let ui_component_box = self.settings_switcher_stack.child_by_name(component_name);
-        if let Some(ui_component_box) = ui_component_box {
+    pub fn set_control_visible(&self, control_name: &str) {
+        let control_box = self.settings_switcher_stack.child_by_name(control_name);
+        if let Some(control_box) = control_box {
             self.settings_switcher_stack.set_child_visible(true);
-            self.settings_switcher_stack.set_visible_child(&ui_component_box);
+            self.settings_switcher_stack.set_visible_child(&control_box);
         } else {
             self.settings_switcher_stack.set_child_visible(false);
         }

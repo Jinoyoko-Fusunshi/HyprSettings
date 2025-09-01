@@ -5,7 +5,7 @@ use crate::providers::hyprland_settings_provider::config_files::hyprland_setting
 use crate::providers::hyprland_settings_provider::config_files::settings_writer::SettingsWriter;
 use crate::providers::hyprland_settings_provider::config_files::yaml_settings_writer::YamlSettingsWriter;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 
 #[derive(Clone)]
@@ -15,7 +15,7 @@ pub struct SettingsSwitcherManager {
 }
 
 pub enum SettingsSwitcherEvent {
-    NewComponentName(String),
+    NewControlName(String),
     SaveSettings,
 }
 
@@ -32,7 +32,7 @@ impl SettingsSwitcherManager {
 
     pub fn notify_event(&self, event: SettingsSwitcherEvent) {
         match  event {
-            SettingsSwitcherEvent::NewComponentName(name) => {
+            SettingsSwitcherEvent::NewControlName(name) => {
                 let settings_switcher_state = SettingsSwitcherState::new(name);
                 let mut settings_switcher = self.settings_switcher.borrow_mut();
                 settings_switcher.update_ui(settings_switcher_state);

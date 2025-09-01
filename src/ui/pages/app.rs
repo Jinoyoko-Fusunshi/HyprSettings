@@ -6,10 +6,10 @@ use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
 use crate::ui::pages::settings::general_page::GeneralSettings;
 use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS};
-use crate::ui::controls::settings_navigation::SettingsNavigation;
+use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::pages::settings::appearance_page::AppearanceSettings;
 use crate::ui::pages::settings::display_page::DisplaySettings;
 use crate::ui::pages::settings::info_page::InfoSettings;
@@ -18,13 +18,13 @@ use crate::ui::pages::settings::overview_page::OverviewPage;
 use crate::ui::pages::settings::startups_page::StartupProgramsSettings;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct App {
     app_box: gtk::Box
 }
 
-impl Component for App {
+impl Control for App {
     fn init_events(&self) {
 
     }
@@ -70,22 +70,22 @@ impl App {
 
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
-            .insert_component(OVERVIEW_SETTINGS.to_string(), overview_settings)
-            .insert_component(GENERAL_SETTINGS.to_string(), general_settings)
-            .insert_component(DISPLAY_SETTINGS.to_string(), display_settings)
-            .insert_component(APPEARANCE_SETTINGS.to_string(), appearance_settings)
-            .insert_component(KEYBINDS_SETTINGS.to_string(), keybinds_settings)
-            .insert_component(STARTUP_PROGRAM_SETTINGS.to_string(), startup_program_settings)
-            .insert_component(INFO_SETTINGS.to_string(), info_settings);
+            .insert_control(OVERVIEW_SETTINGS.to_string(), overview_settings)
+            .insert_control(GENERAL_SETTINGS.to_string(), general_settings)
+            .insert_control(DISPLAY_SETTINGS.to_string(), display_settings)
+            .insert_control(APPEARANCE_SETTINGS.to_string(), appearance_settings)
+            .insert_control(KEYBINDS_SETTINGS.to_string(), keybinds_settings)
+            .insert_control(STARTUP_PROGRAM_SETTINGS.to_string(), startup_program_settings)
+            .insert_control(INFO_SETTINGS.to_string(), info_settings);
 
         let settings_switcher_state = SettingsSwitcherState::new(GENERAL_SETTINGS.to_string());
         settings_switcher.borrow_mut().update_ui(settings_switcher_state);
         
         let settings_switcher_manager = SettingsSwitcherManager::new(settings_switcher.clone(), application_provider.clone());
-        let settings_navigation = SettingsNavigation::new(settings_switcher_manager.clone());
-        settings_navigation.init_events();
+        let navigation = Navigation::new(settings_switcher_manager.clone());
+        navigation.init_events();
 
-        app_box.append(settings_navigation.get_widget());
+        app_box.append(navigation.get_widget());
         app_box.append(settings_switcher.borrow().get_widget());
 
         Self {

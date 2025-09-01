@@ -2,11 +2,11 @@ use gtk::{Align, Label, Orientation, Switch};
 use gtk::glib::Propagation;
 use gtk::SpinButton as GTKSpinButton;
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::spin_button_state::SpinButtonState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 const NORMAL_INCREMENT_VALUE: f64 = 160.0;
 const PAGE_INCREMENT_VALUE: f64 = 320.0;
@@ -23,7 +23,7 @@ pub struct DisplayField {
     refresh_rate_spin_button: SpinButton,
 }
 
-impl Component for DisplayField {
+impl Control for DisplayField {
     fn init_events(&self) {
 
     }
@@ -34,7 +34,7 @@ impl Component for DisplayField {
     }
 }
 
-impl UpdatableComponent<DisplayFieldState> for DisplayField {
+impl UpdatableControl<DisplayFieldState> for DisplayField {
     fn update_ui(&mut self, state: DisplayFieldState) {
         self.monitor_active_switch.set_active(state.monitor_configuration.enabled);
 

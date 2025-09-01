@@ -1,13 +1,13 @@
 use gtk::{Align, Label, LinkButton, Orientation, Separator};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 
 pub struct InfoSettings {
     info_settings_box: gtk::Box,
 }
 
-impl Component for InfoSettings {
+impl Control for InfoSettings {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {

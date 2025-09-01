@@ -5,16 +5,16 @@ use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::models::keybinds::custom_keybind::CustomKeybind;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::input_field::{InputField, InputFieldState};
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::state_savable_component::StateSavableComponent;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct CustomKeyBindInputField {
     state: Rc<RefCell<CustomKeybindInputFieldState>>,
@@ -25,7 +25,7 @@ pub struct CustomKeyBindInputField {
     keybind_input: Rc<RefCell<KeybindInput>>,
 }
 
-impl Component for CustomKeyBindInputField {
+impl Control for CustomKeyBindInputField {
     fn init_events(&self) {
         let state = self.state.clone();
         let shortcut_name_entry_callback = move |entry: &Entry| {
@@ -52,7 +52,7 @@ impl Component for CustomKeyBindInputField {
     }
 }
 
-impl UpdatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputField {
+impl UpdatableControl<CustomKeybindInputFieldState> for CustomKeyBindInputField {
     fn update_ui(&mut self, state: CustomKeybindInputFieldState) {
         let input_field_state = InputFieldState {
             label_text: "Shortcut name:".to_string(),
@@ -75,7 +75,7 @@ impl UpdatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputFiel
     }
 }
 
-impl StatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputField {
+impl StatableControl<CustomKeybindInputFieldState> for CustomKeyBindInputField {
     fn update_state(&mut self, state: CustomKeybindInputFieldState) {
         *self.state.borrow_mut() = state.clone();
 
@@ -87,7 +87,7 @@ impl StatableComponent<CustomKeybindInputFieldState> for CustomKeyBindInputField
     }
 }
 
-impl StateSavableComponent for CustomKeyBindInputField {
+impl StateSavableControl for CustomKeyBindInputField {
     fn save_settings(&self, application_provider: ApplicationProvider) {
         let settings_provider = application_provider.get_settings_provider();
         let mut settings_provider_mut = settings_provider.borrow_mut();

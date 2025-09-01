@@ -3,12 +3,12 @@ use gtk::{Label, Orientation, Separator, SpinButton, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::display_field::DisplayField;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct DisplaySettings {
     application_provider: ApplicationProvider,
@@ -17,7 +17,7 @@ pub struct DisplaySettings {
     display_fields: HashMap<String, DisplayField>,
 }
 
-impl Component for DisplaySettings {
+impl Control for DisplaySettings {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -25,7 +25,7 @@ impl Component for DisplaySettings {
     }
 }
 
-impl UpdatableComponent<DisplaySettingsState> for DisplaySettings {
+impl UpdatableControl<DisplaySettingsState> for DisplaySettings {
     fn update_ui(&mut self, state: DisplaySettingsState) {
         self.clear_display_fields();
 

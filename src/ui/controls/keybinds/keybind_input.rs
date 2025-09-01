@@ -5,14 +5,14 @@ use gtk::gdk::{Key, ModifierType};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputManager};
 use crate::ui::controls::keybinds::key_symbol::KeySymbol;
 use crate::ui::controls::keybinds::keybind_converter::KeybindConverter;
-use crate::ui::statable_component::StatableComponent;
+use crate::ui::statable_control::StatableControl;
 use crate::ui::states::keybind_input_state::KeybindInputState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct KeybindInput {
     state: Rc<RefCell<KeybindInputState>>,
@@ -21,7 +21,7 @@ pub struct KeybindInput {
     reset_key_button: Button,
 }
 
-impl Component for KeybindInput {
+impl Control for KeybindInput {
     fn init_events(&self) {
         let keybind_symbols_box = self.keybind_symbols_box.clone();
         let click_input_controller = GestureClick::new();
@@ -43,7 +43,7 @@ impl Component for KeybindInput {
     }
 }
 
-impl UpdatableComponent<KeybindInputState> for KeybindInput {
+impl UpdatableControl<KeybindInputState> for KeybindInput {
     fn update_ui(&mut self, state: KeybindInputState) {
         if let Some(configuration) = state.configuration {
             self.set_keybind(configuration);
@@ -53,7 +53,7 @@ impl UpdatableComponent<KeybindInputState> for KeybindInput {
     }
 }
 
-impl StatableComponent<KeybindInputState> for KeybindInput {
+impl StatableControl<KeybindInputState> for KeybindInput {
     fn update_state(&mut self, state: KeybindInputState) {
         *self.state.borrow_mut() = state;
     }

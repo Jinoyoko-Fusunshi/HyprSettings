@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
-use crate::ui::statable_component::StatableComponent;
+use crate::ui::statable_control::StatableControl;
 use crate::ui::states::keybind_input_state::KeybindInputState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
 pub struct KeybindInputManager {

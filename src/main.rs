@@ -1,12 +1,12 @@
-mod ui;
-mod providers;
-mod models;
+pub mod ui;
+pub mod providers;
+pub mod models;
 
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, STYLE_PROVIDER_PRIORITY_USER};
 use gtk::gdk::Display;
 use gtk::gio::File;
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::pages::app::App;
 
 fn main() {

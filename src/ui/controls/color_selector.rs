@@ -1,9 +1,9 @@
 use gtk::{Align, ColorButton, Label};
 use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
-use crate::ui::component::Component;
-use crate::ui::labeled_component::LabeledComponent;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::controls::Control;
+use crate::ui::labeled_control::LabeledControl;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct ColorSelectorState {
     pub label_text: String,
@@ -16,7 +16,7 @@ pub struct ColorSelector {
     color_button: ColorButton,
 }
 
-impl Component for ColorSelector {
+impl Control for ColorSelector {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -24,13 +24,17 @@ impl Component for ColorSelector {
     }
 }
 
-impl LabeledComponent for ColorSelector {
+impl LabeledControl for ColorSelector {
+    fn set_text(&self, text: &str) {
+        self.color_button_label.set_text(text);
+    }
+
     fn set_text_width(&self, width: u32) {
         self.color_button_label.set_width_request(width as i32);
     }
 }
 
-impl UpdatableComponent<ColorSelectorState> for ColorSelector {
+impl UpdatableControl<ColorSelectorState> for ColorSelector {
     fn update_ui(&mut self, state: ColorSelectorState) {
         self.color_button_label.set_text(&state.label_text);
         if let Some(color) = state.selected_color {

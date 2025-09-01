@@ -3,11 +3,11 @@ use std::rc::Rc;
 use gtk::{Align, Button};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::component::Component;
 use crate::ui::controls::activable_control::ActivableControl;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::state_savable_component::StateSavableComponent;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::controls::Control;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::state_savable_control::StateSavableControl;
+use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
 pub enum EditMode {
@@ -19,12 +19,12 @@ pub enum EditableControlElementEvent {
     ChangeEditMode(EditMode)
 }
 
-pub struct EditableControlElementManager<Element: ActivableControl + Component + StateSavableComponent + 'static> {
+pub struct EditableControlElementManager<Element: ActivableControl + Control + StateSavableControl + 'static> {
     editable_control_element: Rc<RefCell<EditableControlElement<Element>>>,
     application_provider: ApplicationProvider
 }
 
-impl<Element: ActivableControl + Component +  StateSavableComponent + 'static> EditableControlElementManager<Element> {
+impl<Element: ActivableControl + Control + StateSavableControl + 'static> EditableControlElementManager<Element> {
     pub fn new(
         editable_control_element: Rc<RefCell<EditableControlElement<Element>>>,
         application_provider: ApplicationProvider
@@ -59,14 +59,14 @@ pub struct EditableControlElementState {
     pub edit_mode: EditMode
 }
 
-pub struct EditableControlElement<Element: ActivableControl + Component + StateSavableComponent> {
+pub struct EditableControlElement<Element: ActivableControl + Control + StateSavableControl> {
     editable_control_element_box: gtk::Box,
     editable_control: Rc<RefCell<Element>>,
     mode_toggle_button: Button,
     state: Rc<RefCell<EditableControlElementState>>,
 }
 
-impl<Element: ActivableControl + Component + StateSavableComponent> Component for EditableControlElement<Element> {
+impl<Element: ActivableControl + Control + StateSavableControl> Control for EditableControlElement<Element> {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -74,21 +74,21 @@ impl<Element: ActivableControl + Component + StateSavableComponent> Component fo
     }
 }
 
-impl<Element: ActivableControl + Component + StateSavableComponent>
-UpdatableComponent<EditableControlElementState> for EditableControlElement<Element> {
+impl<Element: ActivableControl + Control + StateSavableControl>
+UpdatableControl<EditableControlElementState> for EditableControlElement<Element> {
     fn update_ui(&mut self, state: EditableControlElementState) {
         self.change_mode(state.edit_mode);
     }
 }
 
-impl<Element: ActivableControl + Component + StateSavableComponent>
-StatableComponent<EditableControlElementState> for EditableControlElement<Element> {
+impl<Element: ActivableControl + Control + StateSavableControl>
+StatableControl<EditableControlElementState> for EditableControlElement<Element> {
     fn update_state(&mut self, state: EditableControlElementState) {
         *self.state.borrow_mut() = state;
     }
 }
 
-impl<Element: ActivableControl + Component + StateSavableComponent> EditableControlElement<Element> {
+impl<Element: ActivableControl + Control + StateSavableControl> EditableControlElement<Element> {
     pub fn new(editable_control: Rc<RefCell<Element>>) -> Self {
         let editable_control_element_box = gtk::Box::new(gtk::Orientation::Horizontal, 10);
         let mode_toggle_button = Button::with_label("✅");

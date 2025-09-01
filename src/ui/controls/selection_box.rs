@@ -1,10 +1,10 @@
 use gtk::{Align, ComboBoxText, Label, Orientation};
 use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
-use crate::ui::labeled_component::LabeledComponent;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::labeled_control::LabeledControl;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
 pub struct SelectionBoxState {
@@ -20,7 +20,7 @@ pub struct SelectionBox {
     selection_combobox: ComboBoxText,
 }
 
-impl Component for SelectionBox {
+impl Control for SelectionBox {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -28,13 +28,17 @@ impl Component for SelectionBox {
     }
 }
 
-impl LabeledComponent for SelectionBox {
+impl LabeledControl for SelectionBox {
+    fn set_text(&self, text: &str) {
+        self.selection_label.set_text(text);   
+    }
+
     fn set_text_width(&self, width: u32) {
         self.selection_label.set_width_request(width as i32);
     }
 }
 
-impl UpdatableComponent<SelectionBoxState> for SelectionBox {
+impl UpdatableControl<SelectionBoxState> for SelectionBox {
     fn update_ui(&mut self, state: SelectionBoxState) {
         self.selection_label.set_text(&state.label_text);
 
@@ -46,7 +50,7 @@ impl UpdatableComponent<SelectionBoxState> for SelectionBox {
     }
 }
 
-impl StatableComponent<SelectionBoxState> for SelectionBox {
+impl StatableControl<SelectionBoxState> for SelectionBox {
     fn update_state(&mut self, state: SelectionBoxState) {
         self.state = state;
     }

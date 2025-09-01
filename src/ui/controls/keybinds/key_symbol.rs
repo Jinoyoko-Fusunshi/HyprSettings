@@ -1,12 +1,12 @@
 use gtk::{Label, Orientation};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::ui::component::Component;
+use crate::ui::controls::Control;
 
 pub struct KeySymbol {
     key_symbol_box: gtk::Box
 }
 
-impl Component for KeySymbol {
+impl Control for KeySymbol {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {

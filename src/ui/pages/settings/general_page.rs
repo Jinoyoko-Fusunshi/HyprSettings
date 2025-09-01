@@ -3,8 +3,8 @@ use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::controls::input_field::{InputField, InputFieldState};
 use crate::ui::states::general_settings_state::GeneralSettingsState;
-use crate::ui::component::Component;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::controls::Control;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub struct GeneralSettings {
     application_provider: ApplicationProvider,
@@ -17,7 +17,7 @@ pub struct GeneralSettings {
     notifications_input_field: InputField,
 }
 
-impl Component for GeneralSettings {
+impl Control for GeneralSettings {
     fn init_events(&self) {
         let settings_provider = self.application_provider.get_settings_provider();
         let config_input_change = move |input: &Entry| {
@@ -61,7 +61,7 @@ impl Component for GeneralSettings {
     }
 }
 
-impl UpdatableComponent<GeneralSettingsState> for GeneralSettings {
+impl UpdatableControl<GeneralSettingsState> for GeneralSettings {
     fn update_ui(&mut self, state: GeneralSettingsState) {
         let input_field_state = InputFieldState {
             label_text: "Hyprland config path:".to_string(),

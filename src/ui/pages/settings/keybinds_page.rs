@@ -7,16 +7,16 @@ use crate::models::keybinds::custom_keybind::CustomKeybind;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::component::Component;
-use crate::ui::component_section_builder::SectionBoxBuilder;
+use crate::ui::controls::Control;
+use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
 use crate::ui::controls::keybinds::custom_keybind_input_field::CustomKeyBindInputField;
 use crate::ui::controls::keybinds::keybind_input_field::KeybindInputField;
-use crate::ui::statable_component::StatableComponent;
-use crate::ui::state_savable_component::StateSavableComponent;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
 use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
-use crate::ui::updatable_component::UpdatableComponent;
+use crate::ui::updatable_control::UpdatableControl;
 
 pub const CUSTOM_ITEM: &str = "Custom";
 
@@ -24,7 +24,7 @@ pub struct KeyBindsSettings {
     key_binds_panel_box: gtk::Box
 }
 
-impl Component for KeyBindsSettings {
+impl Control for KeyBindsSettings {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {

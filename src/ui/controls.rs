@@ -7,5 +7,11 @@ pub mod spin_button;
 pub mod display_field;
 pub mod keybinds;
 pub mod startup_program_field;
-pub mod settings_navigation;
+pub mod navigation;
 pub mod settings_switcher;
+
+pub trait Control {
+    fn init_events(&self);
+
+    fn get_widget(&self) -> &gtk::Box;
+}
