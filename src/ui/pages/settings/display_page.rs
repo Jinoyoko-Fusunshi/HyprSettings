@@ -3,9 +3,9 @@ use gtk::{Label, Orientation, Separator, SpinButton, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
+use crate::ui::boxes::Boxes;
 use crate::ui::controls::Control;
 use crate::ui::controls::display_field::DisplayField;
-use crate::ui::css_styles::CSSStyles;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_control::UpdatableControl;
@@ -32,7 +32,7 @@ impl UpdatableControl<DisplaySettingsState> for DisplaySettings {
         if state.enabled {
             Self::create_display_fields(self, state);
         } else {
-            Self::create_display_error(self);
+            Self::create_display_warning(self);
         }
     }
 }
@@ -63,11 +63,7 @@ impl DisplaySettings {
     fn clear_display_fields(&mut self) {
         self.display_fields.clear();
 
-        let mut current_child = self.display_fields_box.first_child();
-        while let Some(child) = current_child.clone() {
-            self.display_fields_box.remove(&child);
-            current_child = self.display_fields_box.next_sibling();
-        }
+        Boxes::clear_box_content(&self.display_fields_box);
     }
 
     fn create_display_fields(&mut self, state: DisplaySettingsState) {
@@ -116,12 +112,11 @@ impl DisplaySettings {
         }
     }
 
-    fn create_display_error(&mut self) {
-        let display_error_box = gtk::Box::new(Orientation::Vertical, 10);
-        let display_error_label = Label::new(Some("⚠️ wlr-randr program not found. Without the program module no displays can be found and therefore configured."));
-        display_error_label.add_css_class(CSSStyles::MODULE_WARNING_LABEL);
+    fn create_display_warning(&mut self) {
+        let display_warning_box = Boxes::create_warning_box(
+            "⚠️ Wayland RandR program module not found. This is required to configure the monitor displays."
+        );
 
-        display_error_box.append(&display_error_label);
-        self.display_fields_box.append(&display_error_box);
+        self.display_fields_box.append(&display_warning_box);
     }
 }

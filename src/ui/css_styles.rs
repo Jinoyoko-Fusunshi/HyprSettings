@@ -9,5 +9,5 @@ impl CSSStyles {
     pub const CREATE_STARTUP_PROGRAM_BUTTON: &'static str = "create-startup-program";
     pub const DISABLED_STARTUP_PROGRAM_BUTTON: &'static str = "disabled_startup_program";
     pub const HYPRLAND_MODULE_NAME: &'static str = "module-name";
-    pub const MODULE_WARNING_LABEL: &'static str = "module-warning";
+    pub const WARNING_LABEL: &'static str = "warning";
 }

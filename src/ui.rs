@@ -9,3 +9,4 @@ mod state_savable_control;
 mod labeled_control;
 mod manager;
 pub mod pages;
+pub mod boxes;

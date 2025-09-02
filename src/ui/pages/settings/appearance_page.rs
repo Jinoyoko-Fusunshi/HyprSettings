@@ -73,22 +73,6 @@ impl AppearanceSettings {
 
         let settings_provider = application_provider.get_settings_provider();
 
-        // Wallpaper image path option
-        let settings_provider_clone = settings_provider.clone();
-        let wallpaper_path_input_change = {
-            move |entry: &Entry| {
-                settings_provider_clone.borrow_mut().set_wallpaper_path(entry.text().to_string());
-            }
-        };
-        let mut wallpaper_path_input_field = InputField::new();
-        let state = InputFieldState {
-            label_text: "wallpaper path:".to_string(),
-            placeholder_text: "e.g. ~/Pictures/wallpaper.png".to_string(),
-            entry_text: Some(settings_provider.borrow().get_wallpaper_path()),
-        };
-        wallpaper_path_input_field.update_ui(state);
-        wallpaper_path_input_field.set_input_callback(wallpaper_path_input_change);
-
         // Force default wallpaper option
         let settings_provider_clone = settings_provider.clone();
         let force_default_wallpaper_selection_change = {
@@ -128,8 +112,7 @@ impl AppearanceSettings {
         disable_hyprland_logo_selection.update_state(state.clone());
         disable_hyprland_logo_selection.update_ui(state.clone());
         disable_hyprland_logo_selection.set_selection_change(disable_hyprland_logo_selection_change);
-
-        wallpaper_section_box.append(wallpaper_path_input_field.get_widget());
+        
         wallpaper_section_box.append(force_default_wallpaper_selection.get_widget());
         wallpaper_section_box.append(disable_hyprland_logo_selection.get_widget());
         wallpaper_section_box

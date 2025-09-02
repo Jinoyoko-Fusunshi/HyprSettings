@@ -27,11 +27,12 @@ impl Control for InputField {
 impl UpdatableControl<InputFieldState> for InputField {
     fn update_ui(&mut self, state: InputFieldState) {
         self.input_label.set_text(state.label_text.as_str());
+        self.input_entry.set_placeholder_text(Some(state.placeholder_text.as_str()));
 
-        if let Some(text) = state.entry_text {
+        if let Some(text) = state.entry_text && !text.is_empty() {
             self.input_entry.set_text(text.as_str());
         } else {
-            self.input_entry.set_placeholder_text(Some(state.placeholder_text.as_str()));
+            self.input_entry.set_text("");
         }
     }
 }
