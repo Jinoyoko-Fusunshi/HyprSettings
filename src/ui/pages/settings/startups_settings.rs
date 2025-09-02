@@ -8,7 +8,7 @@ use crate::ui::controls::startup_program_field::StartupProgramField;
 use crate::ui::controls::Control;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
-use crate::ui::pages::settings::keybinds_page::CUSTOM_ITEM;
+use crate::ui::pages::settings::keybinds_settings::CUSTOM_ITEM;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;

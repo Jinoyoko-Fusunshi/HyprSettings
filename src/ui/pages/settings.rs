@@ -1,12 +1,12 @@
-pub mod general_page;
-pub mod display_page;
-pub mod info_page;
-pub mod keybinds_page;
-pub mod appearance_page;
-pub mod startups_page;
-pub mod overview_page;
-pub mod wallpaper_page;
-pub mod lockscreen_page;
+pub mod general_settings;
+pub mod display_settings;
+pub mod info_settings;
+pub mod keybinds_settings;
+pub mod appearance_settings;
+pub mod startups_settings;
+pub mod overview_settings;
+pub mod wallpaper_settings;
+pub mod lockscreen_settings;
 
 pub const OVERVIEW_SETTINGS: &str = "overview-settings";
 pub const GENERAL_SETTINGS: &str = "general-settings";
