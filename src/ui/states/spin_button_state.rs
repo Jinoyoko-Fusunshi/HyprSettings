@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct SpinButtonState {
     pub label_text: String,
     pub min_value: f64,

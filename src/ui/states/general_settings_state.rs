@@ -1,5 +1,6 @@
 use crate::providers::application_provider::ApplicationProvider;
 
+#[derive(Clone)]
 pub struct GeneralSettingsState {
     pub hyprland_config_path: Option<String>,
     pub terminal_path: Option<String>,

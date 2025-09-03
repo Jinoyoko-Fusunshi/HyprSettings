@@ -1,14 +1,9 @@
 use gtk::{Align, ColorButton, Label};
 use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
-use crate::models::rgba_color::RGBAColor;
 use crate::ui::controls::Control;
 use crate::ui::labeled_control::LabeledControl;
+use crate::ui::states::color_selector_state::ColorSelectorState;
 use crate::ui::updatable_control::UpdatableControl;
-
-pub struct ColorSelectorState {
-    pub label_text: String,
-    pub selected_color: Option<RGBAColor>,
-}
 
 pub struct ColorSelector {
     color_button_box: gtk::Box,

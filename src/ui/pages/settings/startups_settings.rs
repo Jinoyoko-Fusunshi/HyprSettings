@@ -6,11 +6,12 @@ use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::startup_program_field::StartupProgramField;
 use crate::ui::controls::Control;
-use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager, EditableControlElementState};
+use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
 use crate::ui::pages::settings::keybinds_settings::CUSTOM_ITEM;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
+use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 

@@ -7,12 +7,13 @@ use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
-use crate::ui::controls::input_field::{InputField, InputFieldState};
+use crate::ui::controls::input_field::InputField;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
+use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_control::UpdatableControl;
 

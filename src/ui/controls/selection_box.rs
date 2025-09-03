@@ -5,14 +5,8 @@ use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::statable_control::StatableControl;
+use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::updatable_control::UpdatableControl;
-
-#[derive(Clone)]
-pub struct SelectionBoxState {
-    pub label_text: String,
-    pub selected_option: Option<String>,
-    pub options: Vec<String>,
-}
 
 pub struct SelectionBox {
     state: SelectionBoxState,

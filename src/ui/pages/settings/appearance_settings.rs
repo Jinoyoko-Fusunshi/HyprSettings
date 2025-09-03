@@ -7,12 +7,12 @@ use crate::ui::controls::input_field::InputField;
 use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::controls::color_selector::ColorSelectorState;
-use crate::ui::controls::input_field::InputFieldState;
-use crate::ui::controls::selection_box::SelectionBoxState;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::statable_control::StatableControl;
+use crate::ui::states::color_selector_state::ColorSelectorState;
+use crate::ui::states::input_field_state::InputFieldState;
+use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::spin_button_state::SpinButtonState;
 use crate::ui::updatable_control::UpdatableControl;
 

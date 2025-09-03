@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use crate::models::monitor::monitor_configuration::MonitorConfiguration;
 use crate::providers::application_provider::ApplicationProvider;
 
+#[derive(Clone)]
 pub struct DisplaySettingsState {
     pub enabled: bool,
     pub monitor_configurations: HashMap<String, MonitorConfiguration>,

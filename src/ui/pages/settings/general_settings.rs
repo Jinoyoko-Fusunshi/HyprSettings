@@ -1,9 +1,10 @@
 use gtk::{Entry, Label, Orientation, Separator};
 use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::controls::input_field::{InputField, InputFieldState};
+use crate::ui::controls::input_field::InputField;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::controls::Control;
+use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct GeneralSettings {

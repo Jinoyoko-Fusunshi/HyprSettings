@@ -3,9 +3,10 @@ use gtk::prelude::{BoxExt, EditableExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::boxes::Boxes;
 use crate::ui::controls::Control;
-use crate::ui::controls::input_field::{InputField, InputFieldState};
+use crate::ui::controls::input_field::InputField;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::statable_control::StatableControl;
+use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
 

@@ -7,6 +7,7 @@ use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::Control;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
+use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
@@ -52,11 +53,6 @@ impl<Element: ActivableControl + Control + StateSavableControl + 'static> Editab
             }
         }
     }
-}
-
-#[derive(Clone)]
-pub struct EditableControlElementState {
-    pub edit_mode: EditMode
 }
 
 pub struct EditableControlElement<Element: ActivableControl + Control + StateSavableControl> {

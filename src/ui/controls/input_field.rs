@@ -2,13 +2,8 @@ use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
+use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
-
-pub struct InputFieldState {
-    pub label_text: String,
-    pub entry_text: Option<String>,
-    pub placeholder_text: String,
-}
 
 pub struct InputField {
     input_field_box: gtk::Box,
