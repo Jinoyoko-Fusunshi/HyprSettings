@@ -9,14 +9,14 @@ use crate::ui::statable_control::StatableControl;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct WallpaperPage {
+pub struct WallpaperSettings {
     application_provider: ApplicationProvider,
     state: WallpaperPageState,
     wallpaper_box: gtk::Box,
     wallpaper_sections_box: gtk::Box,
 }
 
-impl Control for WallpaperPage {
+impl Control for WallpaperSettings {
     fn init_events(&self) {
 
     }
@@ -26,7 +26,7 @@ impl Control for WallpaperPage {
     }
 }
 
-impl UpdatableControl<WallpaperPageState> for WallpaperPage {
+impl UpdatableControl<WallpaperPageState> for WallpaperSettings {
     fn update_ui(&mut self, state: WallpaperPageState) {
         Boxes::clear_box_content(&self.wallpaper_sections_box);
 
@@ -38,13 +38,13 @@ impl UpdatableControl<WallpaperPageState> for WallpaperPage {
     }
 }
 
-impl StatableControl<WallpaperPageState> for WallpaperPage {
+impl StatableControl<WallpaperPageState> for WallpaperSettings {
     fn update_state(&mut self, state: WallpaperPageState) {
         self.state = state;
     }
 }
 
-impl WallpaperPage {
+impl WallpaperSettings {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const WALLPAPER_TITLE: &str = "Wallpaper";
         let wallpaper_box = SectionBoxBuilder::new()

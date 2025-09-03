@@ -14,10 +14,10 @@ use crate::ui::pages::settings::appearance_settings::AppearanceSettings;
 use crate::ui::pages::settings::display_settings::DisplaySettings;
 use crate::ui::pages::settings::info_settings::InfoSettings;
 use crate::ui::pages::settings::keybinds_settings::KeyBindsSettings;
-use crate::ui::pages::settings::lockscreen_settings::LockScreenPage;
-use crate::ui::pages::settings::overview_settings::OverviewPage;
+use crate::ui::pages::settings::lockscreen_settings::LockScreenSettings;
+use crate::ui::pages::settings::overview_settings::OverviewSettings;
 use crate::ui::pages::settings::startups_settings::StartupProgramsSettings;
-use crate::ui::pages::settings::wallpaper_settings::WallpaperPage;
+use crate::ui::pages::settings::wallpaper_settings::WallpaperSettings;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
@@ -48,7 +48,7 @@ impl App {
         app_box.set_margin_top(10);
         app_box.set_margin_bottom(10);
 
-        let overview_settings = Box::new(OverviewPage::new(application_provider.clone()));
+        let overview_settings = Box::new(OverviewSettings::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
         let mut general_settings = Box::new(GeneralSettings::new(application_provider.clone()));
@@ -61,12 +61,12 @@ impl App {
         display_settings.update_ui(state);
 
         let state = WallpaperPageState::from(&application_provider);
-        let mut wallpaper_settings = Box::new(WallpaperPage::new(application_provider.clone()));
+        let mut wallpaper_settings = Box::new(WallpaperSettings::new(application_provider.clone()));
         //wallpaper_settings.update_state(state.clone());
         wallpaper_settings.update_ui(state.clone());
 
         let state = LockScreenPageState::from(&application_provider);
-        let mut lockscreen_settings = Box::new(LockScreenPage::new(application_provider.clone()));
+        let mut lockscreen_settings = Box::new(LockScreenSettings::new(application_provider.clone()));
         //lockscreen_settings.update_state(state.clone());
         lockscreen_settings.update_ui(state.clone());
 
