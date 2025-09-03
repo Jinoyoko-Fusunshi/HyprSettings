@@ -476,7 +476,7 @@ impl AppearanceSettings {
         // Blur size option
         let settings_provider_clone = settings_provider.clone();
         let blur_size_spin_button_changed_callback = move |spin_button: &GTKSpinButton| {
-            settings_provider_clone.borrow_mut().set_blur_size(spin_button.value());
+            settings_provider_clone.borrow_mut().set_appearance_blur_size(spin_button.value());
         };
         let mut blur_size_spin_button = SpinButton::new();
         blur_size_spin_button.set_text_width(APPEARANCE_LABEL_WIDTH);
@@ -484,7 +484,7 @@ impl AppearanceSettings {
             label_text: "Blur size:".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: settings_provider.borrow().get_blur_size(),
+            current_value: settings_provider.borrow().get_appearance_blur_size(),
             increment_value: 0.1,
             page_increment_value: 1.0,
             page_size: 0.0,
@@ -498,7 +498,7 @@ impl AppearanceSettings {
         // Blur passes option
         let settings_provider_clone = settings_provider.clone();
         let blur_passes_spin_button_changed_callback = move |spin_button: &GTKSpinButton| {
-            settings_provider_clone.borrow_mut().set_blur_passes(spin_button.value() as usize);
+            settings_provider_clone.borrow_mut().set_appearance_blur_passes(spin_button.value() as usize);
         };
         let mut blur_passes_spin_button = SpinButton::new();
         blur_passes_spin_button.set_text_width(APPEARANCE_LABEL_WIDTH);
@@ -506,7 +506,7 @@ impl AppearanceSettings {
             label_text: "Blur passes:".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: settings_provider.borrow().get_blur_passes() as f64,
+            current_value: settings_provider.borrow().get_appearance_blur_passes() as f64,
             increment_value: 0.1,
             page_increment_value: 1.0,
             page_size: 0.0,
@@ -520,7 +520,7 @@ impl AppearanceSettings {
         // Blur vibrancy option
         let settings_provider_clone = settings_provider.clone();
         let blur_vibrancy_spin_button_change = move |spin_button: &GTKSpinButton| {
-            settings_provider_clone.borrow_mut().set_blur_vibrancy(spin_button.value());
+            settings_provider_clone.borrow_mut().set_appearance_blur_vibrancy(spin_button.value());
         };
         let mut blur_vibrancy_spin_button = SpinButton::new();
         blur_vibrancy_spin_button.set_text_width(APPEARANCE_LABEL_WIDTH);
@@ -528,7 +528,7 @@ impl AppearanceSettings {
             label_text: "Blur vibrancy:".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: settings_provider.borrow().get_blur_vibrancy(),
+            current_value: settings_provider.borrow().get_appearance_blur_vibrancy(),
             increment_value: 0.1,
             page_increment_value: 1.0,
             page_size: 0.0,

@@ -1,5 +1,6 @@
-use gtk::{Orientation, ScrolledWindow};
-use gtk::prelude::{BoxExt, WidgetExt};
+use gtk::{ColorButton, ComboBoxText, Entry, Orientation, ScrolledWindow};
+use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
+use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::boxes::Boxes;
 use crate::ui::controls::color_selector::{ColorSelector, ColorSelectorState};
@@ -36,7 +37,7 @@ impl UpdatableControl<LockScreenPageState> for LockScreenPage {
         Boxes::clear_box_content(&self.lockscreen_sections_box);
 
         if state.enabled {
-            self.create_lockscreen_sections();
+            self.create_lockscreen_sections(&state);
         } else {
             self.create_lockscreen_warning();
         }
@@ -63,7 +64,40 @@ impl LockScreenPage {
         lockscreen_scroll_box.append(&scroll_window);
 
         let state = LockScreenPageState {
-            enabled: true
+            enabled: true,
+            hide_cursor: false,
+            grace: 0.0,
+            fall_timeout: 0,
+            lockscreen_wallpaper: None,
+            blur_size: 0,
+            blur_passes: 0,
+            noise: 0.0,
+            contrast: 0.0,
+            brightness: 0.0,
+            vibrancy: 0.0,
+            input_width: 0,
+            input_height: 0,
+            input_outline_thickness: 0,
+            input_dots_size: 0,
+            input_dots_spacing: 0,
+            input_dots_center: false,
+            input_outer_color: Default::default(),
+            input_inner_color: Default::default(),
+            input_font_color: Default::default(),
+            input_placeholder_text: None,
+            hide_input: false,
+            input_x_position: 0,
+            input_y_position: 0,
+            input_vertical_alignment: None,
+            input_horizontal_alignment: None,
+            display_text: None,
+            display_text_color: Default::default(),
+            display_text_font_size: 0,
+            display_text_font: None,
+            display_text_x_position: 0,
+            display_text_y_position: 0,
+            display_text_vertical_alignment: None,
+            display_text_horizontal_alignment: None,
         };
 
         Self {
@@ -74,50 +108,47 @@ impl LockScreenPage {
         }
     }
 
-    fn create_lockscreen_sections(&self) {
-        self.lockscreen_sections_box.append(&self.create_general_section());
-        self.lockscreen_sections_box.append(&self.create_background_section());
-        self.lockscreen_sections_box.append(&self.create_password_input_field_section());
-        self.lockscreen_sections_box.append(&self.create_text_display_section_box());
+    fn create_lockscreen_sections(&self, lockscreen_state: &LockScreenPageState) {
+        self.lockscreen_sections_box.append(&self.create_general_section(lockscreen_state));
+        self.lockscreen_sections_box.append(&self.create_background_section(lockscreen_state));
+        self.lockscreen_sections_box.append(&self.create_password_input_field_section(lockscreen_state));
+        self.lockscreen_sections_box.append(&self.create_text_display_section_box(lockscreen_state));
     }
 
-    fn create_general_section(&self) -> gtk::Box {
+    fn create_general_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
         const GENERAL_TITLE: &str = "General";
         let general_section_box = SectionBoxBuilder::new()
             .create_header_elements(GENERAL_TITLE)
             .build().expect("Failed to create general section box");
 
-        let state = SelectionBoxState {
-            label_text: "Hide cursor".to_string(),
-            selected_option: None,
-            options: vec!["false".to_string(), "true".to_string()],
-        };
+        // Password hide cursor selection box
         let mut hide_cursor_selection_box = SelectionBox::new();
         hide_cursor_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
+
+        let state = SelectionBoxState {
+            label_text: "Hide cursor".to_string(),
+            selected_option: Some(lockscreen_state.hide_cursor.to_string()),
+            options: vec!["false".to_string(), "true".to_string()],
+        };
         hide_cursor_selection_box.update_state(state.clone());
         hide_cursor_selection_box.update_ui(state.clone());
 
-        let state = SpinButtonState {
-            label_text: "Grace".to_string(),
-            min_value: 0.0,
-            max_value: 100.0,
-            current_value: 0.0,
-            increment_value: 1.0,
-            page_increment_value: 5.0,
-            page_size: 0.0,
-            climb_rate: 2.0,
-            digit_count: 0,
-            use_integral_numbers: true,
+        let settings_provider = self.application_provider.get_settings_provider();
+        let hide_cursor_selection_change = move |combobox: &ComboBoxText| {
+            let bool_value = SelectionBox::parse_selection_as_bool(combobox.active_text());
+            settings_provider.borrow_mut().set_hide_cursor(bool_value);
         };
+        hide_cursor_selection_box.set_selection_change(hide_cursor_selection_change);
+
+        // Grace spin button
         let mut grace_spin_button = SpinButton::new();
         grace_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        grace_spin_button.update_ui(state);
 
         let state = SpinButtonState {
             label_text: "Grace".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.grace as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -125,9 +156,37 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: true,
         };
+        grace_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_grace(spin_button.value() as f32);
+        };
+        grace_spin_button.set_value_change(fall_timeout_change);
+
+        // fall timeout spin button
         let mut fall_timeout = SpinButton::new();
         fall_timeout.set_text_width(LOCKSCREEN_LABEL_WIDTH);
+
+        let state = SpinButtonState {
+            label_text: "Fall timeout".to_string(),
+            min_value: 0.0,
+            max_value: 100.0,
+            current_value: lockscreen_state.fall_timeout as f64,
+            increment_value: 1.0,
+            page_increment_value: 5.0,
+            page_size: 0.0,
+            climb_rate: 2.0,
+            digit_count: 0,
+            use_integral_numbers: true,
+        };
         fall_timeout.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_fall_timeout(spin_button.value() as u32);
+        };
+        fall_timeout.set_value_change(fall_timeout_change);
 
         general_section_box.append(hide_cursor_selection_box.get_widget());
         general_section_box.append(grace_spin_button.get_widget());
@@ -135,25 +194,37 @@ impl LockScreenPage {
         general_section_box
     }
 
-    fn create_background_section(&self) -> gtk::Box {
+    fn create_background_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
         const BACKGROUND_TITLE: &str = "Background";
         let general_section_box = SectionBoxBuilder::new()
             .create_header_elements(BACKGROUND_TITLE)
             .build().expect("Failed to create background section box");
 
+        // lockscreen wallpaper input field
+        let mut lockscreen_wallpaper_input_field = InputField::new();
+
         let state = InputFieldState {
             label_text: "Lockscreen wallpaper path".to_string(),
-            entry_text: None,
+            entry_text: lockscreen_state.lockscreen_wallpaper.clone(),
             placeholder_text: "e.g. ~/Pictures/lockscreen.png".to_string(),
         };
-        let mut lockscreen_wallpaper_input_field = InputField::new();
         lockscreen_wallpaper_input_field.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_wallpaper_input_field_change = move |entry: &Entry| {
+            settings_provider.borrow_mut().set_lockscreen_wallpaper(entry.text().to_string());
+        };
+        lockscreen_wallpaper_input_field.set_input_callback(lockscreen_wallpaper_input_field_change);
+
+        // blur size spin button
+        let mut blur_size_spin_button = SpinButton::new();
+        blur_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Blur size".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.blur_size as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -161,15 +232,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut blur_size_spin_button = SpinButton::new();
-        blur_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         blur_size_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let blur_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_lockscreen_blur_size(spin_button.value() as u32);
+        };
+        blur_size_spin_button.set_value_change(blur_size_spin_button_change);
+
+        // blur passes spin button
+        let mut blur_passes_spin_button = SpinButton::new();
+        blur_passes_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Blur passes".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.blur_passes as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -177,15 +256,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut blur_passes_spin_button = SpinButton::new();
-        blur_passes_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         blur_passes_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let blur_passes_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_lockscreen_blur_passes(spin_button.value() as u32);
+        };
+        blur_passes_spin_button.set_value_change(blur_passes_spin_button_change);
+
+        // noise spin button
+        let mut noise_spin_button = SpinButton::new();
+        noise_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Noise".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.noise as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -193,15 +280,23 @@ impl LockScreenPage {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        let mut noise_spin_button = SpinButton::new();
-        noise_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         noise_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let noise_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_noise(spin_button.value() as f32);
+        };
+        noise_spin_button.set_value_change(noise_spin_button_change);
+
+        // contrast spin button
+        let mut contrast_spin_button = SpinButton::new();
+        contrast_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Contrast".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.contrast as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -209,15 +304,23 @@ impl LockScreenPage {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        let mut contrast_spin_button = SpinButton::new();
-        contrast_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         contrast_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let contrast_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_contrast(spin_button.value() as f32);
+        };
+        contrast_spin_button.set_value_change(contrast_spin_button_change);
+
+        // brightness spin button
+        let mut brightness_spin_button = SpinButton::new();
+        brightness_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Brightness".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.brightness as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -225,15 +328,29 @@ impl LockScreenPage {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        let mut brightness_spin_button = SpinButton::new();
-        brightness_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         brightness_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_brightness(spin_button.value() as f32);
+        };
+        brightness_spin_button.set_value_change(brightness_spin_button_change);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_brightness(spin_button.value() as f32);
+        };
+        brightness_spin_button.set_value_change(brightness_spin_button_change);
+
+        // vibrancy spin button
+        let mut vibrancy_spin_button = SpinButton::new();
+        vibrancy_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Vibrancy".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.vibrancy as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -241,9 +358,13 @@ impl LockScreenPage {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        let mut vibrancy_spin_button = SpinButton::new();
-        vibrancy_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         vibrancy_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let vibrancy_spin_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_vibrancy(spin_button.value() as f32);
+        };
+        vibrancy_spin_button.set_value_change(vibrancy_spin_change);
 
         general_section_box.append(lockscreen_wallpaper_input_field.get_widget());
         general_section_box.append(blur_size_spin_button.get_widget());
@@ -255,17 +376,21 @@ impl LockScreenPage {
         general_section_box
     }
 
-    fn create_password_input_field_section(&self) -> gtk::Box {
+    fn create_password_input_field_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
         const PASSWORD_INPUT_FIELD_TITLE: &str = "Password field";
         let password_input_field_section_box = SectionBoxBuilder::new()
             .create_header_elements(PASSWORD_INPUT_FIELD_TITLE)
             .build().expect("Failed to create text display section box");
 
+        // Password input width spin button
+        let mut input_width_spin_button = SpinButton::new();
+        input_width_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
+
         let state = SpinButtonState {
             label_text: "Input width".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_width as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -273,15 +398,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_width_spin_button = SpinButton::new();
-        input_width_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_width_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_width_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_width(spin_button.value() as u32);
+        };
+        input_width_spin_button.set_value_change(input_width_spin_button_change);
+
+        // Password input height spin button
+        let mut input_height_spin_button = SpinButton::new();
+        input_height_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Input height".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_height as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -289,15 +422,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_height_spin_button = SpinButton::new();
-        input_height_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_height_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_height_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_height(spin_button.value() as u32);
+        };
+        input_height_spin_button.set_value_change(input_height_spin_button_change);
+
+        // Password input outline thickness spin button
+        let mut input_outline_thickness_spin_button = SpinButton::new();
+        input_outline_thickness_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Outline thickness".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_outline_thickness as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -305,15 +446,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_outline_thickness_spin_button = SpinButton::new();
-        input_outline_thickness_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_outline_thickness_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_outline_thickness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_outline_thickness(spin_button.value() as u32);
+        };
+        input_outline_thickness_spin_button.set_value_change(input_outline_thickness_spin_button_change);
+
+        // Password input dots size spin button
+        let mut input_dots_size_spin_button = SpinButton::new();
+        input_dots_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Dots size".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_dots_size as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -321,15 +470,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_dots_size_spin_button = SpinButton::new();
-        input_dots_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_dots_size_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_dots_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_dots_size(spin_button.value() as u32);
+        };
+        input_dots_size_spin_button.set_value_change(input_dots_size_spin_button_change);
+
+        // Password input dots spacing spin button
+        let mut input_dots_spacing_spin_button = SpinButton::new();
+        input_dots_spacing_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Dots spacing".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_dots_spacing as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -337,67 +494,125 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_dots_spacing_spin_button = SpinButton::new();
-        input_dots_spacing_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_dots_spacing_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_dots_spacing_spin_button_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_dots_spacing(spin_button.value() as u32);
+        };
+        input_dots_spacing_spin_button.set_value_change(input_dots_spacing_spin_button_change);
+
+        // Password input dots center selection box
+        let mut input_dots_center_selection_box = SelectionBox::new();
+        input_dots_center_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SelectionBoxState {
             label_text: "Dots center".to_string(),
-            selected_option: None,
+            selected_option: Some(lockscreen_state.input_dots_center.to_string()),
             options: vec!["false".to_string(), "true".to_string()],
         };
-        let mut input_dots_center_selection_box = SelectionBox::new();
-        input_dots_center_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_dots_center_selection_box.update_state(state.clone());
         input_dots_center_selection_box.update_ui(state.clone());
 
-        let state = ColorSelectorState {
-            label_text: "Outer color".to_string(),
-            selected_color: None,
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_dots_center_selection_box_change = move |combo_box_text: &ComboBoxText| {
+            let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
+            settings_provider.borrow_mut().set_input_dots_center(bool_value);
         };
+        input_dots_center_selection_box.set_selection_change(input_dots_center_selection_box_change);
+
+        // Password outer color selector
         let mut outer_color_selector = ColorSelector::new();
         outer_color_selector.set_text_width(LOCKSCREEN_LABEL_WIDTH);
+
+        let state = ColorSelectorState {
+            label_text: "Outer color".to_string(),
+            selected_color: Some(lockscreen_state.input_outer_color.clone()),
+        };
         outer_color_selector.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let outer_color_selector_change = move |color_button: &ColorButton| {
+            settings_provider.borrow_mut().set_input_outer_color(RGBAColor::new(color_button.rgba()))
+        };
+        outer_color_selector.set_color_change(outer_color_selector_change);
+
+        // Password inner color selector
+        let mut inner_color_selector = ColorSelector::new();
+        inner_color_selector.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = ColorSelectorState {
             label_text: "Inner color".to_string(),
-            selected_color: None,
+            selected_color: Some(lockscreen_state.input_inner_color.clone()),
         };
-        let mut inner_color_selector = ColorSelector::new();
-        inner_color_selector.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         inner_color_selector.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let inner_color_selector_change = move |color_button: &ColorButton| {
+            settings_provider.borrow_mut().set_input_inner_color(RGBAColor::new(color_button.rgba()))
+        };
+        inner_color_selector.set_color_change(inner_color_selector_change);
+
+        // Password font color selector
+        let mut font_color_selector = ColorSelector::new();
+        font_color_selector.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = ColorSelectorState {
             label_text: "Font color".to_string(),
-            selected_color: None,
+            selected_color: Some(lockscreen_state.input_font_color.clone()),
         };
-        let mut font_color_selector = ColorSelector::new();
-        font_color_selector.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         font_color_selector.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let font_color_selector_change = move |color_button: &ColorButton| {
+            settings_provider.borrow_mut().set_input_font_color(RGBAColor::new(color_button.rgba()))
+        };
+        font_color_selector.set_color_change(font_color_selector_change);
+
+        // Password input placeholder text input field
+        let mut input_placeholder_text_input_field = InputField::new();
 
         let state = InputFieldState {
             label_text: "Placeholder text".to_string(),
-            entry_text: None,
+            entry_text: lockscreen_state.input_placeholder_text.clone(),
             placeholder_text: "e.g. insert password here...".to_string(),
         };
-        let mut input_placeholder_text_input_field = InputField::new();
         input_placeholder_text_input_field.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_placeholder_text_change = move |entry: &Entry| {
+            settings_provider.borrow_mut().set_input_placeholder_text(entry.text().to_string());
+        };
+        input_placeholder_text_input_field.set_input_callback(input_placeholder_text_change);
+
+        // Password input hide selection box
+        let mut hide_input_selection_box = SelectionBox::new();
+        hide_input_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SelectionBoxState {
             label_text: "Hide input".to_string(),
-            selected_option: None,
+            selected_option: Some(lockscreen_state.hide_input.to_string()),
             options: vec!["false".to_string(), "true".to_string()],
         };
-        let mut hide_input_selection_box = SelectionBox::new();
-        hide_input_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         hide_input_selection_box.update_state(state.clone());
         hide_input_selection_box.update_ui(state.clone());
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let hide_input_selection_box_change = move |combo_box_text: &ComboBoxText| {
+            let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
+            settings_provider.borrow_mut().set_hide_input(bool_value);
+        };
+        hide_input_selection_box.set_selection_change(hide_input_selection_box_change);
+
+        // Password input x position
+        let mut input_x_position = SpinButton::new();
+        input_x_position.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "X-Position".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_x_position as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -405,15 +620,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_x_position = SpinButton::new();
-        input_x_position.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_x_position.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_x_position_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_x_position(spin_button.value() as u32);
+        };
+        input_x_position.set_value_change(input_x_position_change);
+
+        // Password input y position
+        let mut input_y_position = SpinButton::new();
+        input_y_position.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Y-Position".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.input_y_position as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -421,29 +644,49 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut input_y_position = SpinButton::new();
-        input_y_position.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         input_y_position.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let input_y_position_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_input_y_position(spin_button.value() as u32);
+        };
+        input_y_position.set_value_change(input_y_position_change);
+
+        // Password input vertical align selection box
+        let mut vertical_align_selection_box = SelectionBox::new();
+        vertical_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SelectionBoxState {
             label_text: "Vertical alignment".to_string(),
-            selected_option: None,
+            selected_option: lockscreen_state.input_vertical_alignment.clone(),
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
-        let mut vertical_align_selection_box = SelectionBox::new();
-        vertical_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
         vertical_align_selection_box.update_state(state.clone());
         vertical_align_selection_box.update_ui(state.clone());
 
-        let state = SelectionBoxState {
-            label_text: "Horizontal alignment".to_string(),
-            selected_option: None,
-            options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
+        let settings_provider = self.application_provider.get_settings_provider();
+        let vertical_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
+            settings_provider.borrow_mut().set_input_vertical_alignment(combo_box_text.active_text().unwrap().to_string());
         };
+        vertical_align_selection_box.set_selection_change(vertical_align_selection_box_change);
+
+        // Password input horizontal align selection box
         let mut horizontal_align_selection_box = SelectionBox::new();
         horizontal_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
+
+        let state = SelectionBoxState {
+            label_text: "Horizontal alignment".to_string(),
+            selected_option: lockscreen_state.input_horizontal_alignment.clone(),
+            options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
+        };
         horizontal_align_selection_box.update_state(state.clone());
         horizontal_align_selection_box.update_ui(state.clone());
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let horizontal_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
+            settings_provider.borrow_mut().set_input_horizontal_alignment(combo_box_text.active_text().unwrap().to_string());
+        };
+        horizontal_align_selection_box.set_selection_change(horizontal_align_selection_box_change);
 
         password_input_field_section_box.append(input_width_spin_button.get_widget());
         password_input_field_section_box.append(input_height_spin_button.get_widget());
@@ -463,33 +706,53 @@ impl LockScreenPage {
         password_input_field_section_box
     }
 
-    fn create_text_display_section_box(&self) -> gtk::Box {
+    fn create_text_display_section_box(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
         const TEXT_DISPLAY_TITLE: &str = "Display text";
         let text_display_section_box = SectionBoxBuilder::new()
             .create_header_elements(TEXT_DISPLAY_TITLE)
             .build().expect("Failed to create text display section box");
 
+        // Text input field
+        let mut display_text_input_field = InputField::new();
+
         let state = InputFieldState {
             label_text: "Text".to_string(),
-            entry_text: None,
+            entry_text: lockscreen_state.display_text.clone(),
             placeholder_text: "$time (current formatted datetime)".to_string(),
         };
-        let mut display_text_input_field = InputField::new();
         display_text_input_field.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let display_text_input_field_change = move |entry: &Entry| {
+            settings_provider.borrow_mut().set_display_text(entry.text().to_string());
+        };
+        display_text_input_field.set_input_callback(display_text_input_field_change);
+
+        // Text color selector
+        let mut text_color_picker = ColorSelector::new();
+        text_color_picker.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = ColorSelectorState {
             label_text: "Text Color".to_string(),
-            selected_color: None,
+            selected_color: Some(lockscreen_state.display_text_color.clone()),
         };
-        let mut display_text_color_picker = ColorSelector::new();
-        display_text_color_picker.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_color_picker.update_ui(state);
+        text_color_picker.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_color_picker_change = move |color_button: &ColorButton| {
+            settings_provider.borrow_mut().set_display_text_color(RGBAColor::new(color_button.rgba()))
+        };
+        text_color_picker.set_color_change(text_color_picker_change);
+
+        // Font size spin button
+        let mut text_font_size_spin_button = SpinButton::new();
+        text_font_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Font size".to_string(),
             min_value: 1.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.display_text_font_size as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -497,23 +760,39 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut display_text_font_size_spin_button = SpinButton::new();
-        display_text_font_size_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_font_size_spin_button.update_ui(state);
+        text_font_size_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_font_size_spin_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_display_text_font_size(spin_button.value() as u32);
+        };
+        text_font_size_spin_button.set_value_change(text_font_size_spin_change);
+
+        // Font input field
+        let mut text_font = InputField::new();
 
         let state = InputFieldState {
             label_text: "Font".to_string(),
-            entry_text: None,
+            entry_text: lockscreen_state.display_text_font.clone(),
             placeholder_text: "e.g. Calibri".to_string(),
         };
-        let mut display_text_font = InputField::new();
-        display_text_font.update_ui(state);
+        text_font.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_font_change = move |entry: &Entry| {
+            settings_provider.borrow_mut().set_display_text_font(entry.text().to_string());
+        } ;
+        text_font.set_input_callback(text_font_change);
+
+        // X-Position spin button
+        let mut text_x_position_spin_button = SpinButton::new();
+        text_x_position_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "X-Position".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.display_text_x_position as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -521,15 +800,23 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut display_text_x_position_spin_button = SpinButton::new();
-        display_text_x_position_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_x_position_spin_button.update_ui(state);
+        text_x_position_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_x_position_spin_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_display_text_x_position(spin_button.value() as u32);
+        };
+        text_x_position_spin_button.set_value_change(text_x_position_spin_change);
+
+        // Y-Position spin button
+        let mut text_y_position_spin_button = SpinButton::new();
+        text_y_position_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SpinButtonState {
             label_text: "Y-Position".to_string(),
             min_value: 0.0,
             max_value: 100.0,
-            current_value: 0.0,
+            current_value: lockscreen_state.display_text_y_position as f64,
             increment_value: 1.0,
             page_increment_value: 5.0,
             page_size: 0.0,
@@ -537,38 +824,58 @@ impl LockScreenPage {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        let mut display_text_y_position_spin_button = SpinButton::new();
-        display_text_y_position_spin_button.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_y_position_spin_button.update_ui(state);
+        text_y_position_spin_button.update_ui(state);
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_y_position_spin_change = move |spin_button: &gtk::SpinButton| {
+            settings_provider.borrow_mut().set_display_text_y_position(spin_button.value() as u32);
+        };
+        text_y_position_spin_button.set_value_change(text_y_position_spin_change);
+
+        // Vertical alignment selection box
+        let mut text_vertical_align_selection_box = SelectionBox::new();
+        text_vertical_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SelectionBoxState {
             label_text: "Vertical alignment".to_string(),
-            selected_option: None,
+            selected_option: lockscreen_state.display_text_vertical_alignment.clone(),
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
-        let mut display_text_vertical_align_selection_box = SelectionBox::new();
-        display_text_vertical_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_vertical_align_selection_box.update_state(state.clone());
-        display_text_vertical_align_selection_box.update_ui(state.clone());
+        text_vertical_align_selection_box.update_state(state.clone());
+        text_vertical_align_selection_box.update_ui(state.clone());
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_vertical_align_selection_box_change = move |combobox: &ComboBoxText| {
+            settings_provider.borrow_mut().set_display_text_vertical_alignment(combobox.active_text().unwrap().to_string())
+        };
+        text_vertical_align_selection_box.set_selection_change(text_vertical_align_selection_box_change);
+
+        // Horizontal alignment selection box
+        let mut text_horizontal_align_selection_box = SelectionBox::new();
+        text_horizontal_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
 
         let state = SelectionBoxState {
             label_text: "Horizontal alignment".to_string(),
-            selected_option: None,
+            selected_option: lockscreen_state.display_text_horizontal_alignment.clone(),
             options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
         };
-        let mut display_text_horizontal_align_selection_box = SelectionBox::new();
-        display_text_horizontal_align_selection_box.set_text_width(LOCKSCREEN_LABEL_WIDTH);
-        display_text_horizontal_align_selection_box.update_state(state.clone());
-        display_text_horizontal_align_selection_box.update_ui(state.clone());
+        text_horizontal_align_selection_box.update_state(state.clone());
+        text_horizontal_align_selection_box.update_ui(state.clone());
+
+        let settings_provider = self.application_provider.get_settings_provider();
+        let text_horizontal_align_selection_box_change = move |combobox: &ComboBoxText| {
+            settings_provider.borrow_mut().set_display_text_horizontal_alignment(combobox.active_text().unwrap().to_string())
+        };
+        text_horizontal_align_selection_box.set_selection_change(text_horizontal_align_selection_box_change);
 
         text_display_section_box.append(display_text_input_field.get_widget());
-        text_display_section_box.append(display_text_color_picker.get_widget());
-        text_display_section_box.append(display_text_font_size_spin_button.get_widget());
-        text_display_section_box.append(display_text_font.get_widget());
-        text_display_section_box.append(display_text_x_position_spin_button.get_widget());
-        text_display_section_box.append(display_text_y_position_spin_button.get_widget());
-        text_display_section_box.append(display_text_vertical_align_selection_box.get_widget());
-        text_display_section_box.append(display_text_horizontal_align_selection_box.get_widget());
+        text_display_section_box.append(text_color_picker.get_widget());
+        text_display_section_box.append(text_font_size_spin_button.get_widget());
+        text_display_section_box.append(text_font.get_widget());
+        text_display_section_box.append(text_x_position_spin_button.get_widget());
+        text_display_section_box.append(text_y_position_spin_button.get_widget());
+        text_display_section_box.append(text_vertical_align_selection_box.get_widget());
+        text_display_section_box.append(text_horizontal_align_selection_box.get_widget());
         text_display_section_box
     }
 

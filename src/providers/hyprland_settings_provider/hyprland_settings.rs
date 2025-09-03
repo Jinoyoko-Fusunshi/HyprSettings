@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::monitor::monitor_configuration::MonitorConfiguration;
 use crate::providers::hyprland_settings_provider::appearance_settings::AppearanceSettings;
 use crate::providers::hyprland_settings_provider::keybinds_settings::KeyBindsSettings;
+use crate::providers::hyprland_settings_provider::lockscreen_settings::LockScreenSettings;
 
 pub const HYPRLAND_CONFIG_ENTRY: &str = "HyprLandConfig";
 pub const VIRTUAL_TERMINAL_ENTRY: &str = "VirtualTerminal";
@@ -17,5 +18,6 @@ pub struct HyprlandSettings {
     pub monitor_configurations: HashMap<String, MonitorConfiguration>,
     pub appearance_settings: AppearanceSettings,
     pub key_bind_settings: KeyBindsSettings,
+    pub lockscreen_settings: LockScreenSettings,
     pub startup_programs: HashMap<String, String>,
 }
