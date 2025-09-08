@@ -11,14 +11,14 @@ use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct DisplaySettings {
+pub struct Displays {
     application_provider: ApplicationProvider,
     display_box: gtk::Box,
     display_fields_box: gtk::Box,
     display_fields: HashMap<String, DisplayField>,
 }
 
-impl Control for DisplaySettings {
+impl Control for Displays {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -26,7 +26,7 @@ impl Control for DisplaySettings {
     }
 }
 
-impl UpdatableControl<DisplaySettingsState> for DisplaySettings {
+impl UpdatableControl<DisplaySettingsState> for Displays {
     fn update_ui(&mut self, state: DisplaySettingsState) {
         self.clear_display_fields();
 
@@ -38,7 +38,7 @@ impl UpdatableControl<DisplaySettingsState> for DisplaySettings {
     }
 }
 
-impl DisplaySettings {
+impl Displays {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         let display_box = SectionBoxBuilder::new()
             .create_header_elements("Available displays")

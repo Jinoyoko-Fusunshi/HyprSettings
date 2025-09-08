@@ -3,11 +3,11 @@ use gtk::prelude::{BoxExt, WidgetExt};
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::Control;
 
-pub struct InfoSettings {
+pub struct Infos {
     info_settings_box: gtk::Box,
 }
 
-impl Control for InfoSettings {
+impl Control for Infos {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -15,7 +15,7 @@ impl Control for InfoSettings {
     }
 }
 
-impl InfoSettings {
+impl Infos {
     pub fn new() -> Self {
         const INFO_PANEL_LABEL: &str = "Program information";
 
@@ -28,21 +28,21 @@ impl InfoSettings {
         let info_panel_label = Label::new(Some(INFO_PANEL_LABEL));
         let separator = Separator::new(Orientation::Horizontal);
 
-        let application_name = InfoSettings::create_label("HyprSettings");
+        let application_name = Infos::create_label("HyprSettings");
         application_name.add_css_class(CSSStyles::APPLICATION_TITLE);
 
         let application_version_value = format!("v.{}", env!("CARGO_PKG_VERSION"));
-        let application_version_entry = InfoSettings::create_information_entry(
+        let application_version_entry = Infos::create_information_entry(
             "🚀 Version:", application_version_value.as_str()
         );
-        let author_entry = InfoSettings::create_information_entry(
+        let author_entry = Infos::create_information_entry(
             "👨‍💻 Author:", "Jinoyoko Fusunshi"
         );
-        let github_link_entry = InfoSettings::create_link_entry(
+        let github_link_entry = Infos::create_link_entry(
             "📄 Github:", "https://github.com/Jinoyoko-Fusunshi/HyprSettings"
         );
         let horizontal_separator = Separator::new(Orientation::Horizontal);
-        let program_description_entry = InfoSettings::create_program_description_panel();
+        let program_description_entry = Infos::create_program_description_panel();
 
         info_panel_box.append(&info_panel_label);
         info_panel_box.append(&separator);
@@ -60,8 +60,8 @@ impl InfoSettings {
 
     fn create_information_entry(information_name: &str, information_value: &str) -> gtk::Box {
         let entry = gtk::Box::new(Orientation::Horizontal, 10);
-        let information_name_label = InfoSettings::create_label(information_name);
-        let information_value_label = InfoSettings::create_label(information_value);
+        let information_name_label = Infos::create_label(information_name);
+        let information_value_label = Infos::create_label(information_value);
 
         entry.append(&information_name_label);
         entry.append(&information_value_label);
@@ -88,8 +88,8 @@ impl InfoSettings {
 
     fn create_link_entry(link_name: &str, link_value: &str) -> gtk::Box {
         let entry = gtk::Box::new(Orientation::Horizontal, 10);
-        let link_name_label = InfoSettings::create_label(link_name);
-        let link_button = InfoSettings::create_link_button(link_value, link_value);
+        let link_name_label = Infos::create_label(link_name);
+        let link_button = Infos::create_link_button(link_value, link_value);
 
         entry.append(&link_name_label);
         entry.append(&link_button);

@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
-use crate::providers::config_files::settings_writer::SettingsWriter;
+use crate::persistence::settings_writer::SettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::models::settings::keybind_settings::KeyBindSettings;
 use crate::providers::module_provider::{

@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Write;
-use crate::providers::config_files::settings_writer::SettingsWriter;
+use crate::persistence::settings_writer::SettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 
 pub struct YamlSettingsWriter {
@@ -18,7 +18,7 @@ impl SettingsWriter<HyprlandSettings> for YamlSettingsWriter {
             return;
         }
         
-        let mut yaml_file = File::create("hyprsettings.yaml").expect("Cannot create YAML file.");
+        let mut yaml_file = File::create("../../hyprsettings.yaml").expect("Cannot create YAML file.");
         yaml_file.write_all(self.serialized_settings.as_bytes()).expect("Cannot write settings as bytes to YAML file.");
     }
 }

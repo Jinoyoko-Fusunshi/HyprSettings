@@ -11,7 +11,7 @@ use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct GeneralSettings {
+pub struct ProgramPage {
     application_provider: ApplicationProvider,
     general_box: gtk::Box,
     terminal_input_field: InputField,
@@ -20,7 +20,7 @@ pub struct GeneralSettings {
     notifications_input_field: InputField,
 }
 
-impl Control for GeneralSettings {
+impl Control for ProgramPage {
     fn init_events(&self) {
         let program_provider =  self.application_provider.get_program_provider();
         let terminal_input_change = move |input: &Entry| {
@@ -60,7 +60,7 @@ impl Control for GeneralSettings {
     }
 }
 
-impl UpdatableControl<GeneralSettingsState> for GeneralSettings {
+impl UpdatableControl<GeneralSettingsState> for ProgramPage {
     fn update_ui(&mut self, state: GeneralSettingsState) {
         let input_field_state = InputFieldState {
             label_text: "Virtual terminal program path:".to_string(),
@@ -92,7 +92,7 @@ impl UpdatableControl<GeneralSettingsState> for GeneralSettings {
     }
 }
 
-impl GeneralSettings {
+impl ProgramPage {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const PROGRAMS_LABEL: &str = "Programs";
         

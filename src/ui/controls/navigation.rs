@@ -2,8 +2,8 @@ use gtk::{Button, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, LOCKSCREEN_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS, WALLPAPER_SETTINGS};
 use crate::ui::controls::Control;
+use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
@@ -97,47 +97,47 @@ impl Navigation {
     pub fn init_events(&self) {
         let settings_switcher_manager = self.settings_switcher_manager.clone();
         let overview_button_click = Self::create_settings_button_click(
-            OVERVIEW_SETTINGS.to_string(), settings_switcher_manager.clone()
+            OVERVIEW_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.overview_button.connect_clicked(overview_button_click);
 
         let general_button_click = Self::create_settings_button_click(
-            GENERAL_SETTINGS.to_string(), settings_switcher_manager.clone()
+            GENERAL_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.general_button.connect_clicked(general_button_click);
 
         let display_button_click = Self::create_settings_button_click(
-            DISPLAY_SETTINGS.to_string(), settings_switcher_manager.clone()
+            DISPLAY_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.display_button.connect_clicked(display_button_click);
 
         let wallpaper_button_click = Self::create_settings_button_click(
-            WALLPAPER_SETTINGS.to_string(), settings_switcher_manager.clone()
+            WALLPAPER_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.wallpaper_button.connect_clicked(wallpaper_button_click);
 
         let lockscreen_button_click = Self::create_settings_button_click(
-            LOCKSCREEN_SETTINGS.to_string(), settings_switcher_manager.clone()
+            LOCKSCREEN_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.lockscreen_button.connect_clicked(lockscreen_button_click);
 
         let appearance_button_click = Self::create_settings_button_click(
-            APPEARANCE_SETTINGS.to_string(), settings_switcher_manager.clone()
+            APPEARANCE_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.appearance_button.connect_clicked(appearance_button_click);
 
         let startup_button_click = Self::create_settings_button_click(
-            STARTUP_PROGRAM_SETTINGS.to_string(), settings_switcher_manager.clone()
+            STARTUP_PROGRAMS_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.startup_button.connect_clicked(startup_button_click);
 
         let keybinds_button_click = Self::create_settings_button_click(
-            KEYBINDS_SETTINGS.to_string(), settings_switcher_manager.clone()
+            KEYBINDS_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.keybinds_button.connect_clicked(keybinds_button_click);
 
         let info_button_click = Self::create_settings_button_click(
-            INFO_SETTINGS.to_string(), settings_switcher_manager.clone()
+            INFO_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.info_button.connect_clicked(info_button_click);
 
@@ -147,8 +147,9 @@ impl Navigation {
         self.save_button.connect_clicked(save_button_click);
     }
 
-    fn create_settings_button_click(settings_name: String, settings_switcher_manager: SettingsSwitcherManager)
-        -> impl Fn(&Button) + 'static
+    fn create_settings_button_click(
+        settings_name: String, settings_switcher_manager: SettingsSwitcherManager
+    ) -> impl Fn(&Button) + 'static
     {
         move |_: &Button| {
             let new_control_name = SettingsSwitcherEvent::NewControlName(settings_name.clone());

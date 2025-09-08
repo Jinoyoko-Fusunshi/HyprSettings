@@ -8,20 +8,20 @@ use crate::ui::controls::startup_program_field::StartupProgramField;
 use crate::ui::controls::Control;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
-use crate::ui::pages::settings::keybinds_settings::CUSTOM_ITEM;
+use crate::ui::pages::keybinds::CUSTOM_ITEM;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct StartupProgramsSettings {
+pub struct StartupPrograms {
     startup_program_box: gtk::Box,
     startup_program_entries_box: gtk::Box,
     create_button: Button,
 }
 
-impl Control for StartupProgramsSettings {
+impl Control for StartupPrograms {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -29,7 +29,7 @@ impl Control for StartupProgramsSettings {
     }
 }
 
-impl StartupProgramsSettings {
+impl StartupPrograms {
     pub fn new() -> Self {
         const PROGRAMS_ON_STARTUP_LABEL: &str = "Programs on system start";
 

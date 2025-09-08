@@ -10,14 +10,14 @@ use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct WallpaperSettings {
+pub struct Wallpaper {
     application_provider: ApplicationProvider,
     state: WallpaperPageState,
     wallpaper_box: gtk::Box,
     wallpaper_sections_box: gtk::Box,
 }
 
-impl Control for WallpaperSettings {
+impl Control for Wallpaper {
     fn init_events(&self) {
 
     }
@@ -27,7 +27,7 @@ impl Control for WallpaperSettings {
     }
 }
 
-impl UpdatableControl<WallpaperPageState> for WallpaperSettings {
+impl UpdatableControl<WallpaperPageState> for Wallpaper {
     fn update_ui(&mut self, state: WallpaperPageState) {
         Boxes::clear_box_content(&self.wallpaper_sections_box);
 
@@ -39,13 +39,13 @@ impl UpdatableControl<WallpaperPageState> for WallpaperSettings {
     }
 }
 
-impl StatableControl<WallpaperPageState> for WallpaperSettings {
+impl StatableControl<WallpaperPageState> for Wallpaper {
     fn update_state(&mut self, state: WallpaperPageState) {
         self.state = state;
     }
 }
 
-impl WallpaperSettings {
+impl Wallpaper {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const WALLPAPER_TITLE: &str = "Wallpaper";
         let wallpaper_box = SectionBoxBuilder::new()

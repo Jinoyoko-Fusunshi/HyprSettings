@@ -6,11 +6,11 @@ use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::css_styles::CSSStyles;
 
-pub struct OverviewSettings {
+pub struct OverviewPage {
     overview_box: gtk::Box,
 }
 
-impl Control for OverviewSettings {
+impl Control for OverviewPage {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -18,7 +18,7 @@ impl Control for OverviewSettings {
     }
 }
 
-impl OverviewSettings {
+impl OverviewPage {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         let overview_box = gtk::Box::new(Orientation::Vertical, 10);
         overview_box.set_margin_top(10);

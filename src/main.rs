@@ -2,6 +2,7 @@ pub mod ui;
 pub mod providers;
 pub mod models;
 pub mod utils;
+pub mod persistence;
 
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, CssProvider, STYLE_PROVIDER_PRIORITY_USER};

@@ -18,11 +18,11 @@ use crate::ui::updatable_control::UpdatableControl;
 
 const APPEARANCE_LABEL_WIDTH: u32 = 180;
 
-pub struct AppearanceSettings {
+pub struct Appearance {
     widget: gtk::Box,
 }
 
-impl Control for AppearanceSettings {
+impl Control for Appearance {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -30,7 +30,7 @@ impl Control for AppearanceSettings {
     }
 }
 
-impl AppearanceSettings {
+impl Appearance {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         let appearance_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
         appearance_scroll_box.set_vexpand(true);
@@ -45,11 +45,11 @@ impl AppearanceSettings {
         appearance_box.set_margin_start(10);
         appearance_box.set_margin_end(10);
 
-        let wallpaper_section = AppearanceSettings::create_wallpaper_section_box(&application_provider);
-        let styling_section = AppearanceSettings::create_styling_section(&application_provider);
-        let decoration_section = AppearanceSettings::create_decorations_section(&application_provider);
-        let animations_section = AppearanceSettings::create_animations_section(&application_provider);
-        let layouts_section = AppearanceSettings::create_layouts_section(&application_provider);
+        let wallpaper_section = Appearance::create_wallpaper_section_box(&application_provider);
+        let styling_section = Appearance::create_styling_section(&application_provider);
+        let decoration_section = Appearance::create_decorations_section(&application_provider);
+        let animations_section = Appearance::create_animations_section(&application_provider);
+        let layouts_section = Appearance::create_layouts_section(&application_provider);
 
         appearance_box.append(&wallpaper_section);
         appearance_box.append(&styling_section);

@@ -8,7 +8,7 @@ use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::manager::startup_program_field_manager::{StartupProgramFieldEvent, StartupProgramFieldManager};
-use crate::ui::pages::settings::keybinds_settings::CUSTOM_ITEM;
+use crate::ui::pages::keybinds::CUSTOM_ITEM;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::selection_box_state::SelectionBoxState;

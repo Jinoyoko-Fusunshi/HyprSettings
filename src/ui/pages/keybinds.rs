@@ -21,11 +21,11 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub const CUSTOM_ITEM: &str = "Custom";
 
-pub struct KeyBindsSettings {
+pub struct Keybinds {
     key_binds_panel_box: gtk::Box
 }
 
-impl Control for KeyBindsSettings {
+impl Control for Keybinds {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -33,7 +33,7 @@ impl Control for KeyBindsSettings {
     }
 }
 
-impl Clone for KeyBindsSettings {
+impl Clone for Keybinds {
     fn clone(&self) -> Self {
         Self {
             key_binds_panel_box: self.key_binds_panel_box.clone()
@@ -41,7 +41,7 @@ impl Clone for KeyBindsSettings {
     }
 }
 
-impl KeyBindsSettings {
+impl Keybinds {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         let key_binds_panel_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
         key_binds_panel_scroll_box.set_margin_top(10);

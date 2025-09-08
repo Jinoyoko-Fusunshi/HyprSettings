@@ -4,20 +4,23 @@ use gtk::Orientation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
-use crate::ui::pages::settings::general_settings::GeneralSettings;
-use crate::ui::pages::settings::{APPEARANCE_SETTINGS, DISPLAY_SETTINGS, GENERAL_SETTINGS, INFO_SETTINGS, KEYBINDS_SETTINGS, LOCKSCREEN_SETTINGS, OVERVIEW_SETTINGS, STARTUP_PROGRAM_SETTINGS, WALLPAPER_SETTINGS};
+use crate::ui::pages::programs::ProgramPage;
 use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::controls::Control;
-use crate::ui::pages::settings::appearance_settings::AppearanceSettings;
-use crate::ui::pages::settings::display_settings::DisplaySettings;
-use crate::ui::pages::settings::info_settings::InfoSettings;
-use crate::ui::pages::settings::keybinds_settings::KeyBindsSettings;
-use crate::ui::pages::settings::lockscreen_settings::LockScreenSettings;
-use crate::ui::pages::settings::overview_settings::OverviewSettings;
-use crate::ui::pages::settings::startups_settings::StartupProgramsSettings;
-use crate::ui::pages::settings::wallpaper_settings::WallpaperSettings;
+use crate::ui::pages::appearance::Appearance;
+use crate::ui::pages::displays::Displays;
+use crate::ui::pages::infos::Infos;
+use crate::ui::pages::keybinds::Keybinds;
+use crate::ui::pages::lockscreen::Lockscreen;
+use crate::ui::pages::overview::OverviewPage;
+use crate::ui::pages::{
+    APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE,
+    OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE
+};
+use crate::ui::pages::startup_programs::StartupPrograms;
+use crate::ui::pages::wallpaper::Wallpaper;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
@@ -48,51 +51,51 @@ impl App {
         app_box.set_margin_top(10);
         app_box.set_margin_bottom(10);
 
-        let overview_settings = Box::new(OverviewSettings::new(application_provider.clone()));
+        let overview_settings = Box::new(OverviewPage::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
-        let mut general_settings = Box::new(GeneralSettings::new(application_provider.clone()));
+        let mut general_settings = Box::new(ProgramPage::new(application_provider.clone()));
         general_settings.init_events();
         general_settings.update_ui(state);
 
         let state = DisplaySettingsState::from(&application_provider);
-        let mut display_settings = Box::new(DisplaySettings::new(application_provider.clone()));
+        let mut display_settings = Box::new(Displays::new(application_provider.clone()));
         display_settings.init_events();
         display_settings.update_ui(state);
 
         let state = WallpaperPageState::from(&application_provider);
-        let mut wallpaper_settings = Box::new(WallpaperSettings::new(application_provider.clone()));
+        let mut wallpaper_settings = Box::new(Wallpaper::new(application_provider.clone()));
         wallpaper_settings.update_ui(state.clone());
 
         let state = LockScreenPageState::from(&application_provider);
-        let mut lockscreen_settings = Box::new(LockScreenSettings::new(application_provider.clone()));
+        let mut lockscreen_settings = Box::new(Lockscreen::new(application_provider.clone()));
         lockscreen_settings.update_ui(state.clone());
 
-        let appearance_settings = Box::new(AppearanceSettings::new(application_provider.clone()));
+        let appearance_settings = Box::new(Appearance::new(application_provider.clone()));
         appearance_settings.init_events();
 
-        let keybinds_settings = Box::new(KeyBindsSettings::new(application_provider.clone()));
+        let keybinds_settings = Box::new(Keybinds::new(application_provider.clone()));
         keybinds_settings.init_events();
 
-        let startup_program_settings = Box::new(StartupProgramsSettings::new());
+        let startup_program_settings = Box::new(StartupPrograms::new());
         startup_program_settings.init_events(application_provider.clone());
         startup_program_settings.init_ui(application_provider.clone());
         
-        let info_settings = Box::new(InfoSettings::new());
+        let info_settings = Box::new(Infos::new());
 
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
-            .insert_control(OVERVIEW_SETTINGS.to_string(), overview_settings)
-            .insert_control(GENERAL_SETTINGS.to_string(), general_settings)
-            .insert_control(DISPLAY_SETTINGS.to_string(), display_settings)
-            .insert_control(WALLPAPER_SETTINGS.to_string(), wallpaper_settings)
-            .insert_control(LOCKSCREEN_SETTINGS.to_string(), lockscreen_settings)
-            .insert_control(APPEARANCE_SETTINGS.to_string(), appearance_settings)
-            .insert_control(KEYBINDS_SETTINGS.to_string(), keybinds_settings)
-            .insert_control(STARTUP_PROGRAM_SETTINGS.to_string(), startup_program_settings)
-            .insert_control(INFO_SETTINGS.to_string(), info_settings);
+            .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
+            .insert_control(GENERAL_PAGE.to_string(), general_settings)
+            .insert_control(DISPLAY_PAGE.to_string(), display_settings)
+            .insert_control(WALLPAPER_PAGE.to_string(), wallpaper_settings)
+            .insert_control(LOCKSCREEN_PAGE.to_string(), lockscreen_settings)
+            .insert_control(APPEARANCE_PAGE.to_string(), appearance_settings)
+            .insert_control(KEYBINDS_PAGE.to_string(), keybinds_settings)
+            .insert_control(STARTUP_PROGRAMS_PAGE.to_string(), startup_program_settings)
+            .insert_control(INFO_PAGE.to_string(), info_settings);
 
-        let settings_switcher_state = SettingsSwitcherState::new(OVERVIEW_SETTINGS.to_string());
+        let settings_switcher_state = SettingsSwitcherState::new(OVERVIEW_PAGE.to_string());
         settings_switcher.borrow_mut().update_ui(settings_switcher_state);
         
         let settings_switcher_manager = SettingsSwitcherManager::new(settings_switcher.clone(), application_provider.clone());

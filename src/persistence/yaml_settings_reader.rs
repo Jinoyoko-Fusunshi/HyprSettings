@@ -1,5 +1,5 @@
 use std::fs;
-use crate::providers::config_files::settings_reader::SettingsReader;
+use crate::persistence::settings_reader::SettingsReader;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 
 pub const HYPRSETTINGS_CONFIG_FILE: &str = "hyprsettings.yaml";

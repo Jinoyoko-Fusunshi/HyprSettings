@@ -1,9 +1,9 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::providers::config_files::hyprland_settings_writer::HyprlandSettingsWriter;
-use crate::providers::config_files::settings_writer::SettingsWriter;
-use crate::providers::config_files::yaml_settings_writer::YamlSettingsWriter;
+use crate::persistence::hyprland_settings_writer::HyprlandSettingsWriter;
+use crate::persistence::settings_writer::SettingsWriter;
+use crate::persistence::yaml_settings_writer::YamlSettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::updatable_control::UpdatableControl;

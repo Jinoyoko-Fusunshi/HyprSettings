@@ -20,14 +20,14 @@ use crate::ui::updatable_control::UpdatableControl;
 
 const LOCKSCREEN_LABEL_WIDTH: u32 = 180;
 
-pub struct LockScreenSettings {
+pub struct Lockscreen {
     application_provider: ApplicationProvider,
     state: LockScreenPageState,
     lockscreen_scroll_box: gtk::Box,
     lockscreen_sections_box: gtk::Box,
 }
 
-impl Control for LockScreenSettings {
+impl Control for Lockscreen {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &gtk::Box {
@@ -35,7 +35,7 @@ impl Control for LockScreenSettings {
     }
 }
 
-impl UpdatableControl<LockScreenPageState> for LockScreenSettings {
+impl UpdatableControl<LockScreenPageState> for Lockscreen {
     fn update_ui(&mut self, state: LockScreenPageState) {
         Boxes::clear_box_content(&self.lockscreen_sections_box);
 
@@ -47,13 +47,13 @@ impl UpdatableControl<LockScreenPageState> for LockScreenSettings {
     }
 }
 
-impl StatableControl<LockScreenPageState> for LockScreenSettings {
+impl StatableControl<LockScreenPageState> for Lockscreen {
     fn update_state(&mut self, state: LockScreenPageState) {
         self.state = state;
     }
 }
 
-impl LockScreenSettings {
+impl Lockscreen {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         let lockscreen_sections_box = gtk::Box::new(Orientation::Vertical, 10);
         Boxes::set_margin(&lockscreen_sections_box, 10);
