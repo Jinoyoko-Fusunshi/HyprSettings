@@ -4,6 +4,8 @@ use crate::providers::application_provider::ApplicationProvider;
 use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
+use crate::types::GTKBox;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::controls::Control;
@@ -11,16 +13,16 @@ use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct ProgramPage {
+pub struct Programs {
     application_provider: ApplicationProvider,
-    general_box: gtk::Box,
+    general_box: GTKBox,
     terminal_input_field: InputField,
     files_input_field: InputField,
     quick_search_input_field: InputField,
     notifications_input_field: InputField,
 }
 
-impl Control for ProgramPage {
+impl Control for Programs {
     fn init_events(&self) {
         let program_provider =  self.application_provider.get_program_provider();
         let terminal_input_change = move |input: &Entry| {
@@ -55,12 +57,12 @@ impl Control for ProgramPage {
         self.notifications_input_field.set_input_callback(notifications_input_change);
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.general_box
     }
 }
 
-impl UpdatableControl<GeneralSettingsState> for ProgramPage {
+impl UpdatableControl<GeneralSettingsState> for Programs {
     fn update_ui(&mut self, state: GeneralSettingsState) {
         let input_field_state = InputFieldState {
             label_text: "Virtual terminal program path:".to_string(),
@@ -92,11 +94,11 @@ impl UpdatableControl<GeneralSettingsState> for ProgramPage {
     }
 }
 
-impl ProgramPage {
+impl Programs {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const PROGRAMS_LABEL: &str = "Programs";
         
-        let general_box = SectionBoxBuilder::new()
+        let general_box = SectionBoxBuilder::new("programs", DEFAULT_MARGIN)
             .create_header_elements(PROGRAMS_LABEL)
             .build().expect("Failed to create general box");
         general_box.set_margin_top(10);

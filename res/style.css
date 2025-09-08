@@ -1,12 +1,12 @@
-box.navigation-panel {
+box#navigation {
     background: #232323;
 }
 
-box.content-panel {
+box#settings-switcher {
     background: #1a1a1a;
 }
 
-label.application-title {
+label#application-title {
     font-size: 20px;
 }
 
@@ -23,7 +23,7 @@ button.url-link > label {
     border: 2px solid red;
 }
 
-.save-button {
+button#save-settings {
     background: #2196ff;
 }
 
@@ -37,7 +37,7 @@ button.create_startup_program {
     padding: 4px 8px 4px 8px;
 }
 
-box.key-binds-entry {
+box.keybind-input {
     padding: 8px;
     background-color: #232323;
     border: 1px solid black;
@@ -45,11 +45,11 @@ box.key-binds-entry {
     transition: 0.2s ease-in-out;
 }
 
-box.key-binds-entry:focus {
+box.keybind-input:focus {
     border: 1px solid #2196ff;
 }
 
-box.key-panel {
+box.key-symbol {
     margin-bottom: 8px;
     background: #333333;
     box-shadow: 0 8px 4px 0 #000000;
@@ -57,7 +57,7 @@ box.key-panel {
     border-radius: 10px;
 }
 
-label.key-panel {
+label.key-symbol {
     font-size: 12px;
     padding: 8px;
     color: white;

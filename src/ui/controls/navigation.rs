@@ -1,13 +1,14 @@
 use gtk::{Button, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
-use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::Control;
 use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
-    settings_navigation_box: gtk::Box,
+    settings_navigation_box: GTKBox,
     overview_button: Button,
     general_button: Button,
     display_button: Button,
@@ -24,16 +25,17 @@ impl Control for Navigation {
     fn init_events(&self) {
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.settings_navigation_box
     }
 }
 
 impl Navigation {
     pub fn new(settings_switcher_manager: SettingsSwitcherManager) -> Self {
-        let settings_navigation_box = gtk::Box::new(Orientation::Vertical, 10);
-        settings_navigation_box.set_width_request(320);
-        settings_navigation_box.add_css_class(CSSStyles::NAVIGATION_PANEL);
+        let settings_navigation_box = BoxBuilder::new("navigation")
+            .set_orientation(Orientation::Vertical)
+            .set_width(320)
+            .build();
 
         let overview_button = Button::with_label("overview");
         overview_button.set_height_request(48);
@@ -62,11 +64,11 @@ impl Navigation {
         let info_button = Button::with_label("info");
         info_button.set_height_request(48);
     
-        let save_button = Button::with_label("Save");
+        let save_button = Button::with_label("save");
+        save_button.set_widget_name("save-settings");
         save_button.set_height_request(48);
         save_button.set_margin_top(10);
-        save_button.add_css_class(CSSStyles::SAVE_BUTTON);
-        
+
         settings_navigation_box.append(&overview_button);
         settings_navigation_box.append(&general_button);
         settings_navigation_box.append(&display_button);

@@ -1,12 +1,15 @@
 use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct InputField {
-    input_field_box: gtk::Box,
+    input_field_box: GTKBox,
     input_label: Label,
     input_entry: Entry
 }
@@ -14,7 +17,7 @@ pub struct InputField {
 impl Control for InputField {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.input_field_box
     }
 }
@@ -44,8 +47,10 @@ impl ActivableControl for InputField {
 
 impl InputField {
     pub fn new () -> Self {
-        let panel = gtk::Box::new(Orientation::Vertical, 0);
-        panel.set_margin_bottom(10);
+        let panel = BoxBuilder::new("input-field")
+            .set_orientation(Orientation::Vertical)
+            .set_margin_bottom(DEFAULT_MARGIN)
+            .build();
 
         let input_label = Label::new(None);
         input_label.set_halign(Align::Start);

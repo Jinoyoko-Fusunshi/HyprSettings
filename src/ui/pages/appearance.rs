@@ -2,6 +2,9 @@ use gtk::{ColorButton, ComboBoxText, Entry, Orientation, PolicyType, ScrolledWin
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::color_selector::ColorSelector;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::controls::selection_box::SelectionBox;
@@ -19,37 +22,38 @@ use crate::ui::updatable_control::UpdatableControl;
 const APPEARANCE_LABEL_WIDTH: u32 = 180;
 
 pub struct Appearance {
-    widget: gtk::Box,
+    widget: GTKBox,
 }
 
 impl Control for Appearance {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.widget
     }
 }
 
 impl Appearance {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let appearance_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
-        appearance_scroll_box.set_vexpand(true);
+        let appearance_scroll_box = BoxBuilder::new("appearance-scroll")
+            .set_orientation(Orientation::Vertical)
+            .set_full_height(true)
+            .build();
 
         let scrolled_window = ScrolledWindow::new();
         scrolled_window.set_policy(PolicyType::Never, PolicyType::Automatic);
         scrolled_window.set_vexpand(true);
 
-        let appearance_box = gtk::Box::new(Orientation::Vertical, 10);
-        appearance_box.set_margin_top(10);
-        appearance_box.set_margin_bottom(10);
-        appearance_box.set_margin_start(10);
-        appearance_box.set_margin_end(10);
+        let appearance_box = BoxBuilder::new("appearance")
+            .set_orientation(Orientation::Vertical)
+            .set_margin(DEFAULT_MARGIN)
+            .build();
 
         let wallpaper_section = Appearance::create_wallpaper_section_box(&application_provider);
-        let styling_section = Appearance::create_styling_section(&application_provider);
-        let decoration_section = Appearance::create_decorations_section(&application_provider);
-        let animations_section = Appearance::create_animations_section(&application_provider);
-        let layouts_section = Appearance::create_layouts_section(&application_provider);
+        let styling_section = Appearance::create_styling_section_box(&application_provider);
+        let decoration_section = Appearance::create_decorations_section_box(&application_provider);
+        let animations_section = Appearance::create_animations_section_box(&application_provider);
+        let layouts_section = Appearance::create_layouts_section_box(&application_provider);
 
         appearance_box.append(&wallpaper_section);
         appearance_box.append(&styling_section);
@@ -65,9 +69,9 @@ impl Appearance {
         }
     }
 
-    fn create_wallpaper_section_box(application_provider: &ApplicationProvider) -> gtk::Box {
+    fn create_wallpaper_section_box(application_provider: &ApplicationProvider) -> GTKBox {
         const WALLPAPER_LABEL: &str = "Wallpaper";
-        let wallpaper_section_box = SectionBoxBuilder::new()
+        let wallpaper_section_box = SectionBoxBuilder::new("wallpaper-section", 0)
             .create_header_elements(WALLPAPER_LABEL)
             .build().expect("Cannot create wallpaper section");
 
@@ -118,9 +122,9 @@ impl Appearance {
         wallpaper_section_box
     }
 
-    fn create_styling_section(application_provider: &ApplicationProvider) -> gtk::Box {
+    fn create_styling_section_box(application_provider: &ApplicationProvider) -> GTKBox {
         const STYLING_LABEL: &str = "Styling";
-        let styling_section_box = SectionBoxBuilder::new()
+        let styling_section_box = SectionBoxBuilder::new("styling-section-box", 0)
             .create_header_elements(STYLING_LABEL)
             .build().expect("Cannot create styling section");
 
@@ -265,9 +269,9 @@ impl Appearance {
         styling_section_box
     }
 
-    fn create_decorations_section(application_provider: &ApplicationProvider) -> gtk::Box {
+    fn create_decorations_section_box(application_provider: &ApplicationProvider) -> GTKBox {
         const DECORATION_LABEL: &str = "Decoration";
-        let decorations_section_box = SectionBoxBuilder::new()
+        let decorations_section_box = SectionBoxBuilder::new("decorations-section", 0)
             .create_header_elements(DECORATION_LABEL)
             .build().expect("Cannot create styling section");
 
@@ -555,18 +559,18 @@ impl Appearance {
         decorations_section_box
     }
 
-    fn create_animations_section(_: &ApplicationProvider) -> gtk::Box {
+    fn create_animations_section_box(_: &ApplicationProvider) -> GTKBox {
         const ANIMATIONS_LABEL: &str = "Animations";
-        let animations_section_box = SectionBoxBuilder::new()
+        let animations_section_box = SectionBoxBuilder::new("animations-sections", 0)
             .create_header_elements(ANIMATIONS_LABEL)
             .build().expect("Cannot create animations section");
 
         animations_section_box
     }
 
-    fn create_layouts_section(application_provider: &ApplicationProvider) -> gtk::Box {
+    fn create_layouts_section_box(application_provider: &ApplicationProvider) -> GTKBox {
         const LAYOUT_LABEL: &str = "Layout";
-        let layout_section_box = SectionBoxBuilder::new()
+        let layout_section_box = SectionBoxBuilder::new("layouts-section", 0)
             .create_header_elements(LAYOUT_LABEL)
             .build().expect("Cannot create layout section");
 

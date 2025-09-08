@@ -2,7 +2,9 @@ use gtk::{ColorButton, ComboBoxText, Entry, Orientation, ScrolledWindow};
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::boxes::Boxes;
+use crate::types::{GTKBox, GTKSpinButton};
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::color_selector::ColorSelector;
 use crate::ui::controls::Control;
 use crate::ui::controls::input_field::InputField;
@@ -23,14 +25,14 @@ const LOCKSCREEN_LABEL_WIDTH: u32 = 180;
 pub struct Lockscreen {
     application_provider: ApplicationProvider,
     state: LockScreenPageState,
-    lockscreen_scroll_box: gtk::Box,
-    lockscreen_sections_box: gtk::Box,
+    lockscreen_scroll_box: GTKBox,
+    lockscreen_sections_box: GTKBox,
 }
 
 impl Control for Lockscreen {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.lockscreen_scroll_box
     }
 }
@@ -55,15 +57,19 @@ impl StatableControl<LockScreenPageState> for Lockscreen {
 
 impl Lockscreen {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let lockscreen_sections_box = gtk::Box::new(Orientation::Vertical, 10);
-        Boxes::set_margin(&lockscreen_sections_box, 10);
+        let lockscreen_sections_box = BoxBuilder::new("lockscreen")
+            .set_orientation(Orientation::Vertical)
+            .set_margin(DEFAULT_MARGIN)
+            .build();
 
         let scroll_window = ScrolledWindow::new();
         scroll_window.set_vexpand(true);
         scroll_window.set_child(Some(&lockscreen_sections_box));
 
-        let lockscreen_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
-        lockscreen_scroll_box.set_vexpand(true);
+        let lockscreen_scroll_box = BoxBuilder::new("lockscreen-scroll")
+            .set_orientation(Orientation::Vertical)
+            .set_full_height(true)
+            .build();
         lockscreen_scroll_box.append(&scroll_window);
 
         let state = LockScreenPageState {
@@ -112,15 +118,15 @@ impl Lockscreen {
     }
 
     fn create_lockscreen_sections(&self, lockscreen_state: &LockScreenPageState) {
-        self.lockscreen_sections_box.append(&self.create_general_section(lockscreen_state));
-        self.lockscreen_sections_box.append(&self.create_background_section(lockscreen_state));
+        self.lockscreen_sections_box.append(&self.create_general_section_box(lockscreen_state));
+        self.lockscreen_sections_box.append(&self.create_background_section_box(lockscreen_state));
         self.lockscreen_sections_box.append(&self.create_password_input_field_section(lockscreen_state));
         self.lockscreen_sections_box.append(&self.create_text_display_section_box(lockscreen_state));
     }
 
-    fn create_general_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
+    fn create_general_section_box(&self, lockscreen_state: &LockScreenPageState) -> GTKBox {
         const GENERAL_TITLE: &str = "General";
-        let general_section_box = SectionBoxBuilder::new()
+        let general_section_box = SectionBoxBuilder::new("general-section", 0)
             .create_header_elements(GENERAL_TITLE)
             .build().expect("Failed to create general section box");
 
@@ -162,7 +168,7 @@ impl Lockscreen {
         grace_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
+        let fall_timeout_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_grace(spin_button.value() as f32);
         };
         grace_spin_button.set_value_change(fall_timeout_change);
@@ -186,7 +192,7 @@ impl Lockscreen {
         fall_timeout.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
+        let fall_timeout_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_fall_timeout(spin_button.value() as u32);
         };
         fall_timeout.set_value_change(fall_timeout_change);
@@ -197,9 +203,9 @@ impl Lockscreen {
         general_section_box
     }
 
-    fn create_background_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
+    fn create_background_section_box(&self, lockscreen_state: &LockScreenPageState) -> GTKBox {
         const BACKGROUND_TITLE: &str = "Background";
-        let general_section_box = SectionBoxBuilder::new()
+        let general_section_box = SectionBoxBuilder::new("background-section", 0)
             .create_header_elements(BACKGROUND_TITLE)
             .build().expect("Failed to create background section box");
 
@@ -238,7 +244,7 @@ impl Lockscreen {
         blur_size_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let blur_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let blur_size_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_lockscreen_blur_size(spin_button.value() as u32);
         };
         blur_size_spin_button.set_value_change(blur_size_spin_button_change);
@@ -262,7 +268,7 @@ impl Lockscreen {
         blur_passes_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let blur_passes_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let blur_passes_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_lockscreen_blur_passes(spin_button.value() as u32);
         };
         blur_passes_spin_button.set_value_change(blur_passes_spin_button_change);
@@ -286,7 +292,7 @@ impl Lockscreen {
         noise_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let noise_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let noise_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_noise(spin_button.value() as f32);
         };
         noise_spin_button.set_value_change(noise_spin_button_change);
@@ -310,7 +316,7 @@ impl Lockscreen {
         contrast_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let contrast_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let contrast_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_contrast(spin_button.value() as f32);
         };
         contrast_spin_button.set_value_change(contrast_spin_button_change);
@@ -334,13 +340,13 @@ impl Lockscreen {
         brightness_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let brightness_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_brightness(spin_button.value() as f32);
         };
         brightness_spin_button.set_value_change(brightness_spin_button_change);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let brightness_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_brightness(spin_button.value() as f32);
         };
         brightness_spin_button.set_value_change(brightness_spin_button_change);
@@ -364,7 +370,7 @@ impl Lockscreen {
         vibrancy_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let vibrancy_spin_change = move |spin_button: &gtk::SpinButton| {
+        let vibrancy_spin_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_vibrancy(spin_button.value() as f32);
         };
         vibrancy_spin_button.set_value_change(vibrancy_spin_change);
@@ -379,9 +385,9 @@ impl Lockscreen {
         general_section_box
     }
 
-    fn create_password_input_field_section(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
+    fn create_password_input_field_section(&self, lockscreen_state: &LockScreenPageState) -> GTKBox {
         const PASSWORD_INPUT_FIELD_TITLE: &str = "Password field";
-        let password_input_field_section_box = SectionBoxBuilder::new()
+        let password_input_field_section_box = SectionBoxBuilder::new("password-input-field-section", 0)
             .create_header_elements(PASSWORD_INPUT_FIELD_TITLE)
             .build().expect("Failed to create text display section box");
 
@@ -404,7 +410,7 @@ impl Lockscreen {
         input_width_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_width_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let input_width_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_width(spin_button.value() as u32);
         };
         input_width_spin_button.set_value_change(input_width_spin_button_change);
@@ -428,7 +434,7 @@ impl Lockscreen {
         input_height_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_height_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let input_height_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_height(spin_button.value() as u32);
         };
         input_height_spin_button.set_value_change(input_height_spin_button_change);
@@ -452,7 +458,7 @@ impl Lockscreen {
         input_outline_thickness_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_outline_thickness_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let input_outline_thickness_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_outline_thickness(spin_button.value() as u32);
         };
         input_outline_thickness_spin_button.set_value_change(input_outline_thickness_spin_button_change);
@@ -476,7 +482,7 @@ impl Lockscreen {
         input_dots_size_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_dots_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let input_dots_size_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_dots_size(spin_button.value() as u32);
         };
         input_dots_size_spin_button.set_value_change(input_dots_size_spin_button_change);
@@ -500,7 +506,7 @@ impl Lockscreen {
         input_dots_spacing_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_dots_spacing_spin_button_change = move |spin_button: &gtk::SpinButton| {
+        let input_dots_spacing_spin_button_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_dots_spacing(spin_button.value() as u32);
         };
         input_dots_spacing_spin_button.set_value_change(input_dots_spacing_spin_button_change);
@@ -626,7 +632,7 @@ impl Lockscreen {
         input_x_position.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_x_position_change = move |spin_button: &gtk::SpinButton| {
+        let input_x_position_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_x_position(spin_button.value() as u32);
         };
         input_x_position.set_value_change(input_x_position_change);
@@ -650,7 +656,7 @@ impl Lockscreen {
         input_y_position.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_y_position_change = move |spin_button: &gtk::SpinButton| {
+        let input_y_position_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_input_y_position(spin_button.value() as u32);
         };
         input_y_position.set_value_change(input_y_position_change);
@@ -709,9 +715,9 @@ impl Lockscreen {
         password_input_field_section_box
     }
 
-    fn create_text_display_section_box(&self, lockscreen_state: &LockScreenPageState) -> gtk::Box {
+    fn create_text_display_section_box(&self, lockscreen_state: &LockScreenPageState) -> GTKBox {
         const TEXT_DISPLAY_TITLE: &str = "Display text";
-        let text_display_section_box = SectionBoxBuilder::new()
+        let text_display_section_box = SectionBoxBuilder::new("text-display-section", 0)
             .create_header_elements(TEXT_DISPLAY_TITLE)
             .build().expect("Failed to create text display section box");
 
@@ -766,7 +772,7 @@ impl Lockscreen {
         text_font_size_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_font_size_spin_change = move |spin_button: &gtk::SpinButton| {
+        let text_font_size_spin_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_display_text_font_size(spin_button.value() as u32);
         };
         text_font_size_spin_button.set_value_change(text_font_size_spin_change);
@@ -806,7 +812,7 @@ impl Lockscreen {
         text_x_position_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_x_position_spin_change = move |spin_button: &gtk::SpinButton| {
+        let text_x_position_spin_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_display_text_x_position(spin_button.value() as u32);
         };
         text_x_position_spin_button.set_value_change(text_x_position_spin_change);
@@ -830,7 +836,7 @@ impl Lockscreen {
         text_y_position_spin_button.update_ui(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_y_position_spin_change = move |spin_button: &gtk::SpinButton| {
+        let text_y_position_spin_change = move |spin_button: &GTKSpinButton| {
             lockscreen_provider.borrow_mut().set_display_text_y_position(spin_button.value() as u32);
         };
         text_y_position_spin_button.set_value_change(text_y_position_spin_change);

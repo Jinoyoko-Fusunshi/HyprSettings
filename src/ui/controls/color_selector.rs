@@ -1,12 +1,14 @@
-use gtk::{Align, ColorButton, Label};
+use gtk::{Align, ColorButton, Label, Orientation};
 use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::states::color_selector_state::ColorSelectorState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct ColorSelector {
-    color_button_box: gtk::Box,
+    color_button_box: GTKBox,
     color_button_label: Label,
     color_button: ColorButton,
 }
@@ -14,7 +16,7 @@ pub struct ColorSelector {
 impl Control for ColorSelector {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.color_button_box
     }
 }
@@ -40,8 +42,10 @@ impl UpdatableControl<ColorSelectorState> for ColorSelector {
 
 impl ColorSelector {
     pub fn new() -> ColorSelector {
-        let color_button_box = gtk::Box::new(gtk::Orientation::Horizontal, 10);
-        
+        let color_button_box = BoxBuilder::new("color-selector")
+            .set_orientation(Orientation::Horizontal)
+            .build();
+
         let color_button_label = Label::new(None);
         color_button_label.set_halign(Align::Start);
         color_button_label.set_xalign(0.0);

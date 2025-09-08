@@ -10,3 +10,4 @@ mod labeled_control;
 mod manager;
 pub mod pages;
 pub mod boxes;
+mod box_builder;

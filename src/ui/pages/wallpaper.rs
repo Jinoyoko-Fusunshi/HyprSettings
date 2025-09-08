@@ -1,7 +1,9 @@
 use gtk::{Entry, Orientation};
 use gtk::prelude::{BoxExt, EditableExt};
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::boxes::Boxes;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::Control;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::section_box_builder::SectionBoxBuilder;
@@ -13,8 +15,8 @@ use crate::ui::updatable_control::UpdatableControl;
 pub struct Wallpaper {
     application_provider: ApplicationProvider,
     state: WallpaperPageState,
-    wallpaper_box: gtk::Box,
-    wallpaper_sections_box: gtk::Box,
+    wallpaper_box: GTKBox,
+    wallpaper_sections_box: GTKBox,
 }
 
 impl Control for Wallpaper {
@@ -22,7 +24,7 @@ impl Control for Wallpaper {
 
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.wallpaper_box
     }
 }
@@ -48,12 +50,14 @@ impl StatableControl<WallpaperPageState> for Wallpaper {
 impl Wallpaper {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const WALLPAPER_TITLE: &str = "Wallpaper";
-        let wallpaper_box = SectionBoxBuilder::new()
+        let wallpaper_box = SectionBoxBuilder::new("wallpaper", DEFAULT_MARGIN)
             .create_header_elements(WALLPAPER_TITLE)
             .build().expect("Failed to create wallpaper section box");
-        Boxes::set_margin(&wallpaper_box, 10);
 
-        let wallpaper_sections_box = gtk::Box::new(Orientation::Vertical, 10);
+        let wallpaper_sections_box = BoxBuilder::new("wallpaper_sections")
+            .set_orientation(Orientation::Vertical)
+            .build();
+
         wallpaper_box.append(&wallpaper_sections_box);
 
         let state = WallpaperPageState {

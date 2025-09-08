@@ -1,3 +1,5 @@
+use crate::types::GTKBox;
+
 pub mod activable_control;
 pub mod editable_control_element;
 pub mod color_selector;
@@ -13,5 +15,5 @@ pub mod settings_switcher;
 pub trait Control {
     fn init_events(&self);
 
-    fn get_widget(&self) -> &gtk::Box;
+    fn get_widget(&self) -> &GTKBox;
 }

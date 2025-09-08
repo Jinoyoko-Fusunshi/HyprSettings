@@ -1,7 +1,8 @@
 use gtk::{Align, Label, Orientation, Switch};
 use gtk::glib::Propagation;
-use gtk::SpinButton as GTKSpinButton;
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::types::{GTKBox, GTKSpinButton};
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::states::display_field_state::DisplayFieldState;
@@ -14,7 +15,7 @@ const CLIMB_RATE: f64 = 1.0;
 const DISPLAYED_FLOAT_DIGITS: u32 = 0;
 
 pub struct DisplayField {
-    display_field_box: gtk::Box,
+    display_field_box: GTKBox,
     monitor_active_switch: Switch,
     monitor_port_label: Label,
     monitor_display_label: Label,
@@ -28,7 +29,7 @@ impl Control for DisplayField {
 
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.display_field_box
 
     }
@@ -96,9 +97,17 @@ impl UpdatableControl<DisplayFieldState> for DisplayField {
 
 impl DisplayField {
     pub fn new() -> Self {
-        let display_field_box = gtk::Box::new(Orientation::Vertical, 0);
-        let monitor_info_box = gtk::Box::new(Orientation::Horizontal, 10);
-        let video_setting_box = gtk::Box::new(Orientation::Horizontal, 10);
+        let display_field_box = BoxBuilder::new("display-field")
+            .set_orientation(Orientation::Vertical)
+            .build();
+
+        let monitor_info_box = BoxBuilder::new("monitor-infos")
+            .set_orientation(Orientation::Horizontal)
+            .build();
+
+        let video_setting_box = BoxBuilder::new("video-settings")
+            .set_orientation(Orientation::Horizontal)
+            .build();
 
         // Toggle button to en/-disable the monitor
         let monitor_active_switch = Switch::new();

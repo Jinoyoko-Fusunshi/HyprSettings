@@ -1,10 +1,13 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use gtk::Orientation;
-use gtk::prelude::{BoxExt, WidgetExt};
+use gtk::prelude::BoxExt;
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
-use crate::ui::pages::programs::ProgramPage;
+use crate::ui::pages::programs::Programs;
 use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
@@ -14,7 +17,7 @@ use crate::ui::pages::displays::Displays;
 use crate::ui::pages::infos::Infos;
 use crate::ui::pages::keybinds::Keybinds;
 use crate::ui::pages::lockscreen::Lockscreen;
-use crate::ui::pages::overview::OverviewPage;
+use crate::ui::pages::overview::Overview;
 use crate::ui::pages::{
     APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE,
     OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE
@@ -28,7 +31,7 @@ use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct App {
-    app_box: gtk::Box
+    app_box: GTKBox
 }
 
 impl Control for App {
@@ -36,7 +39,7 @@ impl Control for App {
 
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.app_box
     }
 }
@@ -45,16 +48,15 @@ impl App {
     pub fn new() -> Self {
         let application_provider = ApplicationProvider::new();
         
-        let app_box = gtk::Box::new(Orientation::Horizontal, 10);
-        app_box.set_margin_start(10);
-        app_box.set_margin_end(10);
-        app_box.set_margin_top(10);
-        app_box.set_margin_bottom(10);
+        let app_box = BoxBuilder::new("app")
+            .set_orientation(Orientation::Horizontal)
+            .set_margin(DEFAULT_MARGIN)
+            .build();
 
-        let overview_settings = Box::new(OverviewPage::new(application_provider.clone()));
+        let overview_settings = Box::new(Overview::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
-        let mut general_settings = Box::new(ProgramPage::new(application_provider.clone()));
+        let mut general_settings = Box::new(Programs::new(application_provider.clone()));
         general_settings.init_events();
         general_settings.update_ui(state);
 

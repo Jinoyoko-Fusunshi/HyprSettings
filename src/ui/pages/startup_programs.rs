@@ -1,14 +1,18 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use gtk::{Align, Button, Label, Orientation, Separator};
+use gtk::{Align, Button, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::startup_program_field::StartupProgramField;
 use crate::ui::controls::Control;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
 use crate::ui::pages::keybinds::CUSTOM_ITEM;
+use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
@@ -16,41 +20,36 @@ use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct StartupPrograms {
-    startup_program_box: gtk::Box,
-    startup_program_entries_box: gtk::Box,
+    startup_program_box: GTKBox,
+    startup_program_entries_box: GTKBox,
     create_button: Button,
 }
 
 impl Control for StartupPrograms {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.startup_program_box
     }
 }
 
 impl StartupPrograms {
     pub fn new() -> Self {
-        const PROGRAMS_ON_STARTUP_LABEL: &str = "Programs on system start";
+        const STARTUP_PROGRAMS_LABEL: &str = "Programs on system start";
 
-        let startup_program_box = gtk::Box::new(Orientation::Vertical, 10);
-        startup_program_box.set_margin_top(10);
-        startup_program_box.set_margin_bottom(10);
-        startup_program_box.set_margin_start(10);
-        startup_program_box.set_margin_end(10);
+        let startup_program_box = SectionBoxBuilder::new("startup-programs", DEFAULT_MARGIN)
+            .create_header_elements(STARTUP_PROGRAMS_LABEL)
+            .build().expect("Failed to create startup programs box");
 
-        let startup_programs_label = Label::new(Some(PROGRAMS_ON_STARTUP_LABEL));
-        let separator = Separator::new(Orientation::Horizontal);
-
-        let startup_program_entries_box = gtk::Box::new(Orientation::Vertical, 10);
+        let startup_program_entries_box = BoxBuilder::new(".startup-program-entries")
+            .set_orientation(Orientation::Vertical)
+            .build();
 
         let create_button = Button::with_label("➕ Add startup program");
         create_button.set_hexpand(false);
         create_button.set_halign(Align::Start);
         create_button.add_css_class(CSSStyles::CREATE_STARTUP_PROGRAM_BUTTON);
 
-        startup_program_box.append(&startup_programs_label);
-        startup_program_box.append(&separator);
         startup_program_box.append(&startup_program_entries_box);
         startup_program_box.append(&create_button);
 
@@ -100,7 +99,7 @@ impl StartupPrograms {
     }
 
     fn create_editable_startup_program_field(
-        application_provider: ApplicationProvider, startup_program_entries_box: gtk::Box, program_name: String, program_path: String,
+        application_provider: ApplicationProvider, startup_program_entries_box: GTKBox, program_name: String, program_path: String,
         programs: Vec<String>, edit_mode: EditMode,
     ) -> Rc<RefCell<EditableControlElement<StartupProgramField>>>{
         let state = StartupProgramFieldState {

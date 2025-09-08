@@ -1,77 +1,81 @@
 use gtk::{Align, Label, LinkButton, Orientation, Separator};
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::Control;
+use crate::ui::section_box_builder::SectionBoxBuilder;
 
 pub struct Infos {
-    info_settings_box: gtk::Box,
+    info_settings_box: GTKBox,
 }
 
 impl Control for Infos {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.info_settings_box
     }
 }
 
 impl Infos {
     pub fn new() -> Self {
-        const INFO_PANEL_LABEL: &str = "Program information";
+        const INFO_LABEL: &str = "Program information";
 
-        let info_panel_box = gtk::Box::new(Orientation::Vertical, 10);
-        info_panel_box.set_margin_top(10);
-        info_panel_box.set_margin_bottom(10);
-        info_panel_box.set_margin_start(10);
-        info_panel_box.set_margin_end(10);
+        let info_box = SectionBoxBuilder::new("info-panel", DEFAULT_MARGIN)
+            .create_header_elements(INFO_LABEL)
+            .build().expect("Failed to create info panel");
 
-        let info_panel_label = Label::new(Some(INFO_PANEL_LABEL));
-        let separator = Separator::new(Orientation::Horizontal);
-
-        let application_name = Infos::create_label("HyprSettings");
-        application_name.add_css_class(CSSStyles::APPLICATION_TITLE);
+        let application_name = Self::create_label("HyprSettings");
+        application_name.set_widget_name("application-title");
+        application_name.set_margin_bottom(DEFAULT_MARGIN as i32);
 
         let application_version_value = format!("v.{}", env!("CARGO_PKG_VERSION"));
-        let application_version_entry = Infos::create_information_entry(
+        let application_version_entry = Self::create_information_entry_box(
             "🚀 Version:", application_version_value.as_str()
         );
-        let author_entry = Infos::create_information_entry(
+        let author_entry = Self::create_information_entry_box(
             "👨‍💻 Author:", "Jinoyoko Fusunshi"
         );
-        let github_link_entry = Infos::create_link_entry(
+        let github_link_entry = Self::create_link_entry_box(
             "📄 Github:", "https://github.com/Jinoyoko-Fusunshi/HyprSettings"
         );
         let horizontal_separator = Separator::new(Orientation::Horizontal);
-        let program_description_entry = Infos::create_program_description_panel();
+        let program_description_entry = Self::create_program_description_panel();
 
-        info_panel_box.append(&info_panel_label);
-        info_panel_box.append(&separator);
-        info_panel_box.append(&application_name);
-        info_panel_box.append(&application_version_entry);
-        info_panel_box.append(&author_entry);
-        info_panel_box.append(&github_link_entry);
-        info_panel_box.append(&horizontal_separator);
-        info_panel_box.append(&program_description_entry);
+        info_box.append(&application_name);
+        info_box.append(&application_version_entry);
+        info_box.append(&author_entry);
+        info_box.append(&github_link_entry);
+        info_box.append(&horizontal_separator);
+        info_box.append(&program_description_entry);
 
         Self {
-            info_settings_box: info_panel_box
+            info_settings_box: info_box
         }
     }
 
-    fn create_information_entry(information_name: &str, information_value: &str) -> gtk::Box {
-        let entry = gtk::Box::new(Orientation::Horizontal, 10);
-        let information_name_label = Infos::create_label(information_name);
-        let information_value_label = Infos::create_label(information_value);
+    fn create_information_entry_box(information_name: &str, information_value: &str) -> GTKBox {
+        let information_entry_box = BoxBuilder::new("information-entry")
+            .set_orientation(Orientation::Horizontal)
+            .set_margin_bottom(DEFAULT_MARGIN)
+            .build();
 
-        entry.append(&information_name_label);
-        entry.append(&information_value_label);
-        entry
+        let information_name_label = Self::create_label(information_name);
+        let information_value_label = Self::create_label(information_value);
+
+        information_entry_box.append(&information_name_label);
+        information_entry_box.append(&information_value_label);
+        information_entry_box
     }
 
-    fn create_program_description_panel() -> gtk::Box {
-        let program_description_box = gtk::Box::new(Orientation::Vertical, 10);
-        program_description_box.set_hexpand(false);
-        program_description_box.set_width_request(100);
+    fn create_program_description_panel() -> GTKBox {
+        let program_description_box = BoxBuilder::new("program-description")
+            .set_orientation(Orientation::Vertical)
+            .set_width(100)
+            .set_full_width(true)
+            .build();
 
         const USAGE_DESCRIPTION_TEXT: &str = "\
             HyprSettings is a simple Hyprland settings manager for configuring your hyprland instance.\n\
@@ -86,14 +90,17 @@ impl Infos {
         program_description_box
     }
 
-    fn create_link_entry(link_name: &str, link_value: &str) -> gtk::Box {
-        let entry = gtk::Box::new(Orientation::Horizontal, 10);
-        let link_name_label = Infos::create_label(link_name);
-        let link_button = Infos::create_link_button(link_value, link_value);
+    fn create_link_entry_box(link_name: &str, link_value: &str) -> GTKBox {
+        let link_entry_box = BoxBuilder::new("link-entry")
+            .set_orientation(Orientation::Horizontal)
+            .build();
 
-        entry.append(&link_name_label);
-        entry.append(&link_button);
-        entry
+        let link_name_label = Self::create_label(link_name);
+        let link_button = Self::create_link_button(link_value, link_value);
+
+        link_entry_box.append(&link_name_label);
+        link_entry_box.append(&link_button);
+        link_entry_box
     }
 
     fn create_link_button(display_name: &str, link_value: &str) -> LinkButton {

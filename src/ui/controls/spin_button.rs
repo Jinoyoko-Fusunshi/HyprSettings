@@ -1,12 +1,14 @@
 use gtk::{Adjustment, Align, Label, Orientation, SpinButton as GTKSpinButton};
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::states::spin_button_state::SpinButtonState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SpinButton {
-    spin_button_box: gtk::Box,
+    spin_button_box: GTKBox,
     spin_button_label: Label,
     spin_button: GTKSpinButton,
 }
@@ -14,7 +16,7 @@ pub struct SpinButton {
 impl Control for SpinButton {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.spin_button_box
     }
 }
@@ -50,7 +52,10 @@ impl LabeledControl for SpinButton {
 
 impl SpinButton {
     pub fn new() -> SpinButton {
-        let spin_button_box = gtk::Box::new(Orientation::Horizontal, 10);
+        let spin_button_box = BoxBuilder::new("spinbutton")
+            .set_orientation(Orientation::Horizontal)
+            .build();
+
         let spin_button = GTKSpinButton::new(None::<&Adjustment>, 0.0, 0);
         spin_button.set_wrap(true);
 

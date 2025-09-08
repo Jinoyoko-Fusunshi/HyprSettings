@@ -1,9 +1,11 @@
 use std::collections::HashMap;
-use gtk::{Orientation, Separator, SpinButton, Switch};
+use gtk::{Orientation, Separator, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
-use crate::ui::boxes::Boxes;
+use crate::types::{GTKBox, GTKSpinButton};
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::Control;
 use crate::ui::controls::display_field::DisplayField;
 use crate::ui::section_box_builder::SectionBoxBuilder;
@@ -13,15 +15,15 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub struct Displays {
     application_provider: ApplicationProvider,
-    display_box: gtk::Box,
-    display_fields_box: gtk::Box,
+    display_box: GTKBox,
+    display_fields_box: GTKBox,
     display_fields: HashMap<String, DisplayField>,
 }
 
 impl Control for Displays {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.display_box
     }
 }
@@ -40,7 +42,7 @@ impl UpdatableControl<DisplaySettingsState> for Displays {
 
 impl Displays {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let display_box = SectionBoxBuilder::new()
+        let display_box = SectionBoxBuilder::new("displays", DEFAULT_MARGIN)
             .create_header_elements("Available displays")
             .build().expect("Failed to create display settings section box");
 
@@ -49,7 +51,10 @@ impl Displays {
         display_box.set_margin_start(10);
         display_box.set_margin_end(10);
 
-        let display_fields_box = gtk::Box::new(Orientation::Vertical, 10);
+        let display_fields_box = BoxBuilder::new("display-fields")
+            .set_orientation(Orientation::Vertical)
+            .build();
+
         display_box.append(&display_fields_box);
 
         Self {
@@ -87,21 +92,21 @@ impl Displays {
 
             let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
-            let spin_button_width_change = move |spin_button: &SpinButton| {
+            let spin_button_width_change = move |spin_button: &GTKSpinButton| {
                 display_provider.borrow_mut().set_monitor_width(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_width_change(spin_button_width_change);
 
             let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
-            let spin_button_height_change = move |spin_button: &SpinButton| {
+            let spin_button_height_change = move |spin_button: &GTKSpinButton| {
                 display_provider.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_height_change(spin_button_height_change);
 
             let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
-            let spin_button_refresh_rate_change = move |spin_button: &SpinButton| {
+            let spin_button_refresh_rate_change = move |spin_button: &GTKSpinButton| {
                 display_provider.borrow_mut().set_monitor_refresh_rate(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_refresh_rate_change(spin_button_refresh_rate_change);

@@ -1,8 +1,8 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use gtk::{Button, ComboBoxText, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
@@ -14,11 +14,12 @@ use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::{new_rc_mut, RcMut};
 
 pub struct StartupProgramField {
     application_provider: ApplicationProvider,
-    state: Rc<RefCell<StartupProgramFieldState>>,
-    startup_entry_box: gtk::Box,
+    state: RcMut<StartupProgramFieldState>,
+    startup_entry_box: GTKBox,
     delete_button: Button,
     program_name_input: Entry,
     program_path_input: Entry,
@@ -28,7 +29,7 @@ pub struct StartupProgramField {
 impl Control for StartupProgramField {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.startup_entry_box
     }
 }
@@ -112,14 +113,17 @@ impl ActivableControl for StartupProgramField {
 
 impl StartupProgramField {
     pub fn new(application_provider: ApplicationProvider) -> StartupProgramField {
-        let state = Rc::new(RefCell::new(StartupProgramFieldState {
+        let state = new_rc_mut(StartupProgramFieldState {
             previous_program_name: "".to_string(),
             program_path: String::new(),
             program_name: "".to_string(),
             programs: vec![CUSTOM_ITEM.to_string()],
-        }));
+        });
 
-        let startup_entry_box = gtk::Box::new(Orientation::Horizontal, 10);
+        let startup_entry_box = BoxBuilder::new("startup-entry")
+            .set_orientation(Orientation::Horizontal)
+            .build();
+
         let delete_button = Button::with_label("❌");
 
         let program_name_input = Entry::new();

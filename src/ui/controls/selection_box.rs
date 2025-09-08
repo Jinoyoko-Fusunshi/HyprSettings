@@ -1,6 +1,8 @@
 use gtk::{Align, ComboBoxText, Label, Orientation};
 use gtk::glib::GString;
 use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::labeled_control::LabeledControl;
@@ -10,7 +12,7 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SelectionBox {
     state: SelectionBoxState,
-    selection_box: gtk::Box,
+    selection_box: GTKBox,
     selection_label: Label,
     selection_combobox: ComboBoxText,
 }
@@ -18,7 +20,7 @@ pub struct SelectionBox {
 impl Control for SelectionBox {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.selection_box
     }
 }
@@ -63,7 +65,9 @@ impl ActivableControl for SelectionBox {
 
 impl SelectionBox {
     pub fn new() -> SelectionBox {
-        let selection_box = gtk::Box::new(Orientation::Horizontal, 10);
+        let selection_box = BoxBuilder::new("selection-box")
+            .set_orientation(Orientation::Horizontal)
+            .build();
 
         let selection_label = Label::new(None);
         selection_label.set_halign(Align::Start);

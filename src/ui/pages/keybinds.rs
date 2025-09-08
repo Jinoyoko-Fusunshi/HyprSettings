@@ -7,6 +7,9 @@ use crate::models::keybinds::custom_keybind::CustomKeybind;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
@@ -22,13 +25,13 @@ use crate::ui::updatable_control::UpdatableControl;
 pub const CUSTOM_ITEM: &str = "Custom";
 
 pub struct Keybinds {
-    key_binds_panel_box: gtk::Box
+    key_binds_panel_box: GTKBox
 }
 
 impl Control for Keybinds {
     fn init_events(&self) {}
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.key_binds_panel_box
     }
 }
@@ -43,23 +46,25 @@ impl Clone for Keybinds {
 
 impl Keybinds {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let key_binds_panel_scroll_box = gtk::Box::new(Orientation::Vertical, 10);
-        key_binds_panel_scroll_box.set_margin_top(10);
-        key_binds_panel_scroll_box.set_margin_bottom(10);
-        key_binds_panel_scroll_box.set_margin_start(10);
-        key_binds_panel_scroll_box.set_margin_end(10);
-        key_binds_panel_scroll_box.set_vexpand(true);
+        let key_binds_panel_scroll_box = BoxBuilder::new("keybinds")
+            .set_orientation(Orientation::Vertical)
+            .set_margin(DEFAULT_MARGIN)
+            .set_full_height(true)
+            .build();
 
         let scroll_window = ScrolledWindow::new();
         scroll_window.set_vexpand(true);
 
-        let system_keybinds_section_box = Self::create_system_keybinds_box(&application_provider);
-        let focus_keybinds_section_box = Self::create_focus_keybinds_box(&application_provider);
-        let workspace_keybinds_section_box = Self::create_workspace_keybinds_box(&application_provider);
-        let move_window_keybinds_section_box = Self::create_move_window_keybinds_box(&application_provider);
-        let custom_keybinds_section_box = Self::create_custom_keybinds_box(&application_provider);
+        let system_keybinds_section_box = Self::create_system_keybinds_section_box(&application_provider);
+        let focus_keybinds_section_box = Self::create_focus_keybinds_section_box(&application_provider);
+        let workspace_keybinds_section_box = Self::create_workspace_keybinds_section_box(&application_provider);
+        let move_window_keybinds_section_box = Self::create_move_window_keybinds_section_box(&application_provider);
+        let custom_keybinds_section_box = Self::create_custom_keybinds_section_box(&application_provider);
 
-        let key_binds_panel_box = gtk::Box::new(Orientation::Vertical, 10);
+        let key_binds_panel_box = BoxBuilder::new("keybinds")
+            .set_orientation(Orientation::Vertical)
+            .build();
+
         key_binds_panel_box.append(&system_keybinds_section_box);
         key_binds_panel_box.append(&focus_keybinds_section_box);
         key_binds_panel_box.append(&workspace_keybinds_section_box);
@@ -74,8 +79,8 @@ impl Keybinds {
         }
     }
 
-    fn create_system_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
-        let system_keybinds_section_box = SectionBoxBuilder::new()
+    fn create_system_keybinds_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let system_keybinds_section_box = SectionBoxBuilder::new("system-keybinds-section", 0)
             .create_header_elements("System keybinds")
             .build()
             .expect("Cannot build system keybinds section box");
@@ -132,8 +137,8 @@ impl Keybinds {
         system_keybinds_section_box
     }
 
-    fn create_focus_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
-        let focus_window_keybinds_section_box = SectionBoxBuilder::new()
+    fn create_focus_keybinds_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let focus_window_keybinds_section_box = SectionBoxBuilder::new("focus-keybinds-section", 0)
             .create_header_elements("Focus window")
             .build()
             .expect("Cannot build system keybinds section box");
@@ -158,8 +163,8 @@ impl Keybinds {
         focus_window_keybinds_section_box
     }
 
-    fn create_workspace_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
-        let switch_workspace_keybinds_section_box = SectionBoxBuilder::new()
+    fn create_workspace_keybinds_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let switch_workspace_keybinds_section_box = SectionBoxBuilder::new("workspace-keybinds-section", 0)
             .create_header_elements("Workspace")
             .build()
             .expect("Cannot build system keybinds section box");
@@ -208,8 +213,8 @@ impl Keybinds {
         switch_workspace_keybinds_section_box
     }
 
-    fn create_move_window_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
-        let move_window_keybinds_section_box = SectionBoxBuilder::new()
+    fn create_move_window_keybinds_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let move_window_keybinds_section_box = SectionBoxBuilder::new("move-window-keybinds-section", 0)
             .create_header_elements("Move window")
             .build()
             .expect("Cannot build system keybinds section box");
@@ -259,13 +264,15 @@ impl Keybinds {
         move_window_keybinds_section_box
     }
 
-    fn create_custom_keybinds_box(application_provider: &ApplicationProvider) -> gtk::Box {
-        let custom_keybinds_section_box = SectionBoxBuilder::new()
+    fn create_custom_keybinds_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let custom_keybinds_section_box = SectionBoxBuilder::new("custom-keybinds-section", 0)
             .create_header_elements(CUSTOM_ITEM)
             .build()
             .expect("Cannot build system keybinds section box");
 
-        let custom_keybind_entries_box = gtk::Box::new(Orientation::Vertical, 10);
+        let custom_keybind_entries_box = BoxBuilder::new("custom-keybind-entries")
+            .set_orientation(Orientation::Vertical)
+            .build();
 
         let custom_keybind_entries_box_clone = custom_keybind_entries_box.clone();
         let application_provider_clone = application_provider.clone();
@@ -286,7 +293,7 @@ impl Keybinds {
     }
 
     fn create_custom_keybinds_from_settings(
-        application_manager: &ApplicationProvider, custom_keybind_entries_box: &gtk::Box
+        application_manager: &ApplicationProvider, custom_keybind_entries_box: &GTKBox
     ) {
         let settings_provider = application_manager.get_keybinds_provider();
         let custom_keybinds = settings_provider.borrow().get_custom_keybinds();
@@ -298,7 +305,7 @@ impl Keybinds {
     }
 
     fn create_custom_keybind(
-        application_provider: ApplicationProvider, custom_keybind_entries_box: &gtk::Box,
+        application_provider: ApplicationProvider, custom_keybind_entries_box: &GTKBox,
         custom_keybind_name: Option<String>, custom_keybind: Option<CustomKeybind>, edit_mode: EditMode
     ) {
         let mut custom_keybind_input_field = CustomKeyBindInputField::new();

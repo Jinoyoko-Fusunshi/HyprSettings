@@ -1,10 +1,10 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use gtk::{Align, Button, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::models::keybinds::custom_keybind::CustomKeybind;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::providers::application_provider::ApplicationProvider;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::input_field::InputField;
@@ -16,14 +16,15 @@ use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputField
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::{new_rc_mut, RcMut};
 
 pub struct CustomKeyBindInputField {
-    state: Rc<RefCell<CustomKeybindInputFieldState>>,
-    key_bind_entry_box: gtk::Box,
+    state: RcMut<CustomKeybindInputFieldState>,
+    key_bind_entry_box: GTKBox,
     delete_button: Button,
     shortcut_input_field: InputField,
     command_input_field: InputField,
-    keybind_input: Rc<RefCell<KeybindInput>>,
+    keybind_input: RcMut<KeybindInput>,
 }
 
 impl Control for CustomKeyBindInputField {
@@ -48,7 +49,7 @@ impl Control for CustomKeyBindInputField {
         self.keybind_input.borrow().set_input_change(keybind_input_change);
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.key_bind_entry_box
     }
 }
@@ -136,15 +137,16 @@ impl ActivableControl for CustomKeyBindInputField {
 
 impl CustomKeyBindInputField {
     pub fn new() -> Self {
-        let state = Rc::new(RefCell::new(CustomKeybindInputFieldState {
+        let state = new_rc_mut(CustomKeybindInputFieldState {
             previous_shortcut_name: None,
             shortcut_name: None,
             keybind: None,
             command: None,
-        }));
+        });
 
-        let key_bind_entry_box = gtk::Box::new(Orientation::Horizontal, 10);
-        key_bind_entry_box.set_height_request(56);
+        let key_bind_entry_box = BoxBuilder::new("custom-keybind-input-field")
+            .set_orientation(Orientation::Horizontal)
+            .build();
 
         let delete_button = Button::with_label("❌");
         delete_button.set_vexpand(false);
@@ -153,7 +155,7 @@ impl CustomKeyBindInputField {
         let shortcut_input_field = InputField::new();
         let command_input_field = InputField::new();
 
-        let keybind_input = Rc::new(RefCell::new(KeybindInput::new()));
+        let keybind_input = new_rc_mut(KeybindInput::new());
         keybind_input.borrow().init_events();
 
         let keybind_input_manager = KeybindInputManager::new(keybind_input.clone());

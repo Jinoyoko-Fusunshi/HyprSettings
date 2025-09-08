@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 use gtk::{Orientation, Stack};
 use gtk::prelude::{BoxExt, WidgetExt};
-use crate::ui::css_styles::CSSStyles;
+use crate::types::GTKBox;
+use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SettingsSwitcher {
-    settings_switcher_box: gtk::Box,
+    settings_switcher_box: GTKBox,
     settings_switcher_stack: Stack,
     controls: HashMap<String, Box<dyn Control>>,
 }
@@ -17,7 +18,7 @@ impl Control for SettingsSwitcher {
 
     }
 
-    fn get_widget(&self) -> &gtk::Box {
+    fn get_widget(&self) -> &GTKBox {
         &self.settings_switcher_box
     }
 }
@@ -31,10 +32,11 @@ impl UpdatableControl<SettingsSwitcherState> for SettingsSwitcher {
 impl SettingsSwitcher {
     pub fn new() -> Self {
         let settings_switcher_stack = Stack::new();
-        let settings_switcher_box = gtk::Box::new(Orientation::Vertical, 10);
-        settings_switcher_box.set_hexpand(true);
-        settings_switcher_box.add_css_class(CSSStyles::CONTENT_PANEL);
-
+        let settings_switcher_box = BoxBuilder::new("settings-switcher")
+            .set_orientation(Orientation::Vertical)
+            .set_full_height(true)
+            .set_full_width(true)
+            .build();
         settings_switcher_box.append(&settings_switcher_stack);
 
         Self {
