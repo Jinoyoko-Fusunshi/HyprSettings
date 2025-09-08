@@ -10,12 +10,11 @@ pub struct DisplaySettingsState {
 
 impl From<&ApplicationProvider> for DisplaySettingsState {
     fn from(value: &ApplicationProvider) -> Self {
-        let monitor_configurations = value
-            .get_settings_provider()
+        let monitor_configurations = value.get_display_provider()
             .borrow()
             .get_monitor_configurations();
 
-        let enabled = value.get_module_provider()
+        let enabled = value.get_program_provider()
             .borrow()
             .get_module("wlr-randr".to_string())
             .is_some();

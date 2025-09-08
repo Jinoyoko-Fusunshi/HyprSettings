@@ -1,9 +1,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::providers::hyprland_settings_provider::config_files::hyprland_settings_writer::HyprlandSettingsWriter;
-use crate::providers::hyprland_settings_provider::config_files::settings_writer::SettingsWriter;
-use crate::providers::hyprland_settings_provider::config_files::yaml_settings_writer::YamlSettingsWriter;
+use crate::providers::config_files::hyprland_settings_writer::HyprlandSettingsWriter;
+use crate::providers::config_files::settings_writer::SettingsWriter;
+use crate::providers::config_files::yaml_settings_writer::YamlSettingsWriter;
+use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
@@ -38,16 +39,36 @@ impl SettingsSwitcherManager {
                 settings_switcher.update_ui(settings_switcher_state);
             },
             SettingsSwitcherEvent::SaveSettings => {
-                let settings_provider = self.application_provider.get_settings_provider();
-                let settings_provider_ref = settings_provider.borrow();
-                let settings = settings_provider_ref.get_settings();
+                let program_settings = self.application_provider
+                    .get_program_provider().borrow().get_settings();
+
+                let display_settings = self.application_provider
+                    .get_display_provider().borrow().get_settings();
+
+
+                let appearance_settings = self.application_provider
+                    .get_appearance_provider().borrow().get_settings();
+
+                let keybind_settings = self.application_provider
+                    .get_keybinds_provider().borrow().get_settings();
+
+                let lockscreen_settings = self.application_provider
+                    .get_lockscreen_provider().borrow().get_settings();
+
+                let hyprland_settings = HyprlandSettings::new(
+                    program_settings,
+                    display_settings,
+                    appearance_settings,
+                    keybind_settings,
+                    lockscreen_settings
+                );
 
                 let mut yaml_settings_writer = YamlSettingsWriter::new();
-                yaml_settings_writer.serialize_settings(settings.clone());
+                yaml_settings_writer.serialize_settings(hyprland_settings.clone());
                 yaml_settings_writer.write_to_config();
                 
                 let mut conf_settings_writer = HyprlandSettingsWriter::new();
-                conf_settings_writer.serialize_settings(settings.clone());
+                conf_settings_writer.serialize_settings(hyprland_settings.clone());
                 conf_settings_writer.write_to_config();
             }
         }

@@ -42,49 +42,49 @@ pub struct LockScreenPageState {
 
 impl From<&ApplicationProvider> for LockScreenPageState {
     fn from(value: &ApplicationProvider) -> Self {
-        let module_provider = value.get_module_provider();
+        let module_provider = value.get_program_provider();
         let has_hyprlock = module_provider.borrow()
             .get_module(HYPRLOCK_MODULE.to_string())
             .is_some();
 
-        let settings_provider = value.get_settings_provider();
-        let settings_ref = settings_provider.borrow();
+        let lockscreen_provider = value.get_lockscreen_provider();
+        let lockscreen_provider_ref = lockscreen_provider.borrow();
 
         Self {
             enabled: has_hyprlock,
-            hide_cursor: settings_ref.get_hide_cursor(),
-            grace: settings_ref.get_grace(),
-            fall_timeout: settings_ref.get_fall_timeout(),
-            lockscreen_wallpaper: settings_ref.get_lockscreen_wallpaper(),
-            blur_size: settings_ref.get_lockscreen_blur_size(),
-            blur_passes: settings_ref.get_lockscreen_blur_passes(),
-            noise: settings_ref.get_noise(),
-            contrast: settings_ref.get_contrast(),
-            brightness: settings_ref.get_brightness(),
-            vibrancy: settings_ref.get_vibrancy(),
-            input_width: settings_ref.get_input_width(),
-            input_height: settings_ref.get_input_height(),
-            input_outline_thickness: settings_ref.get_input_outline_thickness(),
-            input_dots_size: settings_ref.get_input_dots_size(),
-            input_dots_spacing: settings_ref.get_input_dots_spacing(),
-            input_dots_center: settings_ref.get_input_dots_center(),
-            input_outer_color: settings_ref.get_input_outer_color(),
-            input_inner_color: settings_ref.get_input_inner_color(),
-            input_font_color: settings_ref.get_input_font_color(),
-            input_placeholder_text: settings_ref.get_input_placeholder_text(),
-            hide_input: settings_ref.get_hide_input(),
-            input_x_position: settings_ref.get_input_x_position(),
-            input_y_position: settings_ref.get_input_y_position(),
-            input_vertical_alignment: settings_ref.get_input_vertical_alignment(),
-            input_horizontal_alignment: settings_ref.get_input_horizontal_alignment(),
-            display_text: settings_ref.get_display_text(),
-            display_text_color: settings_ref.get_display_text_color(),
-            display_text_font_size: settings_ref.get_display_text_font_size(),
-            display_text_font: settings_ref.get_display_text_font(),
-            display_text_x_position: settings_ref.get_display_text_x_position(),
-            display_text_y_position: settings_ref.get_display_text_y_position(),
-            display_text_vertical_alignment: settings_ref.get_display_text_vertical_alignment(),
-            display_text_horizontal_alignment: settings_ref.get_display_text_horizontal_alignment(),
+            hide_cursor: lockscreen_provider_ref.get_hide_cursor(),
+            grace: lockscreen_provider_ref.get_grace(),
+            fall_timeout: lockscreen_provider_ref.get_fall_timeout(),
+            lockscreen_wallpaper: lockscreen_provider_ref.get_lockscreen_wallpaper(),
+            blur_size: lockscreen_provider_ref.get_lockscreen_blur_size(),
+            blur_passes: lockscreen_provider_ref.get_lockscreen_blur_passes(),
+            noise: lockscreen_provider_ref.get_noise(),
+            contrast: lockscreen_provider_ref.get_contrast(),
+            brightness: lockscreen_provider_ref.get_brightness(),
+            vibrancy: lockscreen_provider_ref.get_vibrancy(),
+            input_width: lockscreen_provider_ref.get_input_width(),
+            input_height: lockscreen_provider_ref.get_input_height(),
+            input_outline_thickness: lockscreen_provider_ref.get_input_outline_thickness(),
+            input_dots_size: lockscreen_provider_ref.get_input_dots_size(),
+            input_dots_spacing: lockscreen_provider_ref.get_input_dots_spacing(),
+            input_dots_center: lockscreen_provider_ref.get_input_dots_center(),
+            input_outer_color: lockscreen_provider_ref.get_input_outer_color(),
+            input_inner_color: lockscreen_provider_ref.get_input_inner_color(),
+            input_font_color: lockscreen_provider_ref.get_input_font_color(),
+            input_placeholder_text: lockscreen_provider_ref.get_input_placeholder_text(),
+            hide_input: lockscreen_provider_ref.get_hide_input(),
+            input_x_position: lockscreen_provider_ref.get_input_x_position(),
+            input_y_position: lockscreen_provider_ref.get_input_y_position(),
+            input_vertical_alignment: lockscreen_provider_ref.get_input_vertical_alignment(),
+            input_horizontal_alignment: lockscreen_provider_ref.get_input_horizontal_alignment(),
+            display_text: lockscreen_provider_ref.get_display_text(),
+            display_text_color: lockscreen_provider_ref.get_display_text_color(),
+            display_text_font_size: lockscreen_provider_ref.get_display_text_font_size(),
+            display_text_font: lockscreen_provider_ref.get_display_text_font(),
+            display_text_x_position: lockscreen_provider_ref.get_display_text_x_position(),
+            display_text_y_position: lockscreen_provider_ref.get_display_text_y_position(),
+            display_text_vertical_alignment: lockscreen_provider_ref.get_display_text_vertical_alignment(),
+            display_text_horizontal_alignment: lockscreen_provider_ref.get_display_text_horizontal_alignment(),
         }
     }
 }

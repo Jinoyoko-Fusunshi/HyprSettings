@@ -73,13 +73,13 @@ impl StateSavableControl for StartupProgramField {
         let program_name = state_mut.program_name.clone();
         let program_path = state_mut.program_path.clone();
 
-        let settings_provider = application_provider.get_settings_provider();
-        let mut settings_provider_mut = settings_provider.borrow_mut();
-        settings_provider_mut.remove_program(previous_program_name.clone());
-        settings_provider_mut.add_program(program_name.clone(), program_path.clone());
+        let program_provider = application_provider.get_program_provider();
+        let mut program_provider_mut = program_provider.borrow_mut();
+        program_provider_mut.remove_program(previous_program_name.clone());
+        program_provider_mut.add_program(program_name.clone(), program_path.clone());
 
-        settings_provider_mut.remove_startup_program(program_name.clone());
-        settings_provider_mut.add_startup_program(program_name.clone(), program_path.clone());
+        program_provider_mut.remove_startup_program(program_name.clone());
+        program_provider_mut.add_startup_program(program_name.clone(), program_path.clone());
         state_mut.previous_program_name = program_name.clone();
     }
 
@@ -87,10 +87,10 @@ impl StateSavableControl for StartupProgramField {
         let state_ref = self.state.borrow();
         let program_name = state_ref.program_name.clone();
 
-        let settings_provider = application_provider.get_settings_provider();
-        let mut settings_provider_mut = settings_provider.borrow_mut();
-        settings_provider_mut.remove_program(program_name.clone());
-        settings_provider_mut.remove_startup_program(program_name.clone());
+        let program_provider = application_provider.get_program_provider();
+        let mut program_provider_mut = program_provider.borrow_mut();
+        program_provider_mut.remove_program(program_name.clone());
+        program_provider_mut.remove_startup_program(program_name.clone());
     }
 }
 
@@ -163,10 +163,10 @@ impl StartupProgramField {
     }
 
     pub fn set_program_fields(&self, selected_program: Option<String>) {
-        let settings_provider = self.application_provider.get_settings_provider();
+        let program_provider = self.application_provider.get_program_provider();
 
         let program_name = match selected_program.clone() {
-            Some(program) => match settings_provider.borrow().get_program(program.as_str()) {
+            Some(program) => match program_provider.borrow().get_program(program.as_str()) {
                 Some(_) => program,
                 None => "".to_string(),
             }
@@ -174,7 +174,7 @@ impl StartupProgramField {
         };
 
         let command = match selected_program.clone() {
-            Some(program) => settings_provider.borrow()
+            Some(program) => program_provider.borrow()
                 .get_program(program.as_str())
                 .unwrap_or_else(|| "".to_string()),
             None => "".to_string(),

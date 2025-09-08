@@ -43,7 +43,7 @@ impl OverviewSettings {
             .build()
             .expect("Failed to create hyprland modules section box");
 
-        let module_provider = application_provider.get_module_provider();
+        let module_provider = application_provider.get_program_provider();
         let hyprland_modules = module_provider.borrow().get_hyprland_modules();
 
         for module in hyprland_modules {
@@ -61,7 +61,7 @@ impl OverviewSettings {
             .build()
             .expect("Failed to create dependant modules section box");
 
-        let module_provider = application_provider.get_module_provider();
+        let module_provider = application_provider.get_program_provider();
         let dependency_modules = module_provider.borrow().get_dependency_modules();
 
         for module in dependency_modules {

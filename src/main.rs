@@ -1,9 +1,10 @@
 pub mod ui;
 pub mod providers;
 pub mod models;
+pub mod utils;
 
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, STYLE_PROVIDER_PRIORITY_USER};
+use gtk::{Application, ApplicationWindow, CssProvider, STYLE_PROVIDER_PRIORITY_USER};
 use gtk::gdk::Display;
 use gtk::gio::File;
 use crate::ui::controls::Control;
@@ -35,7 +36,7 @@ fn application_activation_setup(application: &Application) {
 }
 
 fn load_css_styles() {
-    let provider = gtk::CssProvider::new();
+    let provider = CssProvider::new();
     let css_file = File::for_path("res/style.css");
     provider.load_from_file(&css_file);
 

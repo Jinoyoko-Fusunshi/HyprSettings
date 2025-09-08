@@ -136,10 +136,10 @@ impl LockScreenSettings {
         hide_cursor_selection_box.update_state(state.clone());
         hide_cursor_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_cursor_selection_change = move |combobox: &ComboBoxText| {
             let bool_value = SelectionBox::parse_selection_as_bool(combobox.active_text());
-            settings_provider.borrow_mut().set_hide_cursor(bool_value);
+            lockscreen_provider.borrow_mut().set_hide_cursor(bool_value);
         };
         hide_cursor_selection_box.set_selection_change(hide_cursor_selection_change);
 
@@ -161,9 +161,9 @@ impl LockScreenSettings {
         };
         grace_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_grace(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_grace(spin_button.value() as f32);
         };
         grace_spin_button.set_value_change(fall_timeout_change);
 
@@ -185,9 +185,9 @@ impl LockScreenSettings {
         };
         fall_timeout.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let fall_timeout_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_fall_timeout(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_fall_timeout(spin_button.value() as u32);
         };
         fall_timeout.set_value_change(fall_timeout_change);
 
@@ -213,9 +213,9 @@ impl LockScreenSettings {
         };
         lockscreen_wallpaper_input_field.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let lockscreen_wallpaper_input_field_change = move |entry: &Entry| {
-            settings_provider.borrow_mut().set_lockscreen_wallpaper(entry.text().to_string());
+            lockscreen_provider.borrow_mut().set_lockscreen_wallpaper(entry.text().to_string());
         };
         lockscreen_wallpaper_input_field.set_input_callback(lockscreen_wallpaper_input_field_change);
 
@@ -237,9 +237,9 @@ impl LockScreenSettings {
         };
         blur_size_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let blur_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_lockscreen_blur_size(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_lockscreen_blur_size(spin_button.value() as u32);
         };
         blur_size_spin_button.set_value_change(blur_size_spin_button_change);
 
@@ -261,9 +261,9 @@ impl LockScreenSettings {
         };
         blur_passes_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let blur_passes_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_lockscreen_blur_passes(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_lockscreen_blur_passes(spin_button.value() as u32);
         };
         blur_passes_spin_button.set_value_change(blur_passes_spin_button_change);
 
@@ -285,9 +285,9 @@ impl LockScreenSettings {
         };
         noise_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let noise_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_noise(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_noise(spin_button.value() as f32);
         };
         noise_spin_button.set_value_change(noise_spin_button_change);
 
@@ -309,9 +309,9 @@ impl LockScreenSettings {
         };
         contrast_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let contrast_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_contrast(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_contrast(spin_button.value() as f32);
         };
         contrast_spin_button.set_value_change(contrast_spin_button_change);
 
@@ -333,15 +333,15 @@ impl LockScreenSettings {
         };
         brightness_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_brightness(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_brightness(spin_button.value() as f32);
         };
         brightness_spin_button.set_value_change(brightness_spin_button_change);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let brightness_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_brightness(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_brightness(spin_button.value() as f32);
         };
         brightness_spin_button.set_value_change(brightness_spin_button_change);
 
@@ -363,9 +363,9 @@ impl LockScreenSettings {
         };
         vibrancy_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let vibrancy_spin_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_vibrancy(spin_button.value() as f32);
+            lockscreen_provider.borrow_mut().set_vibrancy(spin_button.value() as f32);
         };
         vibrancy_spin_button.set_value_change(vibrancy_spin_change);
 
@@ -403,9 +403,9 @@ impl LockScreenSettings {
         };
         input_width_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_width_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_width(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_width(spin_button.value() as u32);
         };
         input_width_spin_button.set_value_change(input_width_spin_button_change);
 
@@ -427,9 +427,9 @@ impl LockScreenSettings {
         };
         input_height_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_height_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_height(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_height(spin_button.value() as u32);
         };
         input_height_spin_button.set_value_change(input_height_spin_button_change);
 
@@ -451,9 +451,9 @@ impl LockScreenSettings {
         };
         input_outline_thickness_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_outline_thickness_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_outline_thickness(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_outline_thickness(spin_button.value() as u32);
         };
         input_outline_thickness_spin_button.set_value_change(input_outline_thickness_spin_button_change);
 
@@ -475,9 +475,9 @@ impl LockScreenSettings {
         };
         input_dots_size_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_size_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_dots_size(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_dots_size(spin_button.value() as u32);
         };
         input_dots_size_spin_button.set_value_change(input_dots_size_spin_button_change);
 
@@ -499,9 +499,9 @@ impl LockScreenSettings {
         };
         input_dots_spacing_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_spacing_spin_button_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_dots_spacing(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_dots_spacing(spin_button.value() as u32);
         };
         input_dots_spacing_spin_button.set_value_change(input_dots_spacing_spin_button_change);
 
@@ -517,10 +517,10 @@ impl LockScreenSettings {
         input_dots_center_selection_box.update_state(state.clone());
         input_dots_center_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_center_selection_box_change = move |combo_box_text: &ComboBoxText| {
             let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
-            settings_provider.borrow_mut().set_input_dots_center(bool_value);
+            lockscreen_provider.borrow_mut().set_input_dots_center(bool_value);
         };
         input_dots_center_selection_box.set_selection_change(input_dots_center_selection_box_change);
 
@@ -534,9 +534,9 @@ impl LockScreenSettings {
         };
         outer_color_selector.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let outer_color_selector_change = move |color_button: &ColorButton| {
-            settings_provider.borrow_mut().set_input_outer_color(RGBAColor::new(color_button.rgba()))
+            lockscreen_provider.borrow_mut().set_input_outer_color(RGBAColor::new(color_button.rgba()))
         };
         outer_color_selector.set_color_change(outer_color_selector_change);
 
@@ -550,9 +550,9 @@ impl LockScreenSettings {
         };
         inner_color_selector.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let inner_color_selector_change = move |color_button: &ColorButton| {
-            settings_provider.borrow_mut().set_input_inner_color(RGBAColor::new(color_button.rgba()))
+            lockscreen_provider.borrow_mut().set_input_inner_color(RGBAColor::new(color_button.rgba()))
         };
         inner_color_selector.set_color_change(inner_color_selector_change);
 
@@ -566,9 +566,9 @@ impl LockScreenSettings {
         };
         font_color_selector.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let font_color_selector_change = move |color_button: &ColorButton| {
-            settings_provider.borrow_mut().set_input_font_color(RGBAColor::new(color_button.rgba()))
+            lockscreen_provider.borrow_mut().set_input_font_color(RGBAColor::new(color_button.rgba()))
         };
         font_color_selector.set_color_change(font_color_selector_change);
 
@@ -582,9 +582,9 @@ impl LockScreenSettings {
         };
         input_placeholder_text_input_field.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_placeholder_text_change = move |entry: &Entry| {
-            settings_provider.borrow_mut().set_input_placeholder_text(entry.text().to_string());
+            lockscreen_provider.borrow_mut().set_input_placeholder_text(entry.text().to_string());
         };
         input_placeholder_text_input_field.set_input_callback(input_placeholder_text_change);
 
@@ -600,10 +600,10 @@ impl LockScreenSettings {
         hide_input_selection_box.update_state(state.clone());
         hide_input_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_input_selection_box_change = move |combo_box_text: &ComboBoxText| {
             let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
-            settings_provider.borrow_mut().set_hide_input(bool_value);
+            lockscreen_provider.borrow_mut().set_hide_input(bool_value);
         };
         hide_input_selection_box.set_selection_change(hide_input_selection_box_change);
 
@@ -625,9 +625,9 @@ impl LockScreenSettings {
         };
         input_x_position.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_x_position_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_x_position(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_x_position(spin_button.value() as u32);
         };
         input_x_position.set_value_change(input_x_position_change);
 
@@ -649,9 +649,9 @@ impl LockScreenSettings {
         };
         input_y_position.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_y_position_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_input_y_position(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_input_y_position(spin_button.value() as u32);
         };
         input_y_position.set_value_change(input_y_position_change);
 
@@ -667,9 +667,9 @@ impl LockScreenSettings {
         vertical_align_selection_box.update_state(state.clone());
         vertical_align_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let vertical_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            settings_provider.borrow_mut().set_input_vertical_alignment(combo_box_text.active_text().unwrap().to_string());
+            lockscreen_provider.borrow_mut().set_input_vertical_alignment(combo_box_text.active_text().unwrap().to_string());
         };
         vertical_align_selection_box.set_selection_change(vertical_align_selection_box_change);
 
@@ -685,9 +685,9 @@ impl LockScreenSettings {
         horizontal_align_selection_box.update_state(state.clone());
         horizontal_align_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let horizontal_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            settings_provider.borrow_mut().set_input_horizontal_alignment(combo_box_text.active_text().unwrap().to_string());
+            lockscreen_provider.borrow_mut().set_input_horizontal_alignment(combo_box_text.active_text().unwrap().to_string());
         };
         horizontal_align_selection_box.set_selection_change(horizontal_align_selection_box_change);
 
@@ -725,9 +725,9 @@ impl LockScreenSettings {
         };
         display_text_input_field.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let display_text_input_field_change = move |entry: &Entry| {
-            settings_provider.borrow_mut().set_display_text(entry.text().to_string());
+            lockscreen_provider.borrow_mut().set_display_text(entry.text().to_string());
         };
         display_text_input_field.set_input_callback(display_text_input_field_change);
 
@@ -741,9 +741,9 @@ impl LockScreenSettings {
         };
         text_color_picker.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_color_picker_change = move |color_button: &ColorButton| {
-            settings_provider.borrow_mut().set_display_text_color(RGBAColor::new(color_button.rgba()))
+            lockscreen_provider.borrow_mut().set_display_text_color(RGBAColor::new(color_button.rgba()))
         };
         text_color_picker.set_color_change(text_color_picker_change);
 
@@ -765,9 +765,9 @@ impl LockScreenSettings {
         };
         text_font_size_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_font_size_spin_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_display_text_font_size(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_display_text_font_size(spin_button.value() as u32);
         };
         text_font_size_spin_button.set_value_change(text_font_size_spin_change);
 
@@ -781,9 +781,9 @@ impl LockScreenSettings {
         };
         text_font.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_font_change = move |entry: &Entry| {
-            settings_provider.borrow_mut().set_display_text_font(entry.text().to_string());
+            lockscreen_provider.borrow_mut().set_display_text_font(entry.text().to_string());
         } ;
         text_font.set_input_callback(text_font_change);
 
@@ -805,9 +805,9 @@ impl LockScreenSettings {
         };
         text_x_position_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_x_position_spin_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_display_text_x_position(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_display_text_x_position(spin_button.value() as u32);
         };
         text_x_position_spin_button.set_value_change(text_x_position_spin_change);
 
@@ -829,9 +829,9 @@ impl LockScreenSettings {
         };
         text_y_position_spin_button.update_ui(state);
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_y_position_spin_change = move |spin_button: &gtk::SpinButton| {
-            settings_provider.borrow_mut().set_display_text_y_position(spin_button.value() as u32);
+            lockscreen_provider.borrow_mut().set_display_text_y_position(spin_button.value() as u32);
         };
         text_y_position_spin_button.set_value_change(text_y_position_spin_change);
 
@@ -847,9 +847,9 @@ impl LockScreenSettings {
         text_vertical_align_selection_box.update_state(state.clone());
         text_vertical_align_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_vertical_align_selection_box_change = move |combobox: &ComboBoxText| {
-            settings_provider.borrow_mut().set_display_text_vertical_alignment(combobox.active_text().unwrap().to_string())
+            lockscreen_provider.borrow_mut().set_display_text_vertical_alignment(combobox.active_text().unwrap().to_string())
         };
         text_vertical_align_selection_box.set_selection_change(text_vertical_align_selection_box_change);
 
@@ -865,9 +865,9 @@ impl LockScreenSettings {
         text_horizontal_align_selection_box.update_state(state.clone());
         text_horizontal_align_selection_box.update_ui(state.clone());
 
-        let settings_provider = self.application_provider.get_settings_provider();
+        let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_horizontal_align_selection_box_change = move |combobox: &ComboBoxText| {
-            settings_provider.borrow_mut().set_display_text_horizontal_alignment(combobox.active_text().unwrap().to_string())
+            lockscreen_provider.borrow_mut().set_display_text_horizontal_alignment(combobox.active_text().unwrap().to_string())
         };
         text_horizontal_align_selection_box.set_selection_change(text_horizontal_align_selection_box_change);
 

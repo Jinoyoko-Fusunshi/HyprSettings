@@ -2,16 +2,27 @@ use std::collections::HashMap;
 use std::process::Command;
 use crate::models::modules::program_module::ProgramModule;
 use crate::models::modules::program_module_info::ProgramModuleInfo;
-use crate::models::modules::{ProgramModuleCategory, HYPRIDLE_MODULE, HYPRLAND_CORE_MODULE, HYPRLOCK_MODULE, HYPRPAPER_MODULE, HYPRPOLKIT_AGENT_MODULE, WAYLANDRANDR_MODULE};
+use crate::models::modules::{
+    ProgramModuleCategory, HYPRIDLE_MODULE, HYPRLAND_CORE_MODULE, HYPRLOCK_MODULE, HYPRPAPER_MODULE,
+    HYPRPOLKIT_AGENT_MODULE, WAYLANDRANDR_MODULE
+};
+use crate::models::settings::program_settings::ProgramSettings;
+
+pub const VIRTUAL_TERMINAL_ENTRY: &str = "VirtualTerminal";
+pub const FILE_MANAGER_ENTRY: &str = "FileManager";
+pub const QUICK_SEARCH_ENTRY: &str = "QuickSearch";
+pub const NOTIFICATION_HANDLER_ENTRY: &str = "NotificationHandler";
 
 pub struct ModuleProvider {
     program_modules: HashMap<String, ProgramModule>,
+    settings: ProgramSettings
 }
 
 impl ModuleProvider {
-    pub fn new() -> Self {
+    pub fn new(settings: ProgramSettings) -> Self {
         Self {
             program_modules: HashMap::new(),
+            settings
         }
     }
 
@@ -75,6 +86,54 @@ impl ModuleProvider {
             .map(|(_, module)| module.clone())
             .into_iter()
             .collect::<Vec<ProgramModule>>()
+    }
+
+    pub fn add_program(&mut self, program: String, path: String) {
+        self.settings.programs.insert(program, path);
+    }
+
+    pub fn set_program_path(&mut self, program: String, path: String) {
+        if path.is_empty() {
+            self.settings.programs.remove(&program);
+            return;
+        }
+
+        self.settings.programs.insert(program, path);
+    }
+
+    pub fn get_program_path(&self, program: String) -> Option<String> {
+        let program_path = self.settings.programs.get(&program);
+        program_path.cloned()
+    }
+
+    pub fn remove_program(&mut self, program: String) {
+        self.settings.programs.remove(&program);
+    }
+
+    pub fn get_program(&self, program: &str) -> Option<String> {
+        self.settings.programs.get(program).cloned()
+    }
+
+    pub fn get_program_names(&self) -> Vec<String> {
+        self.settings.programs.iter()
+            .map(|(program_name, _)| program_name.to_string())
+            .collect()
+    }
+
+    pub fn add_startup_program(&mut self, program: String, path: String) {
+        self.settings.startup_programs.insert(program, path);
+    }
+
+    pub fn remove_startup_program(&mut self, program: String) {
+        self.settings.startup_programs.remove(&program);
+    }
+
+    pub fn get_startup_programs(&self) -> HashMap<String, String> {
+        self.settings.startup_programs.clone()
+    }
+
+    pub fn get_settings(&self) -> ProgramSettings {
+        self.settings.clone()
     }
 
     fn load_modules(&mut self,  module_infos: &Vec<ProgramModuleInfo>) {

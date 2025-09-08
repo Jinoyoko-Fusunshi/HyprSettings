@@ -62,12 +62,12 @@ impl StartupProgramsSettings {
     }
 
     pub fn init_ui(&self, application_provider: ApplicationProvider) {
-        let settings_provider = application_provider.get_settings_provider();
+        let program_provider = application_provider.get_program_provider();
 
         let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut settings_provider.borrow().get_program_names());
+        programs.append(&mut program_provider.borrow().get_program_names());
 
-        for (program_name, program_path) in settings_provider.borrow().get_startup_programs() {
+        for (program_name, program_path) in program_provider.borrow().get_startup_programs() {
             let startup_program_field = Self::create_editable_startup_program_field(
                 application_provider.clone(), self.startup_program_entries_box.clone(),  program_name,
                 program_path, programs.clone(), EditMode::Locked
@@ -77,10 +77,10 @@ impl StartupProgramsSettings {
     }
 
     pub fn init_events(&self, application_provider: ApplicationProvider) {
-        let settings_provider = application_provider.get_settings_provider();
+        let program_provider = application_provider.get_program_provider();
 
         let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut settings_provider.borrow().get_program_names());
+        programs.append(&mut program_provider.borrow().get_program_names());
 
         let startup_program_entries_box = self.startup_program_entries_box.clone();
         let create_startup_program_button_click = move |_ :&Button| {

@@ -1,11 +1,12 @@
 use std::collections::HashMap;
-use gtk::{Label, Orientation, Separator, SpinButton, Switch};
+use gtk::{Orientation, Separator, SpinButton, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::ui::boxes::Boxes;
 use crate::ui::controls::Control;
 use crate::ui::controls::display_field::DisplayField;
+use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_control::UpdatableControl;
@@ -39,17 +40,16 @@ impl UpdatableControl<DisplaySettingsState> for DisplaySettings {
 
 impl DisplaySettings {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let display_box = gtk::Box::new(Orientation::Vertical, 10);
+        let display_box = SectionBoxBuilder::new()
+            .create_header_elements("Available displays")
+            .build().expect("Failed to create display settings section box");
+
         display_box.set_margin_top(10);
         display_box.set_margin_bottom(10);
         display_box.set_margin_start(10);
         display_box.set_margin_end(10);
 
-        let available_displays_label = Label::new(Some("Available displays"));
         let display_fields_box = gtk::Box::new(Orientation::Vertical, 10);
-
-        display_box.append(&available_displays_label);
-        display_box.append(&Separator::new(Orientation::Horizontal));
         display_box.append(&display_fields_box);
 
         Self {
@@ -76,33 +76,33 @@ impl DisplaySettings {
             };
             display_field.update_ui(display_field_state);
 
-            let settings_provider = self.application_provider.get_settings_provider();
+            let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
             let spin_button_active_change = move |_: &Switch, state: bool| -> Propagation {
-                settings_provider.borrow_mut().set_monitor_state(port_clone.clone(), state);
+                display_provider.borrow_mut().set_monitor_state(port_clone.clone(), state);
 
                 Propagation::Proceed
             };
             display_field.set_active_change(spin_button_active_change);
 
-            let settings_provider = self.application_provider.get_settings_provider();
+            let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
             let spin_button_width_change = move |spin_button: &SpinButton| {
-                settings_provider.borrow_mut().set_monitor_width(port_clone.clone(), spin_button.value() as u32);
+                display_provider.borrow_mut().set_monitor_width(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_width_change(spin_button_width_change);
 
-            let settings_provider = self.application_provider.get_settings_provider();
+            let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
             let spin_button_height_change = move |spin_button: &SpinButton| {
-                settings_provider.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
+                display_provider.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_height_change(spin_button_height_change);
 
-            let settings_provider = self.application_provider.get_settings_provider();
+            let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();
             let spin_button_refresh_rate_change = move |spin_button: &SpinButton| {
-                settings_provider.borrow_mut().set_monitor_refresh_rate(port_clone.clone(), spin_button.value() as u32);
+                display_provider.borrow_mut().set_monitor_refresh_rate(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.set_refresh_rate_change(spin_button_refresh_rate_change);
 

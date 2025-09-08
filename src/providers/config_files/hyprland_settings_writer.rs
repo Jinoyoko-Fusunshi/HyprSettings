@@ -3,10 +3,11 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
-use crate::providers::hyprland_settings_provider::config_files::settings_writer::SettingsWriter;
-use crate::providers::hyprland_settings_provider::hyprland_settings::{
-    HyprlandSettings, FILE_MANAGER_ENTRY, LOCK_SCREEN_ENTRY, NOTIFICATION_HANDLER_ENTRY,
-    QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
+use crate::providers::config_files::settings_writer::SettingsWriter;
+use crate::models::settings::hyprland_settings::HyprlandSettings;
+use crate::models::settings::keybind_settings::KeyBindSettings;
+use crate::providers::module_provider::{
+    FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
 
 const COMMENT_CHARACTER: char = '#';
@@ -57,16 +58,15 @@ impl HyprlandSettingsWriter {
 
     fn index_program_variables(&mut self, settings: &HyprlandSettings) {
         let default_value = "".to_string();
-        let terminal_value = settings.programs.get(VIRTUAL_TERMINAL_ENTRY).unwrap_or(&default_value);
-        let file_manager_value = settings.programs.get(FILE_MANAGER_ENTRY).unwrap_or(&default_value);
-        let quick_search_value = settings.programs.get(QUICK_SEARCH_ENTRY).unwrap_or(&default_value);
-        let lockscreen_value = settings.programs.get(LOCK_SCREEN_ENTRY).unwrap_or(&default_value);
-        let notifications_value = settings.programs.get(NOTIFICATION_HANDLER_ENTRY).unwrap_or(&default_value);
+        let program_settings = &settings.program_settings.programs;
+        let terminal_value = program_settings.get(VIRTUAL_TERMINAL_ENTRY).unwrap_or(&default_value);
+        let file_manager_value = program_settings.get(FILE_MANAGER_ENTRY).unwrap_or(&default_value);
+        let quick_search_value = program_settings.get(QUICK_SEARCH_ENTRY).unwrap_or(&default_value);
+        let notifications_value = program_settings.get(NOTIFICATION_HANDLER_ENTRY).unwrap_or(&default_value);
 
         self.program_variables.insert(VIRTUAL_TERMINAL_ENTRY.to_string(), ("$terminal".to_string(), terminal_value.clone()));
         self.program_variables.insert(FILE_MANAGER_ENTRY.to_string(), ("$fileManager".to_string(), file_manager_value.clone()));
         self.program_variables.insert(QUICK_SEARCH_ENTRY.to_string(), ("$quickSearch".to_string(), quick_search_value.clone()));
-        self.program_variables.insert(LOCK_SCREEN_ENTRY.to_string(), ("$lockscreen".to_string(), lockscreen_value.clone()));
         self.program_variables.insert(NOTIFICATION_HANDLER_ENTRY.to_string(), ("$notifications".to_string(), notifications_value.clone()));
     }
 
@@ -84,7 +84,8 @@ impl HyprlandSettingsWriter {
     fn serialize_startup_settings(&mut self, settings: &HyprlandSettings) {
         self.add_comment_section("AUTOSTART".to_string());
 
-        for (program_name, program_command) in settings.startup_programs.clone() {
+        let startup_programs = settings.program_settings.startup_programs.clone();
+        for (program_name, program_command) in startup_programs {
             let execution_command = if let Some(program_pair) = self.program_variables.get(&program_name) {
                 let (program_variable, _) = program_pair;
                 program_variable.clone()
@@ -100,7 +101,8 @@ impl HyprlandSettingsWriter {
     fn serialize_monitor_settings(&mut self, settings: &HyprlandSettings) {
         self.add_comment_section("MONITORS".to_string());
 
-        for (monitor_port, monitor_configuration) in settings.monitor_configurations.clone() {
+        let display_settings = settings.display_settings.monitor_configurations.clone();
+        for (monitor_port, monitor_configuration) in display_settings {
             let video_mode = monitor_configuration.video_mode;
             let display_entry = format!(
                 "monitor={},{}x{}@{},{}x{},1",
@@ -135,62 +137,124 @@ impl HyprlandSettingsWriter {
     }
 
     fn serialize_keybinds_settings(&mut self, settings: &HyprlandSettings) {
+        let keybinds_settings = &settings.keybind_settings;
+
         self.add_comment_section("KEYBINDINGS".to_string());
-        self.create_program_keybind_section(settings, VIRTUAL_TERMINAL_ENTRY, SystemKeybind::Terminal);
-        self.create_program_keybind_section(settings, FILE_MANAGER_ENTRY, SystemKeybind::FileManager);
-        self.create_program_keybind_section(settings, QUICK_SEARCH_ENTRY, SystemKeybind::RunProgram);
-        self.create_program_keybind_section(settings, LOCK_SCREEN_ENTRY, SystemKeybind::LockScreen);
+        self.create_program_keybind_section(
+            keybinds_settings, VIRTUAL_TERMINAL_ENTRY, SystemKeybind::Terminal);
+        self.create_program_keybind_section(
+            keybinds_settings, FILE_MANAGER_ENTRY, SystemKeybind::FileManager);
+        self.create_program_keybind_section(
+            keybinds_settings, QUICK_SEARCH_ENTRY, SystemKeybind::RunProgram);
         self.add_new_line();
 
-        self.create_action_keybind_section(settings, SystemKeybind::CloseWindow, vec!["killactive"]);
-        self.create_action_keybind_section(settings, SystemKeybind::ExitHyprland, vec!["exit"]);
-        self.create_action_keybind_section(settings, SystemKeybind::ToggleFloatingWindow, vec!["togglefloating"]);
-        self.create_action_keybind_section(settings, SystemKeybind::Pseudo, vec!["pseudo"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SplitWindow, vec!["togglesplit"]);
-        self.create_action_keybind_section(settings, SystemKeybind::FocusLeftWindow, vec!["movefocus", "l"]);
-        self.create_action_keybind_section(settings, SystemKeybind::FocusRightWindow, vec!["movefocus", "r"]);
-        self.create_action_keybind_section(settings, SystemKeybind::FocusTopWindow, vec!["movefocus", "u"]);
-        self.create_action_keybind_section(settings, SystemKeybind::FocusBottomWindow, vec!["movefocus", "d"]);
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::CloseWindow, vec!["killactive"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::ExitHyprland, vec!["exit"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::ToggleFloatingWindow, vec!["togglefloating"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::Pseudo, vec!["pseudo"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SplitWindow, vec!["togglesplit"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::FocusLeftWindow, vec!["movefocus", "l"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::FocusRightWindow, vec!["movefocus", "r"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::FocusTopWindow, vec!["movefocus", "u"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::FocusBottomWindow, vec!["movefocus", "d"]
+        );
         self.add_new_line();
 
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceOne, vec!["workspace", "1"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceTwo, vec!["workspace", "2"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceThree, vec!["workspace", "3"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceFour, vec!["workspace", "4"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceFive, vec!["workspace", "5"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceSix, vec!["workspace", "6"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceSeven, vec!["workspace", "7"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceEight, vec!["workspace", "8"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceNine, vec!["workspace", "9"]);
-        self.create_action_keybind_section(settings, SystemKeybind::SwitchWorkspaceZero, vec!["workspace", "0"]);
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceOne, vec!["workspace", "1"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceTwo, vec!["workspace", "2"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceThree, vec!["workspace", "3"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceFour, vec!["workspace", "4"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceFive, vec!["workspace", "5"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceSix, vec!["workspace", "6"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceSeven, vec!["workspace", "7"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceEight, vec!["workspace", "8"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceNine, vec!["workspace", "9"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::SwitchWorkspaceZero, vec!["workspace", "0"]
+        );
         self.add_new_line();
 
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceOne, vec!["movetoworkspace", "1"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceTwo, vec!["movetoworkspace", "2"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceThree, vec!["movetoworkspace", "3"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceFour, vec!["movetoworkspace", "4"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceFive, vec!["movetoworkspace", "5"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceSix, vec!["movetoworkspace", "6"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceSeven, vec!["movetoworkspace", "7"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceEight, vec!["movetoworkspace", "8"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceNine, vec!["movetoworkspace", "9"]);
-        self.create_action_keybind_section(settings, SystemKeybind::MoveWorkspaceZero, vec!["movetoworkspace", "0"]);
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceOne, vec!["movetoworkspace", "1"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceTwo, vec!["movetoworkspace", "2"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceThree, vec!["movetoworkspace", "3"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceFour, vec!["movetoworkspace", "4"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceFive, vec!["movetoworkspace", "5"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceSix, vec!["movetoworkspace", "6"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceSeven, vec!["movetoworkspace", "7"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceEight, vec!["movetoworkspace", "8"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceNine, vec!["movetoworkspace", "9"]
+        );
+        self.create_action_keybind_section(
+            keybinds_settings, SystemKeybind::MoveWorkspaceZero, vec!["movetoworkspace", "0"]
+        );
     }
 
-    fn create_program_keybind_section(&mut self, settings: &HyprlandSettings, program_name: &str, system_keybind: SystemKeybind) {
-        let program_keybind = settings.key_bind_settings.get_keybind(system_keybind);
+    fn create_program_keybind_section(&mut self, settings: &KeyBindSettings, program_name: &str, system_keybind: SystemKeybind) {
+        let program_keybind = settings.program_keybinds.get(&system_keybind);
         if let Some(keybind) = program_keybind {
             let program_pair = self.program_variables.get(program_name);
             if let Some((program_variable, _)) = program_pair {
                 let arguments = vec!["exec", program_variable.as_str()];
-                self.add_line_entry(Self::create_keybind_entry(keybind, arguments));
+                self.add_line_entry(Self::create_keybind_entry(keybind.clone(), arguments));
             }
         }
     }
 
-    fn create_action_keybind_section(&mut self, settings: &HyprlandSettings, system_keybind: SystemKeybind, arguments: Vec<&str>) {
-        if let Some(keybind) = settings.key_bind_settings.get_keybind(system_keybind) {
-            self.add_line_entry(Self::create_keybind_entry(keybind, arguments));
+    fn create_action_keybind_section(&mut self, settings: &KeyBindSettings, system_keybind: SystemKeybind, arguments: Vec<&str>) {
+        if let Some(keybind) = settings.program_keybinds.get(&system_keybind) {
+            self.add_line_entry(Self::create_keybind_entry(keybind.clone(), arguments));
         }
     }
 

@@ -279,16 +279,16 @@ impl KeyBindsSettings {
         add_custom_key_bind_entry_button.connect_clicked(create_custom_keybind_entry_button_callback);
 
         let custom_key_bind_entries_box_clone = custom_keybind_entries_box.clone();
-        Self::create_custom_keybinds_from_settings(application_provider.clone(), &custom_key_bind_entries_box_clone);
+        Self::create_custom_keybinds_from_settings(application_provider, &custom_key_bind_entries_box_clone);
         custom_keybinds_section_box.append(&custom_key_bind_entries_box_clone);
         custom_keybinds_section_box.append(&add_custom_key_bind_entry_button);
         custom_keybinds_section_box
     }
 
     fn create_custom_keybinds_from_settings(
-        application_manager: ApplicationProvider, custom_keybind_entries_box: &gtk::Box
+        application_manager: &ApplicationProvider, custom_keybind_entries_box: &gtk::Box
     ) {
-        let settings_provider = application_manager.get_settings_provider();
+        let settings_provider = application_manager.get_keybinds_provider();
         let custom_keybinds = settings_provider.borrow().get_custom_keybinds();
 
         for (keybind_name, keybind) in custom_keybinds {
@@ -357,8 +357,10 @@ impl KeyBindsSettings {
             application_provider.clone(), system_keybind.clone()
         );
 
-        let settings_provider = application_provider.get_settings_provider();
-        let program_keybind = settings_provider.borrow().get_keybind(system_keybind.clone());
+        let keybind_provider = application_provider.get_keybinds_provider();
+        let program_keybind = keybind_provider.borrow()
+            .get_keybind(system_keybind.clone());
+
         let mut keybind_iput_field = KeybindInputField::new();
         let state = KeybindInputFieldState {
             input_text: entry_field_name,
@@ -373,9 +375,10 @@ impl KeyBindsSettings {
         application_provider: ApplicationProvider,
         system_keybind: SystemKeybind
     ) -> impl Fn(KeyBindConfiguration) {
-        let settings_provider = application_provider.get_settings_provider();
+        let keybind_provider = application_provider.get_keybinds_provider();
         let input_field_change = move |keybind_configuration: KeyBindConfiguration| {
-            settings_provider.borrow_mut().set_keybind(system_keybind.clone(), keybind_configuration.clone());
+            keybind_provider.borrow_mut()
+                .set_keybind(system_keybind.clone(), keybind_configuration.clone());
         };
         input_field_change
     }

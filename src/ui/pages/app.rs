@@ -62,12 +62,10 @@ impl App {
 
         let state = WallpaperPageState::from(&application_provider);
         let mut wallpaper_settings = Box::new(WallpaperSettings::new(application_provider.clone()));
-        //wallpaper_settings.update_state(state.clone());
         wallpaper_settings.update_ui(state.clone());
 
         let state = LockScreenPageState::from(&application_provider);
         let mut lockscreen_settings = Box::new(LockScreenSettings::new(application_provider.clone()));
-        //lockscreen_settings.update_state(state.clone());
         lockscreen_settings.update_ui(state.clone());
 
         let appearance_settings = Box::new(AppearanceSettings::new(application_provider.clone()));

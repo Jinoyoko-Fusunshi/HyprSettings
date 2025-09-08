@@ -69,12 +69,12 @@ impl WallpaperSettings {
     }
 
     fn create_wallpaper_sections(&self) {
-        let settings_provider = self.application_provider
-            .get_settings_provider();
-        let settings_provider_clone = settings_provider.clone();
+        let appearance_provider = self.application_provider
+            .get_appearance_provider();
+        let appearance_provider_clone = appearance_provider.clone();
         let wallpaper_path_input_change = {
             move |entry: &Entry| {
-                settings_provider_clone.borrow_mut().set_wallpaper_path(entry.text().to_string());
+                appearance_provider_clone.borrow_mut().set_wallpaper_path(entry.text().to_string());
             }
         };
 
@@ -82,7 +82,7 @@ impl WallpaperSettings {
         let state = InputFieldState {
             label_text: "wallpaper path:".to_string(),
             placeholder_text: "e.g. ~/Pictures/wallpaper.png".to_string(),
-            entry_text: Some(settings_provider.borrow().get_wallpaper_path()),
+            entry_text: Some(appearance_provider.borrow().get_wallpaper_path()),
         };
         wallpaper_path_input_field.update_ui(state);
         wallpaper_path_input_field.set_input_callback(wallpaper_path_input_change);

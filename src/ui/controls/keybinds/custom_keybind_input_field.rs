@@ -90,18 +90,18 @@ impl StatableControl<CustomKeybindInputFieldState> for CustomKeyBindInputField {
 
 impl StateSavableControl for CustomKeyBindInputField {
     fn save_settings(&self, application_provider: ApplicationProvider) {
-        let settings_provider = application_provider.get_settings_provider();
-        let mut settings_provider_mut = settings_provider.borrow_mut();
+        let keybinds_provider = application_provider.get_keybinds_provider();
+        let mut keybinds_provider_mut = keybinds_provider.borrow_mut();
         let mut state_mut = self.state.borrow_mut();
         if let Some(name) = state_mut.previous_shortcut_name.clone() {
-            settings_provider_mut.remove_custom_keybind(name)
+            keybinds_provider_mut.remove_custom_keybind(name)
         }
 
         if let Some(name) = state_mut.shortcut_name.clone() {
             if let Some(command) = state_mut.command.clone() {
                 if let Some(keybind) = state_mut.keybind.clone() {
                     let custom_keybind = CustomKeybind::new(command, keybind);
-                    settings_provider_mut.set_custom_keybind(state_mut.shortcut_name.clone(), Some(custom_keybind));
+                    keybinds_provider_mut.set_custom_keybind(state_mut.shortcut_name.clone(), Some(custom_keybind));
                     state_mut.previous_shortcut_name = Some(name);
                 }
             }
@@ -109,11 +109,11 @@ impl StateSavableControl for CustomKeyBindInputField {
     }
 
     fn remove_settings(&self, application_provider: ApplicationProvider) {
-        let settings_provider = application_provider.get_settings_provider();
-        let mut settings_provider_mut = settings_provider.borrow_mut();
+        let keybinds_provider = application_provider.get_keybinds_provider();
+        let mut keybinds_provider_mut = keybinds_provider.borrow_mut();
         let state_ref = self.state.borrow();
         if let Some(name) = state_ref.previous_shortcut_name.clone() {
-            settings_provider_mut.remove_custom_keybind(name)
+            keybinds_provider_mut.remove_custom_keybind(name)
         }
     }
 }
