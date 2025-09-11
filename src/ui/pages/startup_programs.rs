@@ -18,6 +18,7 @@ use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::new_rc_mut;
 
 pub struct StartupPrograms {
     startup_program_box: GTKBox,
@@ -64,7 +65,7 @@ impl StartupPrograms {
         let program_provider = application_provider.get_program_provider();
 
         let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut program_provider.borrow().get_program_names());
+        programs.append(&mut program_provider.borrow().get_program_and_module_names());
 
         for (program_name, program_path) in program_provider.borrow().get_startup_programs() {
             let startup_program_field = Self::create_editable_startup_program_field(
@@ -79,7 +80,7 @@ impl StartupPrograms {
         let program_provider = application_provider.get_program_provider();
 
         let mut programs = vec![CUSTOM_ITEM.to_string()];
-        programs.append(&mut program_provider.borrow().get_program_names());
+        programs.append(&mut program_provider.borrow().get_program_and_module_names());
 
         let startup_program_entries_box = self.startup_program_entries_box.clone();
         let create_startup_program_button_click = move |_ :&Button| {
@@ -109,7 +110,7 @@ impl StartupPrograms {
             programs,
         };
 
-        let startup_program_field = Rc::new(RefCell::new(StartupProgramField::new(application_provider.clone())));
+        let startup_program_field = new_rc_mut(StartupProgramField::new(application_provider.clone()));
         let startup_program_field_manager = StartupProgramFieldManager::new(startup_program_field.clone());
         startup_program_field.borrow_mut().update_state(state.clone());
         startup_program_field.borrow_mut().update_ui(state.clone());
@@ -124,7 +125,7 @@ impl StartupPrograms {
         editable_control_element.update_state(editable_control_element_state.clone());
         editable_control_element.update_ui(editable_control_element_state.clone());
 
-        let editable_control_element_rc = Rc::new(RefCell::new(editable_control_element));
+        let editable_control_element_rc = new_rc_mut(editable_control_element);
         let editable_control_element_manager = EditableControlElementManager::new(
             editable_control_element_rc.clone(), application_provider.clone()
         );

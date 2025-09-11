@@ -1,5 +1,5 @@
 use gtk::Entry;
-use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
+use gtk::prelude::{BoxExt, EditableExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY

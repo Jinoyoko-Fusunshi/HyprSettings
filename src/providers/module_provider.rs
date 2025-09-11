@@ -88,44 +88,60 @@ impl ModuleProvider {
             .collect::<Vec<ProgramModule>>()
     }
 
-    pub fn add_program(&mut self, program: String, path: String) {
-        self.settings.programs.insert(program, path);
+    pub fn add_program(&mut self, name: String, path: String) {
+        self.settings.programs.insert(name, path);
     }
 
-    pub fn set_program_path(&mut self, program: String, path: String) {
+    pub fn set_program_path(&mut self, name: String, path: String) {
         if path.is_empty() {
-            self.settings.programs.remove(&program);
+            self.settings.programs.remove(&name);
             return;
         }
 
-        self.settings.programs.insert(program, path);
+        self.settings.programs.insert(name, path);
     }
 
-    pub fn get_program_path(&self, program: String) -> Option<String> {
-        let program_path = self.settings.programs.get(&program);
+    pub fn get_program_path(&self, name: String) -> Option<String> {
+        let program_path = self.settings.programs.get(&name);
         program_path.cloned()
     }
 
-    pub fn remove_program(&mut self, program: String) {
-        self.settings.programs.remove(&program);
+    pub fn remove_program(&mut self, name: String) {
+        self.settings.programs.remove(&name);
     }
 
-    pub fn get_program(&self, program: &str) -> Option<String> {
-        self.settings.programs.get(program).cloned()
+    pub fn get_program_path_or_module(&self, program_module_name: String) -> Option<String> {
+        if let Some(path) = self.get_program_path(program_module_name.clone()) {
+            return Some(path.clone())
+        }
+
+        if let Some(module) = self.program_modules.get(&program_module_name) {
+            return Some(module.info.name.clone())
+        }
+
+        None
     }
 
-    pub fn get_program_names(&self) -> Vec<String> {
-        self.settings.programs.iter()
+    pub fn get_program_and_module_names(&self) -> Vec<String> {
+        let module_names: Vec<String> = self.program_modules.iter()
+            .map(|(name, _)| name.to_string())
+            .collect();
+
+        let mut program_names: Vec<String> = self.settings.programs.iter()
             .map(|(program_name, _)| program_name.to_string())
-            .collect()
+            .collect();
+
+        let mut program_module_names = module_names;
+        program_module_names.append(&mut program_names);
+        program_module_names
     }
 
-    pub fn add_startup_program(&mut self, program: String, path: String) {
-        self.settings.startup_programs.insert(program, path);
+    pub fn add_startup_program(&mut self, name: String, path: String) {
+        self.settings.startup_programs.insert(name, path);
     }
 
-    pub fn remove_startup_program(&mut self, program: String) {
-        self.settings.startup_programs.remove(&program);
+    pub fn remove_startup_program(&mut self, name: String) {
+        self.settings.startup_programs.remove(&name);
     }
 
     pub fn get_startup_programs(&self) -> HashMap<String, String> {
@@ -136,8 +152,8 @@ impl ModuleProvider {
         self.settings.clone()
     }
 
-    fn load_modules(&mut self,  module_infos: &Vec<ProgramModuleInfo>) {
-        for module_info in module_infos {
+    fn load_modules(&mut self,  infos: &Vec<ProgramModuleInfo>) {
+        for module_info in infos {
             let program_module = ModuleProvider::get_program_module(module_info.clone());
             self.program_modules.insert(module_info.name.clone(), program_module);
         }

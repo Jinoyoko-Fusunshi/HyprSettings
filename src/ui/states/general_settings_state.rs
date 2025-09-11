@@ -16,10 +16,10 @@ impl From<&ApplicationProvider> for GeneralSettingsState {
         let program_provider = value.get_program_provider();
         let program_provider_ref = program_provider.borrow();
 
-        let terminal_path = program_provider_ref.get_program(VIRTUAL_TERMINAL_ENTRY);
-        let file_manager_path = program_provider_ref.get_program(FILE_MANAGER_ENTRY);
-        let quick_search_path = program_provider_ref.get_program(QUICK_SEARCH_ENTRY);
-        let notification_handler_path = program_provider_ref.get_program(NOTIFICATION_HANDLER_ENTRY);
+        let terminal_path = program_provider_ref.get_program_path(VIRTUAL_TERMINAL_ENTRY.to_string());
+        let file_manager_path = program_provider_ref.get_program_path(FILE_MANAGER_ENTRY.to_string());
+        let quick_search_path = program_provider_ref.get_program_path(QUICK_SEARCH_ENTRY.to_string());
+        let notification_handler_path = program_provider_ref.get_program_path(NOTIFICATION_HANDLER_ENTRY.to_string());
 
         Self {
             terminal_path,

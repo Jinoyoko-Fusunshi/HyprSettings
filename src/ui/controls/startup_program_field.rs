@@ -79,7 +79,7 @@ impl StateSavableControl for StartupProgramField {
         program_provider_mut.remove_program(previous_program_name.clone());
         program_provider_mut.add_program(program_name.clone(), program_path.clone());
 
-        program_provider_mut.remove_startup_program(program_name.clone());
+        program_provider_mut.remove_startup_program(previous_program_name.clone());
         program_provider_mut.add_startup_program(program_name.clone(), program_path.clone());
         state_mut.previous_program_name = program_name.clone();
     }
@@ -166,26 +166,25 @@ impl StartupProgramField {
         self.selection_box.set_selection_change(selection_box_change);
     }
 
-    pub fn set_program_fields(&self, selected_program: Option<String>) {
+    pub fn set_program_fields(&self, selected_program_name: Option<String>) {
         let program_provider = self.application_provider.get_program_provider();
-
-        let program_name = match selected_program.clone() {
-            Some(program) => match program_provider.borrow().get_program(program.as_str()) {
-                Some(_) => program,
+        let name = match selected_program_name.clone() {
+            Some(path) => match program_provider.borrow().get_program_path_or_module(path.clone()) {
+                Some(_) => path,
                 None => "".to_string(),
             }
             None => "".to_string(),
         };
 
-        let command = match selected_program.clone() {
+        let path = match selected_program_name.clone() {
             Some(program) => program_provider.borrow()
-                .get_program(program.as_str())
+                .get_program_path_or_module(program)
                 .unwrap_or_else(|| "".to_string()),
             None => "".to_string(),
         };
 
-        self.program_name_input.set_text(program_name.as_str());
-        self.program_path_input.set_text(command.as_str());
+        self.program_name_input.set_text(name.as_str());
+        self.program_path_input.set_text(path.as_str());
     }
 
     pub fn change_input_access(&self, selected_program: Option<String>) {
