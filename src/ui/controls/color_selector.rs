@@ -47,7 +47,7 @@ impl ColorSelector {
         color_button_label.set_xalign(0.0);
         
         let color_button = ColorButton::new();
-        
+        color_button.set_use_alpha(true);
         color_button_box.append(&color_button_label);
         color_button_box.append(&color_button);
         
