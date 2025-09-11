@@ -41,10 +41,6 @@ impl UpdatableControl<SpinButtonState> for SpinButton {
 }
 
 impl LabeledControl for SpinButton {
-    fn set_text(&self, text: &str) {
-        self.spin_button_label.set_text(text);   
-    }
-
     fn set_text_width(&self, width: u32) {
         self.spin_button_label.set_width_request(width as i32);
     }

@@ -26,10 +26,6 @@ impl Control for SelectionBox {
 }
 
 impl LabeledControl for SelectionBox {
-    fn set_text(&self, text: &str) {
-        self.selection_label.set_text(text);   
-    }
-
     fn set_text_width(&self, width: u32) {
         self.selection_label.set_width_request(width as i32);
     }

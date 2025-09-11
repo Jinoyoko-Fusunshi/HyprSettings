@@ -1,4 +1,4 @@
-use gtk::{Button, Orientation};
+use gtk::{Button, Label, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
@@ -37,32 +37,15 @@ impl Navigation {
             .set_width(320)
             .build();
 
-        let overview_button = Button::with_label("overview");
-        overview_button.set_height_request(48);
-
-        let general_button = Button::with_label("general");
-        general_button.set_height_request(48);
-
-        let display_button = Button::with_label("display");
-        display_button.set_height_request(48);
-
-        let wallpaper_button = Button::with_label("wallpaper");
-        wallpaper_button.set_height_request(48);
-
-        let lockscreen_button = Button::with_label("lockscreen");
-        lockscreen_button.set_height_request(48);
-
-        let appearance_button = Button::with_label("appearance");
-        appearance_button.set_height_request(48);
-
-        let startup_button = Button::with_label("startup");
-        startup_button.set_height_request(48);
-
-        let keybinds_button = Button::with_label("keybinds");
-        keybinds_button.set_height_request(48);
-    
-        let info_button = Button::with_label("info");
-        info_button.set_height_request(48);
+        let overview_button =  Self::create_settings_button("👀 overview");
+        let general_button = Self::create_settings_button("💾 user programs");
+        let display_button = Self::create_settings_button("🖥️ display");
+        let wallpaper_button = Self::create_settings_button("🖼️ wallpaper");
+        let lockscreen_button = Self::create_settings_button("🔐 lockscreen");
+        let appearance_button = Self::create_settings_button("🖌️ appearance");
+        let startup_button = Self::create_settings_button("🚀 startup");
+        let keybinds_button = Self::create_settings_button("⌨️ keybinds");
+        let info_button = Self::create_settings_button("📝 info");
     
         let save_button = Button::with_label("save");
         save_button.set_widget_name("save-settings");
@@ -147,6 +130,18 @@ impl Navigation {
             settings_switcher_manager.notify_event(SettingsSwitcherEvent::SaveSettings);
         };
         self.save_button.connect_clicked(save_button_click);
+    }
+
+    fn create_settings_button(label_text: &str) -> Button {
+        let label = Label::new(Some(label_text));
+        label.set_xalign(0.0);
+        label.set_hexpand(false);
+        label.set_margin_start(80);
+
+        let button = Button::new();
+        button.set_height_request(48);
+        button.set_child(Some(&label));
+        button
     }
 
     fn create_settings_button_click(

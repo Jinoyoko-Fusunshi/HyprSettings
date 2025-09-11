@@ -22,10 +22,6 @@ impl Control for ColorSelector {
 }
 
 impl LabeledControl for ColorSelector {
-    fn set_text(&self, text: &str) {
-        self.color_button_label.set_text(text);
-    }
-
     fn set_text_width(&self, width: u32) {
         self.color_button_label.set_width_request(width as i32);
     }
