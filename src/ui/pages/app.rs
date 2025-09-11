@@ -56,9 +56,9 @@ impl App {
         let overview_settings = Box::new(Overview::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
-        let mut general_settings = Box::new(Programs::new(application_provider.clone()));
-        general_settings.init_events();
-        general_settings.update_ui(state);
+        let mut program_settings = Box::new(Programs::new(application_provider.clone()));
+        program_settings.init_events();
+        program_settings.update_ui(state);
 
         let state = DisplaySettingsState::from(&application_provider);
         let mut display_settings = Box::new(Displays::new(application_provider.clone()));
@@ -88,7 +88,7 @@ impl App {
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
             .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
-            .insert_control(GENERAL_PAGE.to_string(), general_settings)
+            .insert_control(GENERAL_PAGE.to_string(), program_settings)
             .insert_control(DISPLAY_PAGE.to_string(), display_settings)
             .insert_control(WALLPAPER_PAGE.to_string(), wallpaper_settings)
             .insert_control(LOCKSCREEN_PAGE.to_string(), lockscreen_settings)

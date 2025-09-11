@@ -1,16 +1,13 @@
 use std::collections::HashMap;
-use std::fs::OpenOptions;
-use std::io::{BufWriter, Write};
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
 use crate::persistence::settings_writer::SettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::models::settings::keybind_settings::KeyBindSettings;
+use crate::persistence::hyprland_writer_utils::{ConfigSectionBuilder, HyprlandWriterUtils, COMMENT_CHARACTER};
 use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
-
-const COMMENT_CHARACTER: char = '#';
 
 pub struct HyprlandSettingsWriter {
     program_variables: HashMap<String, (String, String)>,
@@ -30,21 +27,7 @@ impl SettingsWriter<HyprlandSettings> for HyprlandSettingsWriter {
 
     fn write_to_config(&self) {
         const HYPRLAND_CONFIG_PATH: &str = "hyprland.conf";
-
-        if self.config_lines.len() == 0 {
-            return;
-        }
-
-        let file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(HYPRLAND_CONFIG_PATH)
-            .expect("Cannot open hyprland config file");
-        let mut buffer_writer = BufWriter::new(file);
-
-        let file_content = self.config_lines.join("\n");
-        buffer_writer.write_all(file_content.as_bytes()).expect("Cannot write to config file");
+        HyprlandWriterUtils::write_content_to_file(HYPRLAND_CONFIG_PATH, self.config_lines.clone())
     }
 }
 
@@ -73,10 +56,10 @@ impl HyprlandSettingsWriter {
     fn serialize_program_settings(&mut self) {
         self.add_comment_section("PROGRAMS".to_string());
 
-        self.add_line_entry(Self::create_comment("Set programs that you use"));
+        self.add_line_entry(HyprlandWriterUtils::create_comment("Set programs that you use"));
         for (_, program_pair) in self.program_variables.clone() {
             let (program_variable, program_command) = program_pair;
-            let program_pair = Self::create_value_pair(program_variable, program_command);
+            let program_pair = HyprlandWriterUtils::create_value_pair(program_variable, program_command);
             self.add_line_entry(program_pair);
         }
     }
@@ -280,14 +263,14 @@ impl HyprlandSettingsWriter {
         let layout_value = settings.appearance_settings.layout.to_string();
 
         let general_section_lines = ConfigSectionBuilder::new("general".to_string())
-            .add_line(Self::create_value_pair("gaps_in".to_string(), gaps_in_value))
-            .add_line(Self::create_value_pair("gaps_out".to_string(), gaps_out_value))
-            .add_line(Self::create_value_pair("border_size".to_string(), border_size_value))
-            .add_line(Self::create_value_pair("col.active_border".to_string(), column_active_border_value))
-            .add_line(Self::create_value_pair("col.inactive_border".to_string(), column_inactive_border_value))
-            .add_line(Self::create_value_pair("resize_on_border".to_string(), resize_on_border_value))
-            .add_line(Self::create_value_pair("allow_tearing".to_string(), allow_tearing_value))
-            .add_line(Self::create_value_pair("layout".to_string(), layout_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("gaps_in".to_string(), gaps_in_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("gaps_out".to_string(), gaps_out_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("border_size".to_string(), border_size_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("col.active_border".to_string(), column_active_border_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("col.inactive_border".to_string(), column_inactive_border_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("resize_on_border".to_string(), resize_on_border_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("allow_tearing".to_string(), allow_tearing_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("layout".to_string(), layout_value))
             .build();
         general_section_lines
     }
@@ -300,14 +283,14 @@ impl HyprlandSettingsWriter {
         let inactive_dim_opacity = settings.appearance_settings.inactive_opacity.to_string();
 
         let decoration_section_lines = ConfigSectionBuilder::new("decoration".to_string())
-            .add_line(Self::create_value_pair("rounding".to_string(), rounding_value))
-            .add_line(Self::create_value_pair("rounding_power".to_string(), rounding_power_value))
-            .add_line(Self::create_value_pair("dim_inactive".to_string(), dim_inactive.to_string()))
-            .add_line(Self::create_value_pair("active_opacity".to_string(), active_dim_opacity))
-            .add_line(Self::create_value_pair("inactive_opacity".to_string(), inactive_dim_opacity))
-            .add_line(Self::create_new_line())
+            .add_line(HyprlandWriterUtils::create_value_pair("rounding".to_string(), rounding_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("rounding_power".to_string(), rounding_power_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("dim_inactive".to_string(), dim_inactive.to_string()))
+            .add_line(HyprlandWriterUtils::create_value_pair("active_opacity".to_string(), active_dim_opacity))
+            .add_line(HyprlandWriterUtils::create_value_pair("inactive_opacity".to_string(), inactive_dim_opacity))
+            .add_line(HyprlandWriterUtils::create_new_line())
             .add_lines(Self::create_shadow_config_section(settings))
-            .add_line(Self::create_new_line())
+            .add_line(HyprlandWriterUtils::create_new_line())
             .add_lines(Self::create_blur_config_section(settings))
             .build();
         decoration_section_lines
@@ -320,10 +303,10 @@ impl HyprlandSettingsWriter {
         let shadow_color = settings.appearance_settings.shadow_color.to_string();
 
         let shadow_section_lines = ConfigSectionBuilder::new("shadow".to_string())
-            .add_line(Self::create_value_pair("enabled".to_string(), shadows_enabled))
-            .add_line(Self::create_value_pair("range".to_string(), shadow_range))
-            .add_line(Self::create_value_pair("render_power".to_string(), shadow_render_power))
-            .add_line(Self::create_value_pair("color".to_string(), shadow_color))
+            .add_line(HyprlandWriterUtils::create_value_pair("enabled".to_string(), shadows_enabled))
+            .add_line(HyprlandWriterUtils::create_value_pair("range".to_string(), shadow_range))
+            .add_line(HyprlandWriterUtils::create_value_pair("render_power".to_string(), shadow_render_power))
+            .add_line(HyprlandWriterUtils::create_value_pair("color".to_string(), shadow_color))
             .build();
         shadow_section_lines
     }
@@ -335,10 +318,10 @@ impl HyprlandSettingsWriter {
         let blur_vibrancy = settings.appearance_settings.blur_vibrancy.to_string();
 
         let blur_section_lines = ConfigSectionBuilder::new("blur".to_string())
-            .add_line(Self::create_value_pair("enabled".to_string(), blur_enabled))
-            .add_line(Self::create_value_pair("size".to_string(), blur_size))
-            .add_line(Self::create_value_pair("passes".to_string(), blur_passed))
-            .add_line(Self::create_value_pair("vibrancy".to_string(), blur_vibrancy))
+            .add_line(HyprlandWriterUtils::create_value_pair("enabled".to_string(), blur_enabled))
+            .add_line(HyprlandWriterUtils::create_value_pair("size".to_string(), blur_size))
+            .add_line(HyprlandWriterUtils::create_value_pair("passes".to_string(), blur_passed))
+            .add_line(HyprlandWriterUtils::create_value_pair("vibrancy".to_string(), blur_vibrancy))
             .build();
         blur_section_lines
     }
@@ -348,8 +331,8 @@ impl HyprlandSettingsWriter {
         let preserve_split_value = settings.appearance_settings.split_preservation.to_string();
 
         let dwindle_status_section_lines = ConfigSectionBuilder::new("dwindle".to_string())
-            .add_line(Self::create_value_pair("pseudotile".to_string(), pseudo_tiling_value))
-            .add_line(Self::create_value_pair("preserve_split".to_string(), preserve_split_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("pseudotile".to_string(), pseudo_tiling_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("preserve_split".to_string(), preserve_split_value))
             .build();
 
         dwindle_status_section_lines
@@ -358,7 +341,7 @@ impl HyprlandSettingsWriter {
     fn create_master_config_section(settings: &HyprlandSettings) -> Vec<String> {
         let master_status_value = settings.appearance_settings.master_status.to_string();
         let master_status_section_lines = ConfigSectionBuilder::new("master".to_string())
-            .add_line(Self::create_value_pair("new_status".to_string(), master_status_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("new_status".to_string(), master_status_value))
             .build();
 
         master_status_section_lines
@@ -369,14 +352,14 @@ impl HyprlandSettingsWriter {
         let disable_hyprland_logo_value = settings.appearance_settings.disable_hyprland_logo.to_string();
 
         let misc_section_lines = ConfigSectionBuilder::new("misc".to_string())
-            .add_line(Self::create_value_pair("force_default_wallpaper".to_string(), force_default_wallpaper_value))
-            .add_line(Self::create_value_pair("disable_hyprland_logo".to_string(), disable_hyprland_logo_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("force_default_wallpaper".to_string(), force_default_wallpaper_value))
+            .add_line(HyprlandWriterUtils::create_value_pair("disable_hyprland_logo".to_string(), disable_hyprland_logo_value))
             .build();
         misc_section_lines
     }
 
     fn add_new_line(&mut self) {
-        self.add_line_entry(Self::create_new_line());
+        self.add_line_entry(HyprlandWriterUtils::create_new_line());
     }
 
     fn add_line_entries(&mut self, lines: Vec<String>) {
@@ -387,22 +370,6 @@ impl HyprlandSettingsWriter {
 
     fn add_line_entry(&mut self, text: String) {
         self.config_lines.push(text);
-    }
-
-    fn create_new_line() -> String {
-        "".to_string()
-    }
-
-    fn create_value_pair(name: String, value: String) -> String {
-        format!("{} = {}", name, value)
-    }
-
-    fn create_comment(text: &str) -> String {
-        let mut comment = String::new();
-        comment.push(COMMENT_CHARACTER);
-        comment.push_str(" ");
-        comment.push_str(text);
-        comment
     }
 
     fn add_comment_section(&mut self, section_name: String) {
@@ -443,43 +410,5 @@ impl HyprlandSettingsWriter {
         }
 
         comment_row
-    }
-}
-
-struct ConfigSectionBuilder {
-    section_title: String,
-    section_lines: Vec<String>
-}
-
-impl ConfigSectionBuilder {
-    pub fn new(section_title: String) -> Self {
-        Self {
-            section_title,
-            section_lines: Vec::new()
-        }
-    }
-
-    pub fn add_lines(&mut self, lines: Vec<String>) -> &mut Self {
-        for line in lines {
-            self.add_line(line);
-        }
-        self
-    }
-
-    pub fn add_line(&mut self, line: String) -> &mut Self {
-        self.section_lines.push(line);
-        self
-    }
-
-    pub fn build(&self) -> Vec<String> {
-        let mut lines = Vec::new();
-        lines.push(format!("{} {{", self.section_title));
-
-        for line in self.section_lines.clone() {
-            lines.push(format!("\t{}", line));
-        }
-
-        lines.push("}".to_string());
-        lines
     }
 }

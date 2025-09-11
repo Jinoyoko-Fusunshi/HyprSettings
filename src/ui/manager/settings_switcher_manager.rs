@@ -5,6 +5,8 @@ use crate::persistence::hyprland_settings_writer::HyprlandSettingsWriter;
 use crate::persistence::settings_writer::SettingsWriter;
 use crate::persistence::yaml_settings_writer::YamlSettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
+use crate::persistence::hyprlock_settings_writer::HyprlockSettingsWriter;
+use crate::persistence::hyprpaper_settings_writer::HyprpaperSettingsWriter;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
@@ -56,20 +58,28 @@ impl SettingsSwitcherManager {
                     .get_lockscreen_provider().borrow().get_settings();
 
                 let hyprland_settings = HyprlandSettings::new(
-                    program_settings,
-                    display_settings,
-                    appearance_settings,
-                    keybind_settings,
-                    lockscreen_settings
+                    program_settings.clone(),
+                    display_settings.clone(),
+                    appearance_settings.clone(),
+                    keybind_settings.clone(),
+                    lockscreen_settings.clone()
                 );
 
                 let mut yaml_settings_writer = YamlSettingsWriter::new();
                 yaml_settings_writer.serialize_settings(hyprland_settings.clone());
                 yaml_settings_writer.write_to_config();
                 
-                let mut conf_settings_writer = HyprlandSettingsWriter::new();
-                conf_settings_writer.serialize_settings(hyprland_settings.clone());
-                conf_settings_writer.write_to_config();
+                let mut hyprland_settings_writer = HyprlandSettingsWriter::new();
+                hyprland_settings_writer.serialize_settings(hyprland_settings.clone());
+                hyprland_settings_writer.write_to_config();
+
+                let mut hyprpaper_settings_writer = HyprpaperSettingsWriter::new();
+                hyprpaper_settings_writer.serialize_settings(appearance_settings.clone());
+                hyprpaper_settings_writer.write_to_config();
+                
+                let mut hyprlock_settings_writer = HyprlockSettingsWriter::new();
+                hyprlock_settings_writer.serialize_settings(lockscreen_settings.clone());
+                hyprlock_settings_writer.write_to_config();
             }
         }
     }

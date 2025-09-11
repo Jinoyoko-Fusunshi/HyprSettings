@@ -5,7 +5,7 @@ use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
 use crate::types::GTKBox;
-use crate::ui::boxes::DEFAULT_MARGIN;
+use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::input_field::InputField;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::controls::Control;
@@ -101,10 +101,7 @@ impl Programs {
         let general_box = SectionBoxBuilder::new("programs", DEFAULT_MARGIN)
             .create_header_elements(PROGRAMS_LABEL)
             .build().expect("Failed to create general box");
-        general_box.set_margin_top(10);
-        general_box.set_margin_bottom(10);
-        general_box.set_margin_start(10);
-        general_box.set_margin_end(10);
+        Boxes::set_margin(&general_box, DEFAULT_MARGIN);
 
         let mut terminal_input_field = InputField::new();
         let state = InputFieldState {
