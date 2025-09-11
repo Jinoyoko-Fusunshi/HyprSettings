@@ -1,7 +1,11 @@
+use std::env;
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
+use std::path::Path;
 
 pub const COMMENT_CHARACTER: char = '#';
+
+pub const HYPRLAND_CONFIG_PATH: &str = ".config/hypr";
 
 pub struct ConfigSectionBuilder {
     section_title: String,
@@ -75,5 +79,13 @@ impl HyprlandWriterUtils {
 
         let file_content = config_lines.join("\n");
         buffer_writer.write_all(file_content.as_bytes()).expect("Cannot write to config file");
+    }
+
+    pub fn create_hyprland_config_path(config_name: &str) -> String {
+        let home_path = env::var("HOME").unwrap_or("".to_string());
+        let config_file_path = Path::new(&home_path);
+        let config_file_path = config_file_path.join(HYPRLAND_CONFIG_PATH);
+        let config_file_path = config_file_path.join(config_name);
+        config_file_path.to_str().unwrap().to_string()
     }
 }

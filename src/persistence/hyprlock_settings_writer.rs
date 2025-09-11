@@ -22,8 +22,8 @@ impl SettingsWriter<LockScreenSettings> for HyprlockSettingsWriter {
     }
 
     fn write_to_config(&self) {
-        const HYPRLOCK_CONFIG_FILE_PATH: &str = "hyprlock.conf";
-        HyprlandWriterUtils::write_content_to_file(HYPRLOCK_CONFIG_FILE_PATH, self.config_lines.clone());
+        let hyprlock_config_file_path = HyprlandWriterUtils::create_hyprland_config_path("hyprlock.conf");
+        HyprlandWriterUtils::write_content_to_file(hyprlock_config_file_path.as_str(), self.config_lines.clone());
     }
 }
 

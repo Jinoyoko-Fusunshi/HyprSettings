@@ -12,10 +12,10 @@ impl SettingsWriter<AppearanceSettings> for HyprpaperSettingsWriter {
     }
 
     fn write_to_config(&self) {
-        const HYPRPAPER_CONFIG_PATH: &str = "hyprpaper.conf";
+        let hyprpaper_config_file_path = HyprlandWriterUtils::create_hyprland_config_path("hyprpaper.conf");
 
         if !self.config_lines.is_empty() {
-            HyprlandWriterUtils::write_content_to_file(HYPRPAPER_CONFIG_PATH, self.config_lines.clone())
+            HyprlandWriterUtils::write_content_to_file(hyprpaper_config_file_path.as_str(), self.config_lines.clone())
         }
     }
 }

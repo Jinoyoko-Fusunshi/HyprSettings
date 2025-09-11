@@ -77,10 +77,10 @@ impl Infos {
             .set_full_width(true)
             .build();
 
-        const USAGE_DESCRIPTION_TEXT: &str = "\
-            HyprSettings is a simple Hyprland settings manager for configuring your hyprland instance.\n\
-            All hyprland settings will be read and written into its dedicated config file path.\n\
-            It accepts configurations for the hyprland modules listed in the overview page.";
+        const USAGE_DESCRIPTION_TEXT: &str =
+            "A generical independent tool to configure the hyprland environment by a GTK GUI.\n\
+            This tool gives the ability to easily configure all hyprland variables and writes the settings into their config files\n\
+            after clicking the save button.";
 
         let usage_description_label = Label::new(Some(USAGE_DESCRIPTION_TEXT));
         usage_description_label.set_xalign(0.0);

@@ -38,8 +38,10 @@ fn application_activation_setup(application: &Application) {
 }
 
 fn load_css_styles() {
+    const CSS_STYLE_PATH: &str = "/usr/share/HyprSettings/style.css";
+
     let provider = CssProvider::new();
-    let css_file = File::for_path("res/style.css");
+    let css_file = File::for_path(CSS_STYLE_PATH);
     provider.load_from_file(&css_file);
 
     let display = Display::default().expect("Could not get default display");

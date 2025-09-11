@@ -26,8 +26,8 @@ impl SettingsWriter<HyprlandSettings> for HyprlandSettingsWriter {
     }
 
     fn write_to_config(&self) {
-        const HYPRLAND_CONFIG_PATH: &str = "hyprland.conf";
-        HyprlandWriterUtils::write_content_to_file(HYPRLAND_CONFIG_PATH, self.config_lines.clone())
+        let hyprland_config_file_path = HyprlandWriterUtils::create_hyprland_config_path("hyprland.conf");
+        HyprlandWriterUtils::write_content_to_file(hyprland_config_file_path.as_str(), self.config_lines.clone())
     }
 }
 
