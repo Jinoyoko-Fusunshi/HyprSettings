@@ -119,6 +119,7 @@ impl HyprlandSettingsWriter {
     }
 
     fn serialize_appearance_settings(&mut self, settings: &HyprlandSettings) {
+        let cursor_section_lines = Self::create_cursor_config_section(settings);
         let general_section_lines = Self::create_general_config_section(settings);
         let decoration_section_lines = Self::create_decorations_config_section(settings);
         let dwindle_section_lines = Self::create_dwindle_config_section(settings);
@@ -126,6 +127,8 @@ impl HyprlandSettingsWriter {
         let misc_section_lines = Self::create_misc_config_section(settings);
 
         self.add_comment_section("LOOK AND FEEL".to_string());
+        self.add_line_entries(cursor_section_lines);
+        self.add_new_line();
         self.add_line_entries(general_section_lines);
         self.add_new_line();
         self.add_line_entries(decoration_section_lines);
@@ -268,6 +271,16 @@ impl HyprlandSettingsWriter {
         
         let command_arguments = arguments.join(", ");
         format!("bind = {}, {}", key_arguments, command_arguments)
+    }
+
+    fn create_cursor_config_section(settings: &HyprlandSettings) -> Vec<String> {
+        let cursor_size_value = settings.appearance_settings.cursor_size.to_string();
+        let cursor_theme_value = settings.appearance_settings.cursor_theme.clone();
+
+        vec![
+            HyprlandWriterUtils::create_environment_variable("XCURSOR_SIZE".to_string(), cursor_size_value),
+            HyprlandWriterUtils::create_environment_variable("XCURSOR_THEME".to_string(), cursor_theme_value),
+        ]
     }
 
     fn create_general_config_section(settings: &HyprlandSettings) -> Vec<String> {

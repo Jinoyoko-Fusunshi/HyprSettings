@@ -20,6 +20,22 @@ impl AppearanceProvider {
         self.settings.wallpaper_path.clone()
     }
 
+    pub fn set_cursor_size(&mut self, size: u32) {
+        self.settings.cursor_size = size;
+    }
+
+    pub fn get_cursor_size(&self) -> u32 {
+        self.settings.cursor_size
+    }
+
+    pub fn set_cursor_theme(&mut self, theme: String) {
+        self.settings.cursor_theme = theme;
+    }
+
+    pub fn get_cursor_theme(&self) -> String {
+        self.settings.cursor_theme.clone()
+    }
+
     pub fn set_force_default_wallpaper(&mut self, state: bool) {
         self.settings.force_default_wallpaper = state;
     }

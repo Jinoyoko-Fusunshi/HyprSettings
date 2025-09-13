@@ -1,3 +1,4 @@
+use std::fs;
 use gtk::{ColorButton, ComboBoxText, Entry, Orientation, PolicyType, ScrolledWindow, SpinButton as GTKSpinButton};
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
@@ -50,12 +51,14 @@ impl Appearance {
             .build();
 
         let wallpaper_section = Appearance::create_wallpaper_section_box(&application_provider);
+        let cursor_section = Appearance::create_cursor_section_box(&application_provider);
         let styling_section = Appearance::create_styling_section_box(&application_provider);
         let decoration_section = Appearance::create_decorations_section_box(&application_provider);
         let animations_section = Appearance::create_animations_section_box(&application_provider);
         let layouts_section = Appearance::create_layouts_section_box(&application_provider);
 
         appearance_box.append(&wallpaper_section);
+        appearance_box.append(&cursor_section);
         appearance_box.append(&styling_section);
         appearance_box.append(&decoration_section);
         appearance_box.append(&animations_section);
@@ -77,7 +80,7 @@ impl Appearance {
 
         let appearance_provider = application_provider.get_appearance_provider();
 
-        // Force default wallpaper option
+        // Force the default wallpaper option
         let appearance_provider_clone = appearance_provider.clone();
         let force_default_wallpaper_selection_change = {
             move |entry: &ComboBoxText| {
@@ -120,6 +123,78 @@ impl Appearance {
         wallpaper_section_box.append(force_default_wallpaper_selection.get_widget());
         wallpaper_section_box.append(disable_hyprland_logo_selection.get_widget());
         wallpaper_section_box
+    }
+
+    fn create_cursor_section_box(application_provider: &ApplicationProvider) -> GTKBox {
+        let appearance_provider = application_provider.get_appearance_provider();
+
+        const CURSOR_LABEL: &str = "Cursor";
+        let cursor_section_box = SectionBoxBuilder::new("cursor-section-box", 0)
+            .create_header_elements(CURSOR_LABEL)
+            .build().expect("Cannot create cursor section");
+
+        let appearance_provider_clone = appearance_provider.clone();
+        let cursor_size_spin_button_change = move |spin_button: &GTKSpinButton| {
+            appearance_provider_clone.borrow_mut().set_cursor_size(spin_button.value() as u32);
+        };
+        let state = SpinButtonState {
+            label_text: "Size".to_string(),
+            min_value: 1.0,
+            max_value: 100.0,
+            current_value: appearance_provider.borrow().get_cursor_size() as f64,
+            increment_value: 1.0,
+            page_increment_value: 5.0,
+            page_size: 0.0,
+            climb_rate: 2.0,
+            digit_count: 0,
+            use_integral_numbers: false,
+        };
+
+        let mut cursor_size_spin_button = SpinButton::new();
+        cursor_size_spin_button.set_text_width(APPEARANCE_LABEL_WIDTH);
+        cursor_size_spin_button.update_ui(state);
+        cursor_size_spin_button.set_value_change(cursor_size_spin_button_change);
+
+        let appearance_provider_clone = appearance_provider.clone();
+        let cursor_theme_spin_button_change = move |spin_button: &ComboBoxText| {
+            let selected_text = spin_button.active_text().expect("Cannot read active selection text");
+            appearance_provider_clone.borrow_mut().set_cursor_theme(selected_text.to_string());
+        };
+        let state = SelectionBoxState {
+            label_text: "Theme".to_string(),
+            selected_option: Some(appearance_provider.borrow().get_cursor_theme()),
+            options: Self::get_icon_themes(),
+        };
+        let mut cursor_theme_selection_box = SelectionBox::new();
+        cursor_theme_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
+        cursor_theme_selection_box.update_state(state.clone());
+        cursor_theme_selection_box.update_ui(state.clone());
+        cursor_theme_selection_box.set_selection_change(cursor_theme_spin_button_change);
+
+        cursor_section_box.append(cursor_size_spin_button.get_widget());
+        cursor_section_box.append(cursor_theme_selection_box.get_widget());
+        cursor_section_box
+    }
+
+    fn get_icon_themes() -> Vec<String> {
+        const ICONS_THEME_PATH: &str = "/usr/share/icons";
+        let mut icon_directories: Vec<String> = Vec::new();
+
+        let icons_directory = fs::read_dir(ICONS_THEME_PATH);
+        if let Ok(icons_directory) = icons_directory {
+            for subdirectory in icons_directory {
+                if let Ok(subdirectory) = subdirectory {
+                    if subdirectory.file_type().expect("Cannot read file type").is_dir() {
+                        let subdirectory_path = subdirectory.path();
+                        let subdirectory_name = subdirectory_path.file_name().expect("Cannot read file name")
+                            .to_str().expect("Cannot convert file name to string");
+                        icon_directories.push(subdirectory_name.to_string());
+                    }
+                }
+            }
+        }
+
+        icon_directories
     }
 
     fn create_styling_section_box(application_provider: &ApplicationProvider) -> GTKBox {

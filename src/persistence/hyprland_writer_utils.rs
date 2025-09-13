@@ -52,6 +52,10 @@ impl HyprlandWriterUtils {
         "".to_string()
     }
 
+    pub fn create_environment_variable(variable: String, value: String) -> String {
+        format!("env = {},{}", variable, value)
+    }
+
     pub fn create_value_pair(name: String, value: String) -> String {
         format!("{} = {}", name, value)
     }

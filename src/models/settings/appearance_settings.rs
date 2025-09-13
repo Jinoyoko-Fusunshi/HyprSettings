@@ -4,6 +4,8 @@ use crate::models::rgba_color::RGBAColor;
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AppearanceSettings {
     pub wallpaper_path: String,
+    pub cursor_size: u32,
+    pub cursor_theme: String,
     pub force_default_wallpaper: bool,
     pub disable_hyprland_logo: bool,
     pub inner_gab: f64,
