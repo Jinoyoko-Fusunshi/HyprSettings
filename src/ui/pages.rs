@@ -9,6 +9,7 @@ pub mod startup_programs;
 pub mod overview;
 pub mod wallpaper;
 pub mod lockscreen;
+mod input;
 
 pub const OVERVIEW_PAGE: &str = "overview-page";
 pub const GENERAL_PAGE: &str = "general-page";
@@ -17,5 +18,6 @@ pub const WALLPAPER_PAGE: &str = "wallpaper-page";
 pub const LOCKSCREEN_PAGE: &str = "lockscreen-page";
 pub const APPEARANCE_PAGE: &str = "appearance-page";
 pub const STARTUP_PROGRAMS_PAGE: &str = "startup-page";
+pub const INPUT_PAGE: &str = "input-page";
 pub const KEYBINDS_PAGE: &str = "keybinds-page";
 pub const INFO_PAGE: &str = "info-page";

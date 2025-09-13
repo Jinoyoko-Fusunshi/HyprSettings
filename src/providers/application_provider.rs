@@ -7,9 +7,11 @@ use crate::persistence::settings_reader::SettingsReader;
 use crate::persistence::yaml_settings_reader::YamlSettingsReader;
 use crate::models::settings::display_settings::DisplaySettings;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
+use crate::models::settings::input_settings::InputSettings;
 use crate::models::settings::keybind_settings::KeyBindSettings;
 use crate::models::settings::lockscreen_settings::LockScreenSettings;
 use crate::models::settings::program_settings::ProgramSettings;
+use crate::providers::input_provider::InputProvider;
 use crate::providers::keybind_provider::KeybindProvider;
 use crate::providers::lockscreen_provider::LockscreenProvider;
 use crate::providers::module_provider::ModuleProvider;
@@ -17,11 +19,12 @@ use crate::utils::{new_rc_mut, RcMut};
 
 #[derive(Clone)]
 pub struct ApplicationProvider {
-    module_provider: Rc<RefCell<ModuleProvider>>,
-    display_provider: Rc<RefCell<DisplayProvider>>,
-    appearance_provider: Rc<RefCell<AppearanceProvider>>,
-    lockscreen_provider: Rc<RefCell<LockscreenProvider>>,
-    keybind_provider: Rc<RefCell<KeybindProvider>>,
+    module_provider: RcMut<ModuleProvider>,
+    display_provider: RcMut<DisplayProvider>,
+    appearance_provider: RcMut<AppearanceProvider>,
+    lockscreen_provider: RcMut<LockscreenProvider>,
+    input_provider: RcMut<InputProvider>,
+    keybind_provider: RcMut<KeybindProvider>,
 }
 
 impl ApplicationProvider {
@@ -32,12 +35,14 @@ impl ApplicationProvider {
         let appearance_provider = Self::create_appearance_provider(&hyprland_settings);
         let lockscreen_provider = Self::create_lockscreen_provider(&hyprland_settings);
         let keybind_provider = Self::create_keybind_provider(&hyprland_settings);
+        let input_provider = Self::create_input_provider(&hyprland_settings);
 
         Self {
             module_provider,
             display_provider,
             appearance_provider,
             lockscreen_provider,
+            input_provider,
             keybind_provider,
         }
     }
@@ -60,6 +65,10 @@ impl ApplicationProvider {
 
     pub fn get_keybinds_provider(&self) -> Rc<RefCell<KeybindProvider>> {
         self.keybind_provider.clone()
+    }
+
+    pub fn get_input_provider(&self) -> Rc<RefCell<InputProvider>> {
+        self.input_provider.clone()
     }
 
     fn create_module_provider(settings: &Option<HyprlandSettings>) -> RcMut<ModuleProvider> {
@@ -113,6 +122,16 @@ impl ApplicationProvider {
         };
 
         new_rc_mut(keybind_provider)
+    }
+
+    fn create_input_provider(settings: &Option<HyprlandSettings>) -> RcMut<InputProvider> {
+        let input_provider = if let Some(settings) = settings {
+            InputProvider::new(settings.input_settings.clone())
+        } else {
+            InputProvider::new(InputSettings::default())
+        };
+
+        new_rc_mut(input_provider)
     }
 
     fn get_config_settings() -> Option<HyprlandSettings> {

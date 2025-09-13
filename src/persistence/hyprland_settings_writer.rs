@@ -23,6 +23,7 @@ impl SettingsWriter<HyprlandSettings> for HyprlandSettingsWriter {
         self.serialize_startup_settings(&settings);
         self.serialize_monitor_settings(&settings);
         self.serialize_appearance_settings(&settings);
+        self.serialize_input_settings(&settings);
         self.serialize_keybinds_settings(&settings);
     }
 
@@ -138,6 +139,41 @@ impl HyprlandSettingsWriter {
         self.add_line_entries(master_section_lines);
         self.add_new_line();
         self.add_line_entries(misc_section_lines);
+    }
+
+    fn serialize_input_settings(&mut self, settings: &HyprlandSettings) {
+        let input_settings = &settings.input_settings;
+
+        let input_section_lines = ConfigSectionBuilder::new("input".to_string())
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "kb_layout".to_string(), input_settings.keyboard_layout.clone()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "numlock_by_default".to_string(), input_settings.numlock_enabled.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "repeat_rate".to_string(), input_settings.keyboard_repeat_rate.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "repeat_delay".to_string(), input_settings.keyboard_repeat_delay.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "sensitivity".to_string(), input_settings.mouse_sensitivity.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "left_handed".to_string(), input_settings.mouse_left_handed.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "scroll_factor".to_string(), input_settings.mouse_scroll_factor.to_string()
+            ))
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "natural_scroll".to_string(), input_settings.mouse_natural_scroll.to_string()
+            ))
+            .build();
+
+        self.add_comment_section("INPUT".to_string());
+        self.add_new_line();
+        self.add_line_entries(input_section_lines);
     }
 
     fn serialize_keybinds_settings(&mut self, settings: &HyprlandSettings) {

@@ -4,7 +4,7 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::controls::Control;
-use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
@@ -16,6 +16,7 @@ pub struct Navigation {
     lockscreen_button: Button,
     appearance_button: Button,
     startup_button: Button,
+    input_button: Button,   
     keybinds_button: Button,
     info_button: Button,
     save_button: Button,
@@ -43,6 +44,7 @@ impl Navigation {
         let wallpaper_button = Self::create_settings_button("🖼️ wallpaper");
         let lockscreen_button = Self::create_settings_button("🔐 lockscreen");
         let appearance_button = Self::create_settings_button("🖌️ appearance");
+        let input_button = Self::create_settings_button("🖱 input");
         let startup_button = Self::create_settings_button("🚀 startup");
         let keybinds_button = Self::create_settings_button("⌨️ keybinds");
         let info_button = Self::create_settings_button("📝 info");
@@ -58,6 +60,7 @@ impl Navigation {
         settings_navigation_box.append(&wallpaper_button);
         settings_navigation_box.append(&lockscreen_button);
         settings_navigation_box.append(&appearance_button);
+        settings_navigation_box.append(&input_button);
         settings_navigation_box.append(&startup_button);
         settings_navigation_box.append(&keybinds_button);
         settings_navigation_box.append(&info_button);
@@ -73,6 +76,7 @@ impl Navigation {
             lockscreen_button,
             appearance_button,
             startup_button,
+            input_button,
             keybinds_button,
             info_button,
             save_button,
@@ -116,6 +120,11 @@ impl Navigation {
         );
         self.startup_button.connect_clicked(startup_button_click);
 
+        let input_button_click = Self::create_settings_button_click(
+            INPUT_PAGE.to_string(), settings_switcher_manager.clone()  
+        );
+        self.input_button.connect_clicked(input_button_click);
+        
         let keybinds_button_click = Self::create_settings_button_click(
             KEYBINDS_PAGE.to_string(), settings_switcher_manager.clone()
         );

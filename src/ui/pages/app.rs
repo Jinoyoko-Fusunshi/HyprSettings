@@ -18,10 +18,8 @@ use crate::ui::pages::infos::Infos;
 use crate::ui::pages::keybinds::Keybinds;
 use crate::ui::pages::lockscreen::Lockscreen;
 use crate::ui::pages::overview::Overview;
-use crate::ui::pages::{
-    APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE,
-    OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE
-};
+use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::input::Input;
 use crate::ui::pages::startup_programs::StartupPrograms;
 use crate::ui::pages::wallpaper::Wallpaper;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
@@ -76,6 +74,9 @@ impl App {
         let appearance_settings = Box::new(Appearance::new(application_provider.clone()));
         appearance_settings.init_events();
 
+        let input_settings = Box::new(Input::new(application_provider.clone()));
+        input_settings.init_events();
+
         let keybinds_settings = Box::new(Keybinds::new(application_provider.clone()));
         keybinds_settings.init_events();
 
@@ -95,6 +96,7 @@ impl App {
             .insert_control(APPEARANCE_PAGE.to_string(), appearance_settings)
             .insert_control(KEYBINDS_PAGE.to_string(), keybinds_settings)
             .insert_control(STARTUP_PROGRAMS_PAGE.to_string(), startup_program_settings)
+            .insert_control(INPUT_PAGE.to_string(), input_settings)
             .insert_control(INFO_PAGE.to_string(), info_settings);
 
         let settings_switcher_state = SettingsSwitcherState::new(OVERVIEW_PAGE.to_string());

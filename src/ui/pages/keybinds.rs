@@ -24,6 +24,7 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub const CUSTOM_ITEM: &str = "Custom";
 
+#[derive(Clone)]
 pub struct Keybinds {
     key_binds_panel_box: GTKBox
 }
@@ -33,14 +34,6 @@ impl Control for Keybinds {
 
     fn get_widget(&self) -> &GTKBox {
         &self.key_binds_panel_box
-    }
-}
-
-impl Clone for Keybinds {
-    fn clone(&self) -> Self {
-        Self {
-            key_binds_panel_box: self.key_binds_panel_box.clone()
-        }
     }
 }
 

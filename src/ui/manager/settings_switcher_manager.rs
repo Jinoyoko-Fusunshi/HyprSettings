@@ -51,6 +51,9 @@ impl SettingsSwitcherManager {
                 let appearance_settings = self.application_provider
                     .get_appearance_provider().borrow().get_settings();
 
+                let input_settings = self.application_provider
+                    .get_input_provider().borrow().get_settings();
+                
                 let keybind_settings = self.application_provider
                     .get_keybinds_provider().borrow().get_settings();
 
@@ -61,6 +64,7 @@ impl SettingsSwitcherManager {
                     program_settings.clone(),
                     display_settings.clone(),
                     appearance_settings.clone(),
+                    input_settings.clone(),
                     keybind_settings.clone(),
                     lockscreen_settings.clone()
                 );
