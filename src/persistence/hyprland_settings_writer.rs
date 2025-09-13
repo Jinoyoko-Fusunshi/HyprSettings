@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
+use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::persistence::settings_writer::SettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::models::settings::keybind_settings::KeyBindSettings;
@@ -86,15 +87,32 @@ impl HyprlandSettingsWriter {
 
         let display_settings = settings.display_settings.monitor_configurations.clone();
         for (monitor_port, monitor_configuration) in display_settings {
+            if !monitor_configuration.enabled {
+                continue;
+            }
+
             let video_mode = monitor_configuration.video_mode;
+            let transformation_settings = match monitor_configuration.orientation {
+                MonitorOrientation::None => 0,
+                MonitorOrientation::Rotation90 => 1,
+                MonitorOrientation::Rotation180 => 2,
+                MonitorOrientation::Rotation270 => 3,
+                MonitorOrientation::Flipped => 4,
+                MonitorOrientation::FlippedRotation90 => 5,
+                MonitorOrientation::FlippedRotation180 => 6,
+                MonitorOrientation::FlippedRotation270 => 7,
+            };
+
             let display_entry = format!(
-                "monitor={},{}x{}@{},{}x{},1",
+                "monitor = {}, {}x{}@{}, {}x{}, {}, transform, {}",
                 monitor_port,
                 video_mode.width_resolution,
                 video_mode.height_resolution,
                 video_mode.refresh_rate,
-                0,
-                0,
+                monitor_configuration.x_offset,
+                monitor_configuration.y_offset,
+                monitor_configuration.resolution_scale,
+                transformation_settings
             );
             self.add_line_entry(display_entry);
         }

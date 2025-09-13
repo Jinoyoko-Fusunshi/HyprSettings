@@ -2,6 +2,7 @@ use gtk::{Adjustment, Align, Label, Orientation, SpinButton as GTKSpinButton};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
+use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::Control;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::states::spin_button_state::SpinButtonState;
@@ -37,6 +38,16 @@ impl UpdatableControl<SpinButtonState> for SpinButton {
         self.spin_button.set_climb_rate(state.climb_rate);
         self.spin_button.set_digits(state.digit_count);
         self.spin_button.set_numeric(state.use_integral_numbers);
+    }
+}
+
+impl ActivableControl for SpinButton {
+    fn enable_control(&self) {
+        self.spin_button.set_sensitive(true);
+    }
+
+    fn disable_control(&self) {
+        self.spin_button.set_sensitive(false);
     }
 }
 

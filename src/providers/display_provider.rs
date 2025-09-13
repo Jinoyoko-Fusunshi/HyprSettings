@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::process::Command;
-use crate::models::monitor::monitor_configuration::MonitorConfiguration;
+use crate::models::monitor::monitor_configuration::{MonitorConfiguration, MonitorOrientation};
 use crate::models::monitor::monitor_info_parser::MonitorInfoParser;
 use crate::models::settings::display_settings::DisplaySettings;
 
@@ -27,6 +27,7 @@ impl DisplayProvider {
         monitor_info_parser.parse_output(&output);
         let monitor_information = monitor_info_parser.get_result();
 
+        let monitor_orientation = MonitorOrientation::None;
         let monitor_configurations: HashMap<String, MonitorConfiguration> = monitor_information
             .iter()
             .map(|monitor_information| {
@@ -35,7 +36,11 @@ impl DisplayProvider {
                 let configuration = MonitorConfiguration {
                     enabled: true,
                     information: monitor_information.clone(),
-                    video_mode: monitor_information.max_video_mode.clone()
+                    video_mode: monitor_information.max_video_mode.clone(),
+                    x_offset: 0,
+                    y_offset: 0,
+                    resolution_scale: 1.0,
+                    orientation: monitor_orientation.clone(),
                 };
 
                 (port, configuration)
@@ -69,12 +74,44 @@ impl DisplayProvider {
         configuration.video_mode.height_resolution = height;
     }
 
+    pub fn set_monitor_x_offset(&mut self, monitor_port: String, x_offset: u32) {
+        let configuration = self.settings.monitor_configurations
+            .get_mut(&monitor_port)
+            .unwrap();
+        
+        configuration.x_offset = x_offset;
+    }
+
+    pub fn set_monitor_y_offset(&mut self, monitor_port: String, y_offset: u32) {
+        let configuration = self.settings.monitor_configurations
+            .get_mut(&monitor_port)
+            .unwrap();
+
+        configuration.y_offset = y_offset;
+    }
+    
     pub fn set_monitor_refresh_rate(&mut self, monitor_port: String, refresh_rate: u32) {
         let configuration = self.settings.monitor_configurations
             .get_mut(&monitor_port)
             .unwrap();
         
         configuration.video_mode.refresh_rate = refresh_rate;
+    }
+    
+    pub fn set_resolution_scale(&mut self, monitor_port: String, scale: f32) {
+        let configuration = self.settings.monitor_configurations
+            .get_mut(&monitor_port)
+            .unwrap();
+        
+        configuration.resolution_scale = scale;
+    }
+
+    pub fn set_monitor_orientation(&mut self, monitor_port: String, orientation: MonitorOrientation) {
+        let configuration = self.settings.monitor_configurations
+            .get_mut(&monitor_port)
+            .unwrap();
+
+        configuration.orientation = orientation;
     }
 
     pub fn get_monitor_configurations(&self) -> HashMap<String, MonitorConfiguration> {
