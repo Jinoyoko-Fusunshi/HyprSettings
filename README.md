@@ -42,7 +42,7 @@ bash copy-resources.sh
 
 Run the program via terminal:
 ```shell
-./target/release/HyprSettings
+./target/release/hyprsettings
 ```
 
 ## Dependencies
@@ -51,9 +51,9 @@ Run the program via terminal:
 - **[cargo, rust](https://doc.rust-lang.org/cargo/)** = 1.89.0
 
 ### Rust packages
-- **[gtk](https://github.com/gtk-rs/gtk4-rs)** = 0.9.7
-- **[serde](https://github.com/serde-rs/serde)** = 1.0.219
-- **[serde_yaml](https://github.com/dtolnay/serde-yaml)** = 0.9.33
+- **[gtk](https://github.com/gtk-rs/gtk4-rs)** = 0.10.1
+- **[serde](https://github.com/serde-rs/serde)** = 1.0.225
+- **[serde_yaml](https://github.com/dtolnay/serde-yaml)** = 0.9.34
 
 ## Installation
 Install the program via the script (requires root)
@@ -67,7 +67,7 @@ bash uninstall.sh
 
 Run the program via terminal
 ```shell
-HyprSettings
+hyprsettings
 ```
 
 ## Project

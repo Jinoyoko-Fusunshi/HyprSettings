@@ -15,7 +15,7 @@ use crate::ui::pages::app::App;
 fn main() {
     // GTK application initialization
     let application = Application::builder()
-        .application_id("de.jinoworks.HyprSettings")
+        .application_id("jinoworks.hyprsettings")
         .build();
     
     application.connect_activate(application_activation_setup);
@@ -27,7 +27,7 @@ fn application_activation_setup(application: &Application) {
     
     let window = ApplicationWindow::builder()
         .application(application)
-        .title("Hypr Settings")
+        .title("HyprSettings")
         .default_width(800)
         .default_height(600)
         .build();
@@ -38,7 +38,7 @@ fn application_activation_setup(application: &Application) {
 }
 
 fn load_css_styles() {
-    const CSS_STYLE_PATH: &str = "/usr/share/HyprSettings/style.css";
+    const CSS_STYLE_PATH: &str = "/usr/share/hyprsettings/style.css";
 
     let provider = CssProvider::new();
     let css_file = File::for_path(CSS_STYLE_PATH);

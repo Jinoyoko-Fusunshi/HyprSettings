@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=HyprSettings
+Exec=/usr/bin/hyprsettings
+Type=Application
+Categories=Utility
+StartupNotify=true
+Terminal=false
