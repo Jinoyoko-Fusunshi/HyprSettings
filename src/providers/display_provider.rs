@@ -3,6 +3,7 @@ use std::process::Command;
 use crate::models::monitor::monitor_configuration::{MonitorConfiguration, MonitorOrientation};
 use crate::models::monitor::monitor_info_parser::MonitorInfoParser;
 use crate::models::settings::display_settings::DisplaySettings;
+use crate::math::vector::Vector;
 
 pub struct DisplayProvider {
     settings: DisplaySettings
@@ -37,8 +38,7 @@ impl DisplayProvider {
                     enabled: true,
                     information: monitor_information.clone(),
                     video_mode: monitor_information.max_video_mode.clone(),
-                    x_offset: 0,
-                    y_offset: 0,
+                    offset: Vector::new(0.0, 0.0),
                     resolution_scale: 1.0,
                     orientation: monitor_orientation.clone(),
                 };
@@ -74,20 +74,12 @@ impl DisplayProvider {
         configuration.video_mode.height_resolution = height;
     }
 
-    pub fn set_monitor_x_offset(&mut self, monitor_port: String, x_offset: u32) {
+    pub fn set_monitor_offset(&mut self, monitor_port: String, offset: Vector) {
         let configuration = self.settings.monitor_configurations
             .get_mut(&monitor_port)
             .unwrap();
         
-        configuration.x_offset = x_offset;
-    }
-
-    pub fn set_monitor_y_offset(&mut self, monitor_port: String, y_offset: u32) {
-        let configuration = self.settings.monitor_configurations
-            .get_mut(&monitor_port)
-            .unwrap();
-
-        configuration.y_offset = y_offset;
+        configuration.offset = offset;
     }
     
     pub fn set_monitor_refresh_rate(&mut self, monitor_port: String, refresh_rate: u32) {

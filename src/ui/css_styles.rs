@@ -10,4 +10,5 @@ impl CSSStyles {
     pub const KEYBIND_INPUT: &'static str = "keybind-input";
     pub const KEY_SYMBOL_LABEL: &'static str = "key-symbol";
     pub const KEY_SYMBOL_BOX: &'static str = "key-symbol";
+    pub const DISPLAY_ELEMENT_BOX: &'static str = "display-element";
 }

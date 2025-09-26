@@ -29,8 +29,6 @@ pub struct DisplayField {
     monitor_display_label: Label,
     width_spin_button: SpinButton,
     height_spin_button: SpinButton,
-    x_offset_spin_button: SpinButton,
-    y_offset_spin_button: SpinButton,
     refresh_rate_spin_button: SpinButton,
     resolution_scale_spin_button: SpinButton,
     display_mode_selection_box: SelectionBox,
@@ -94,34 +92,6 @@ impl UpdatableControl<DisplayFieldState> for DisplayField {
         };
         self.height_spin_button.update_ui(height_spin_button_state);
 
-        let x_offset_spin_button_state = SpinButtonState {
-            label_text: "X-Offset:".to_string(),
-            climb_rate: RESOLUTION_CLIMB_RATE,
-            min_value: 0.0,
-            max_value: 10000.0,
-            digit_count: FLOAT_DIGITS,
-            use_integral_numbers: false,
-            current_value: state.monitor_configuration.x_offset as f64,
-            increment_value: RESOLUTION_INCREMENT,
-            page_size: 0.0,
-            page_increment_value: RESOLUTION_PAGE_INCREMENT
-        };
-        self.x_offset_spin_button.update_ui(x_offset_spin_button_state);
-
-        let y_offset_spin_button_state = SpinButtonState {
-            label_text: "Y-Offset:".to_string(),
-            climb_rate: RESOLUTION_CLIMB_RATE,
-            min_value: 0.0,
-            max_value: 10000.0,
-            digit_count: FLOAT_DIGITS,
-            use_integral_numbers: false,
-            current_value: state.monitor_configuration.y_offset as f64,
-            increment_value: RESOLUTION_INCREMENT,
-            page_size: 0.0,
-            page_increment_value: RESOLUTION_PAGE_INCREMENT
-        };
-        self.y_offset_spin_button.update_ui(y_offset_spin_button_state);
-
         let refresh_rate_spin_button_state = SpinButtonState {
             label_text: "Refresh Rate:".to_string(),
             climb_rate: REFRESH_CLIMB_RATE,
@@ -168,8 +138,6 @@ impl ActivableControl for DisplayField {
     fn enable_control(&self) {
         self.width_spin_button.enable_control();
         self.height_spin_button.enable_control();
-        self.x_offset_spin_button.enable_control();
-        self.y_offset_spin_button.enable_control();
         self.refresh_rate_spin_button.enable_control();
         self.display_mode_selection_box.enable_control();
     }
@@ -177,8 +145,6 @@ impl ActivableControl for DisplayField {
     fn disable_control(&self) {
         self.width_spin_button.disable_control();
         self.height_spin_button.disable_control();
-        self.x_offset_spin_button.disable_control();
-        self.y_offset_spin_button.disable_control();
         self.refresh_rate_spin_button.disable_control();
         self.display_mode_selection_box.disable_control();
     }
@@ -187,7 +153,6 @@ impl ActivableControl for DisplayField {
 impl DisplayField {
     pub fn new() -> Self {
         const SIZE_BOX_LABEL_WIDTH: u32 = 50;
-        const OFFSET_BOX_LABEL_WIDTH: u32 = 70;
         const REFRESH_BOX_LABEL_WIDTH: u32 = 100;
 
         let display_field_box = BoxBuilder::new("display-field")
@@ -230,19 +195,6 @@ impl DisplayField {
         size_field_box.append(width_spin_button.get_widget());
         size_field_box.append(height_spin_button.get_widget());
 
-        let offset_field_box = BoxBuilder::new("offset-field")
-            .set_orientation(Orientation::Vertical)
-            .build();
-
-        let x_offset_spin_button = SpinButton::new();
-        x_offset_spin_button.set_text_width(OFFSET_BOX_LABEL_WIDTH);
-
-        let y_offset_spin_button = SpinButton::new();
-        y_offset_spin_button.set_text_width(OFFSET_BOX_LABEL_WIDTH);
-
-        offset_field_box.append(x_offset_spin_button.get_widget());
-        offset_field_box.append(y_offset_spin_button.get_widget());
-
         let refresh_rate_box = BoxBuilder::new("refresh-rate-box")
             .set_orientation(Orientation::Vertical)
             .build();
@@ -264,7 +216,6 @@ impl DisplayField {
         rotation_mode_box.append(rotation_mode_selection_box.get_widget());
 
         video_setting_box.append(&size_field_box);
-        video_setting_box.append(&offset_field_box);
         video_setting_box.append(&refresh_rate_box);
         video_setting_box.append(&rotation_mode_box);
 
@@ -278,8 +229,6 @@ impl DisplayField {
             monitor_display_label,
             width_spin_button,
             height_spin_button,
-            x_offset_spin_button,
-            y_offset_spin_button,
             refresh_rate_spin_button,
             resolution_scale_spin_button,
             display_mode_selection_box: rotation_mode_selection_box
@@ -296,13 +245,6 @@ impl DisplayField {
 
     pub fn set_height_change(&self, value_change: impl Fn(&GTKSpinButton) + 'static) {
         self.height_spin_button.set_value_change(value_change);
-    }
-
-    pub fn set_x_offset_change(&self, value_change: impl Fn(&GTKSpinButton) + 'static) {
-        self.x_offset_spin_button.set_value_change(value_change);
-    }
-    pub fn set_y_offset_change(&self, value_change: impl Fn(&GTKSpinButton) + 'static) {
-        self.y_offset_spin_button.set_value_change(value_change);
     }
     
     pub fn set_refresh_rate_change(&self, value_change: impl Fn(&GTKSpinButton) + 'static) {

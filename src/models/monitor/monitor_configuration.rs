@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use crate::models::monitor::monitor_information::MonitorInformation;
 use crate::models::monitor::video_mode::VideoMode;
+use crate::math::vector::Vector;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub enum MonitorOrientation {
@@ -48,13 +49,42 @@ impl Display for MonitorOrientation {
     }
 }
 
+impl MonitorOrientation {
+    pub fn is_landscape(&self) -> bool {
+        match self {
+            MonitorOrientation::None => true,
+            MonitorOrientation::Rotation180 => true,
+            MonitorOrientation::Flipped => true,
+            MonitorOrientation::FlippedRotation180 => true,
+            _ => false
+        }
+    }
+
+    pub fn is_portrait(&self) -> bool {
+        match self {
+            MonitorOrientation::Rotation90 => true,
+            MonitorOrientation::Rotation270 => true,
+            MonitorOrientation::FlippedRotation90 => true,
+            MonitorOrientation::FlippedRotation270 => true,
+            _ => false
+        }
+    }
+    
+    pub fn get_size_by_orientation(&self, size: Vector) -> Vector {
+        if self.is_landscape() {
+            size
+        } else {
+            Vector::new(size.get_y(), size.get_x())
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MonitorConfiguration {
     pub enabled: bool,
     pub information: MonitorInformation,
     pub video_mode: VideoMode,
-    pub x_offset: u32,
-    pub y_offset: u32,
+    pub offset: Vector,
     pub resolution_scale: f32,
     pub orientation: MonitorOrientation,
 }

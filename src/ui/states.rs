@@ -13,3 +13,5 @@ pub mod color_selector_state;
 pub mod editable_control_element_state;
 pub mod input_field_state;
 pub mod selection_box_state;
+pub mod display_element_state;
+pub mod display_configurator_state;

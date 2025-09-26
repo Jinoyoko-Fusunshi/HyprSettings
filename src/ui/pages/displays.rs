@@ -7,9 +7,13 @@ use crate::types::{GTKBox, GTKSpinButton};
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::Control;
+use crate::ui::controls::display_configurator::DisplayConfigurator;
 use crate::ui::controls::display_field::DisplayField;
+use crate::ui::manager::display_configurator_manager::DisplayConfiguratorManager;
 use crate::ui::manager::display_field_manager::{DisplayFieldEvent, DisplayFieldManager};
 use crate::ui::section_box_builder::SectionBoxBuilder;
+use crate::ui::statable_control::StatableControl;
+use crate::ui::states::display_configurator_state::DisplayConfiguratorState;
 use crate::ui::states::display_field_state::DisplayFieldState;
 use crate::ui::states::display_settings_state::DisplaySettingsState;
 use crate::ui::updatable_control::UpdatableControl;
@@ -56,7 +60,24 @@ impl Displays {
             .set_orientation(Orientation::Vertical)
             .build();
 
+        let display_provider = application_provider.get_display_provider();
+        let display_configurator_state = DisplayConfiguratorState::from(display_provider);
+        let display_configurator = new_rc_mut(
+            DisplayConfigurator::new(application_provider.get_display_provider())
+        );
+
+        for (monitor_port, _) in &display_configurator_state.display_element_states {
+            display_configurator.borrow_mut().insert_display_element(monitor_port.clone());
+        }
+
+        display_configurator.borrow_mut().update_state(display_configurator_state.clone());
+        display_configurator.borrow_mut().update_ui(display_configurator_state.clone());
+
+        let display_configurator_manager = DisplayConfiguratorManager::new(display_configurator.clone());
+        display_configurator.borrow_mut().init_events_by_manager(display_configurator_manager);
+
         display_box.append(&display_fields_box);
+        display_box.append(display_configurator.borrow().get_widget());
 
         Self {
             application_provider,
@@ -104,20 +125,6 @@ impl Displays {
                 display_provider.borrow_mut().set_monitor_height(port_clone.clone(), spin_button.value() as u32);
             };
             display_field.borrow_mut().set_height_change(height_spin_button_change);
-            
-            let display_provider = self.application_provider.get_display_provider();
-            let port_clone = port.clone();
-            let x_offset_spin_button_change = move |spin_button: &GTKSpinButton| {
-                display_provider.borrow_mut().set_monitor_x_offset(port_clone.clone(), spin_button.value() as u32);
-            };
-            display_field.borrow_mut().set_x_offset_change(x_offset_spin_button_change);
-
-            let display_provider = self.application_provider.get_display_provider();
-            let port_clone = port.clone();
-            let y_offset_spin_button_change = move |spin_button: &GTKSpinButton| {
-                display_provider.borrow_mut().set_monitor_y_offset(port_clone.clone(), spin_button.value() as u32);
-            };
-            display_field.borrow_mut().set_y_offset_change(y_offset_spin_button_change);
 
             let display_provider = self.application_provider.get_display_provider();
             let port_clone = port.clone();

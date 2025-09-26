@@ -4,6 +4,7 @@ pub mod models;
 pub mod utils;
 pub mod persistence;
 mod types;
+mod math;
 
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, CssProvider, STYLE_PROVIDER_PRIORITY_USER};

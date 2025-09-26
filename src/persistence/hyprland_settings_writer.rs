@@ -110,8 +110,8 @@ impl HyprlandSettingsWriter {
                 video_mode.width_resolution,
                 video_mode.height_resolution,
                 video_mode.refresh_rate,
-                monitor_configuration.x_offset,
-                monitor_configuration.y_offset,
+                monitor_configuration.offset.get_x(),
+                monitor_configuration.offset.get_y(),
                 monitor_configuration.resolution_scale,
                 transformation_settings
             );
