@@ -79,12 +79,12 @@ box#display-configurator {
     border: 2px #333333 solid;
 }
 
-box.display-element {
+box.monitor {
     background: #111111;
     border-radius: 8px;
     border: 2px #333333 solid;
 }
 
-box.display-element:focus {
+box.monitor:focus {
     background: #2196ff;
 }

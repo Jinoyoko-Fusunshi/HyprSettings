@@ -86,8 +86,8 @@ impl HyprlandSettingsWriter {
     fn serialize_monitor_settings(&mut self, settings: &HyprlandSettings) {
         self.add_comment_section("MONITORS".to_string());
 
-        let display_settings = settings.display_settings.monitor_configurations.clone();
-        for (monitor_port, monitor_configuration) in display_settings {
+        let monitor_settings = settings.monitor_settings.monitor_configurations.clone();
+        for (monitor_port, monitor_configuration) in monitor_settings {
             if !monitor_configuration.enabled {
                 continue;
             }
@@ -104,7 +104,7 @@ impl HyprlandSettingsWriter {
                 MonitorOrientation::FlippedRotation270 => 7,
             };
 
-            let display_entry = format!(
+            let monitor_entry = format!(
                 "monitor = {}, {}x{}@{}, {}x{}, {}, transform, {}",
                 monitor_port,
                 video_mode.width_resolution,
@@ -115,7 +115,7 @@ impl HyprlandSettingsWriter {
                 monitor_configuration.resolution_scale,
                 transformation_settings
             );
-            self.add_line_entry(display_entry);
+            self.add_line_entry(monitor_entry);
         }
     }
 

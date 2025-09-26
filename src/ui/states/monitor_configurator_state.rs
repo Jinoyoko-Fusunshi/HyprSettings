@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 use crate::math::vector::Vector;
-use crate::providers::display_provider::DisplayProvider;
-use crate::ui::states::display_element_state::DisplayElementState;
+use crate::providers::monitor_provider::MonitorProvider;
+use crate::ui::states::monitor_state::DisplayElementState;
 use crate::utils::RcMut;
 
 #[derive(Default, Clone)]
-pub struct DisplayConfiguratorState {
-    pub display_element_states: HashMap<String, DisplayElementState>,
+pub struct MonitorConfiguratorState {
+    pub monitor_states: HashMap<String, DisplayElementState>,
     pub selected_monitor: Option<String>,
 }
 
-impl From<RcMut<DisplayProvider>> for DisplayConfiguratorState {
-    fn from(value: RcMut<DisplayProvider>) -> Self {
+impl From<RcMut<MonitorProvider>> for MonitorConfiguratorState {
+    fn from(value: RcMut<MonitorProvider>) -> Self {
         let display_element_states: HashMap<String, DisplayElementState> = value.borrow()
             .get_monitor_configurations()
             .into_iter()
@@ -38,8 +38,8 @@ impl From<RcMut<DisplayProvider>> for DisplayConfiguratorState {
             })
             .collect();
 
-        DisplayConfiguratorState {
-            display_element_states,
+        MonitorConfiguratorState {
+            monitor_states: display_element_states,
             selected_monitor: None
         }
     }

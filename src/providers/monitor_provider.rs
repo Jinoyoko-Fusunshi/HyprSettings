@@ -2,21 +2,21 @@ use std::collections::HashMap;
 use std::process::Command;
 use crate::models::monitor::monitor_configuration::{MonitorConfiguration, MonitorOrientation};
 use crate::models::monitor::monitor_info_parser::MonitorInfoParser;
-use crate::models::settings::display_settings::DisplaySettings;
+use crate::models::settings::monitor_settings::MonitorSettings;
 use crate::math::vector::Vector;
 
-pub struct DisplayProvider {
-    settings: DisplaySettings
+pub struct MonitorProvider {
+    settings: MonitorSettings
 }
 
-impl DisplayProvider {
-    pub fn new(settings: DisplaySettings) -> Self {
+impl MonitorProvider {
+    pub fn new(settings: MonitorSettings) -> Self {
         Self {
             settings
         }
     }
 
-    pub fn init_monitors(&mut self) {
+    pub fn fetch_monitors(&mut self) {
         let command_result = Command::new("wlr-randr")
             .output()
             .expect("Error during wlrandr execution");
@@ -90,7 +90,7 @@ impl DisplayProvider {
         configuration.video_mode.refresh_rate = refresh_rate;
     }
     
-    pub fn set_resolution_scale(&mut self, monitor_port: String, scale: f32) {
+    pub fn set_monitor_scale(&mut self, monitor_port: String, scale: f32) {
         let configuration = self.settings.monitor_configurations
             .get_mut(&monitor_port)
             .unwrap();
@@ -110,7 +110,7 @@ impl DisplayProvider {
         self.settings.monitor_configurations.clone()
     }
 
-    pub fn get_settings(&self) -> DisplaySettings {
+    pub fn get_settings(&self) -> MonitorSettings {
         self.settings.clone()
     }
 }

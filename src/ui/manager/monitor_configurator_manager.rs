@@ -1,10 +1,10 @@
 use crate::math::vector::Vector;
-use crate::ui::controls::display_configurator::DisplayConfigurator;
+use crate::ui::controls::monitor_configurator::MonitorConfigurator;
 use crate::utils::RcMut;
 
 #[derive(Clone)]
-pub struct DisplayConfiguratorManager {
-    display_configurator: RcMut<DisplayConfigurator>
+pub struct MonitorConfiguratorManager {
+    display_configurator: RcMut<MonitorConfigurator>
 }
 
 pub enum DisplayConfiguratorEvent {
@@ -13,8 +13,8 @@ pub enum DisplayConfiguratorEvent {
     DisplayPlaced(String, Vector)
 }
 
-impl DisplayConfiguratorManager {
-    pub fn new(display_configurator: RcMut<DisplayConfigurator>) -> Self {
+impl MonitorConfiguratorManager {
+    pub fn new(display_configurator: RcMut<MonitorConfigurator>) -> Self {
         Self {
             display_configurator
         }
@@ -24,7 +24,7 @@ impl DisplayConfiguratorManager {
         let mut display_configurator = self.display_configurator.borrow_mut();
         match event {
             DisplayConfiguratorEvent::DisplaySelected(monitor_port) => {
-              display_configurator.select_display_element(Some(monitor_port));
+              display_configurator.select_monitor(Some(monitor_port));
             },
             DisplayConfiguratorEvent::DisplayMoving(monitor_port, moved_position) => {
                 let corrected_moved_position = Self::get_corrected_position(
@@ -40,14 +40,14 @@ impl DisplayConfiguratorManager {
                 let corrected_placed_position = Self::get_corrected_position(
                     placed_position, display_configurator.get_size()
                 );
-                display_configurator.place_display(
-                    monitor_port.clone(), corrected_placed_position
+                display_configurator.place_monitor(
+                    &monitor_port, &corrected_placed_position
                 );
             }
         }
     }
 
-    pub fn get_display_configurator(&self) -> RcMut<DisplayConfigurator> {
+    pub fn get_display_configurator(&self) -> RcMut<MonitorConfigurator> {
         self.display_configurator.clone()
     }
 

@@ -1,5 +1,5 @@
 // This parser parses the output of the stdout output from the wlr-randr cli tool.
-// Based on the output, the display information will be estimated, since no core packages exist to easily
+// Based on the output, the monitor information will be estimated, since no core packages exist to easily
 // retrieve monitor information in wayland as in of July 2025.
 
 use crate::models::monitor::monitor_information::MonitorInformation;
@@ -34,12 +34,12 @@ impl MonitorInfoParser {
             let mut line_index = 0;
             for line in &monitor_segment {
                 if line_index == 0 {
-                    let split_monitor_display_name = line
+                    let split_monitor_name = line
                         .split(" ")
                         .map(|x| x.to_string())
                         .collect::<Vec<String>>();
 
-                    port_name = split_monitor_display_name[0].clone();
+                    port_name = split_monitor_name[0].clone();
 
                     line_index += 1;
                     continue;

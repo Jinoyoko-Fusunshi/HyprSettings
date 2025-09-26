@@ -4,14 +4,14 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::controls::Control;
-use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
     settings_navigation_box: GTKBox,
     overview_button: Button,
     general_button: Button,
-    display_button: Button,
+    monitors_button: Button,
     wallpaper_button: Button,
     lockscreen_button: Button,
     appearance_button: Button,
@@ -40,7 +40,7 @@ impl Navigation {
 
         let overview_button =  Self::create_settings_button("👀 overview");
         let general_button = Self::create_settings_button("💾 user programs");
-        let display_button = Self::create_settings_button("🖥️ display");
+        let monitors_button = Self::create_settings_button("🖥️ monitors");
         let wallpaper_button = Self::create_settings_button("🖼️ wallpaper");
         let lockscreen_button = Self::create_settings_button("🔐 lockscreen");
         let appearance_button = Self::create_settings_button("🖌️ appearance");
@@ -56,7 +56,7 @@ impl Navigation {
 
         settings_navigation_box.append(&overview_button);
         settings_navigation_box.append(&general_button);
-        settings_navigation_box.append(&display_button);
+        settings_navigation_box.append(&monitors_button);
         settings_navigation_box.append(&wallpaper_button);
         settings_navigation_box.append(&lockscreen_button);
         settings_navigation_box.append(&appearance_button);
@@ -71,7 +71,7 @@ impl Navigation {
             settings_navigation_box,
             overview_button,
             general_button,
-            display_button,
+            monitors_button: monitors_button,
             wallpaper_button,
             lockscreen_button,
             appearance_button,
@@ -95,10 +95,10 @@ impl Navigation {
         );
         self.general_button.connect_clicked(general_button_click);
 
-        let display_button_click = Self::create_settings_button_click(
-            DISPLAY_PAGE.to_string(), settings_switcher_manager.clone()
+        let monitors_button_click = Self::create_settings_button_click(
+            MONITORS_PAGE.to_string(), settings_switcher_manager.clone()
         );
-        self.display_button.connect_clicked(display_button_click);
+        self.monitors_button.connect_clicked(monitors_button_click);
 
         let wallpaper_button_click = Self::create_settings_button_click(
             WALLPAPER_PAGE.to_string(), settings_switcher_manager.clone()

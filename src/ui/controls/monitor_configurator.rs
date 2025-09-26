@@ -3,117 +3,117 @@ use gtk::{Fixed, GestureClick, GestureDrag };
 use gtk::prelude::{BoxExt, FixedExt, GestureDragExt, WidgetExt};
 use crate::math::geometry::aabb::AABB;
 use crate::math::vector::Vector;
-use crate::providers::display_provider::DisplayProvider;
+use crate::providers::monitor_provider::MonitorProvider;
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
-use crate::ui::controls::display_element::DisplayElement;
-use crate::ui::manager::display_configurator_manager::{DisplayConfiguratorEvent, DisplayConfiguratorManager};
+use crate::ui::controls::monitor::Monitor;
+use crate::ui::manager::monitor_configurator_manager::{DisplayConfiguratorEvent, MonitorConfiguratorManager};
 use crate::ui::statable_control::StatableControl;
-use crate::ui::states::display_configurator_state::DisplayConfiguratorState;
-use crate::ui::states::display_element_state::DisplayElementState;
+use crate::ui::states::monitor_configurator_state::MonitorConfiguratorState;
+use crate::ui::states::monitor_state::DisplayElementState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::RcMut;
 
-pub struct DisplayConfigurator {
-    display_provider: RcMut<DisplayProvider>,
-    state: DisplayConfiguratorState,
-    display_configurator_box: GTKBox,
-    display_elements_fixed: Fixed,
-    display_elements: HashMap<String, DisplayElement>
+pub struct MonitorConfigurator {
+    monitor_provider: RcMut<MonitorProvider>,
+    state: MonitorConfiguratorState,
+    monitor_configurator_box: GTKBox,
+    monitors_fixed: Fixed,
+    monitors: HashMap<String, Monitor>
 }
 
-impl Control for DisplayConfigurator {
+impl Control for MonitorConfigurator {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &GTKBox {
-        &self.display_configurator_box
+        &self.monitor_configurator_box
     }
 }
 
-impl UpdatableControl<DisplayConfiguratorState> for DisplayConfigurator {
-    fn update_ui(&mut self, state: DisplayConfiguratorState) {
-        for (monitor_port, state) in state.display_element_states {
-            let display_element = self.display_elements.get_mut(&monitor_port).unwrap();
-            display_element.update_ui(state.clone());
-            self.display_elements_fixed.move_(
-                display_element.get_widget(), state.position.get_x(), state.position.get_y()
+impl UpdatableControl<MonitorConfiguratorState> for MonitorConfigurator {
+    fn update_ui(&mut self, state: MonitorConfiguratorState) {
+        for (port, state) in state.monitor_states {
+            let monitor = self.monitors.get_mut(&port).unwrap();
+            monitor.update_ui(state.clone());
+            self.monitors_fixed.move_(
+                monitor.get_widget(), state.position.get_x(), state.position.get_y()
             );
         }
     }
 }
 
-impl StatableControl<DisplayConfiguratorState> for DisplayConfigurator {
-    fn update_state(&mut self, state: DisplayConfiguratorState) {
+impl StatableControl<MonitorConfiguratorState> for MonitorConfigurator {
+    fn update_state(&mut self, state: MonitorConfiguratorState) {
         self.state = state;
     }
 }
 
-impl DisplayConfigurator {
-    pub fn new(display_provider: RcMut<DisplayProvider>) -> Self {
-        let display_configurator_box = BoxBuilder::new("display-configurator")
+impl MonitorConfigurator {
+    pub fn new(monitor_provider: RcMut<MonitorProvider>) -> Self {
+        let monitor_configurator_box = BoxBuilder::new("display-configurator")
             .set_margin_top(10)
             .build();
 
-        let display_elements_fixed = Fixed::new();
-        display_elements_fixed.set_height_request(500);
-        display_configurator_box.append(&display_elements_fixed);
+        let monitors_fixed = Fixed::new();
+        monitors_fixed.set_height_request(500);
+        monitor_configurator_box.append(&monitors_fixed);
 
-        let display_elements = HashMap::new();
-        let state: DisplayConfiguratorState = Default::default();
+        let monitors = HashMap::new();
+        let state: MonitorConfiguratorState = Default::default();
 
         Self {
-            display_provider,
+            monitor_provider,
             state,
-            display_configurator_box,
-            display_elements_fixed,
-            display_elements
+            monitor_configurator_box,
+            monitors_fixed,
+            monitors
         }
     }
 
-    pub fn insert_display_element(&mut self, port_name: String) {
-        let display_element = DisplayElement::new();
-        self.display_elements_fixed.put(display_element.get_widget(), 0.0, 0.0);
-        self.display_elements.insert(port_name.clone(), display_element);
+    pub fn insert_monitor(&mut self, port: &String) {
+        let monitor = Monitor::new();
+        self.monitors_fixed.put(monitor.get_widget(), 0.0, 0.0);
+        self.monitors.insert(port.clone(), monitor);
     }
 
-    pub fn select_display_element(&mut self, port_name: Option<String>) {
-        self.state.selected_monitor = port_name.clone();
-        if let Some(port_name) = port_name {
-            if let Some(display_element) = self.display_elements.get(&port_name) {
-                display_element.focus();
+    pub fn select_monitor(&mut self, port: Option<String>) {
+        self.state.selected_monitor = port.clone();
+        if let Some(port) = port {
+            if let Some(monitor) = self.monitors.get(&port) {
+                monitor.focus();
             }
         }
     }
 
-    pub fn place_display(&mut self, port_name: String, placed_position: Vector) {
-        let mut display_configuration_state = self.state.clone();
-        let mut current_display_element_state = display_configuration_state
-            .display_element_states
-            .get(&port_name)
+    pub fn place_monitor(&mut self, port: &String, position: &Vector) {
+        let mut monitor_configurator_state = self.state.clone();
+        let mut monitor_state = monitor_configurator_state
+            .monitor_states
+            .get(port)
             .unwrap()
             .clone();
-        current_display_element_state.position = placed_position.clone();
+        monitor_state.position = position.clone();
 
-        display_configuration_state.display_element_states.insert(
-            port_name.clone(), current_display_element_state.clone()
+        monitor_configurator_state.monitor_states.insert(
+            port.clone(), monitor_state.clone()
         );
-        self.update_state(display_configuration_state.clone());
+        self.update_state(monitor_configurator_state.clone());
 
         self.adjust_current_display_element_to_intersecting_closest_one(
-            &port_name, &placed_position, &mut current_display_element_state,
+            &port, &position, &mut monitor_state,
         );
-        display_configuration_state.display_element_states.insert(
-            port_name.clone(), current_display_element_state.clone()
+        monitor_configurator_state.monitor_states.insert(
+            port.clone(), monitor_state.clone()
         );
-        self.update_state(display_configuration_state.clone());
+        self.update_state(monitor_configurator_state.clone());
 
-        let current_display_element_position = current_display_element_state.position;
-        self.move_display_element(port_name.clone(), current_display_element_position.clone());
+        let monitor_position = monitor_state.position;
+        self.move_display_element(port.clone(), monitor_position.clone());
 
-        let mut display_provider_mut = self.display_provider.borrow_mut();
-        display_provider_mut.set_monitor_offset(
-            port_name.clone(), current_display_element_position.mul_by(10.0)
+        let mut monitor_provider_mut = self.monitor_provider.borrow_mut();
+        monitor_provider_mut.set_monitor_offset(
+            port.clone(), monitor_position.mul_by(10.0)
         );
     }
 
@@ -222,7 +222,7 @@ impl DisplayConfigurator {
     }
 
     fn get_other_display_element_states(&self, port_name: &String) -> HashMap<String, DisplayElementState> {
-        self.state.display_element_states.iter()
+        self.state.monitor_states.iter()
             .filter(|(monitor_port, _)| {
                 *monitor_port != port_name
             })
@@ -276,38 +276,38 @@ impl DisplayConfigurator {
     }
 
     pub fn move_display_element(&mut self, port_name: String, moved_position: Vector) {
-        let display_element_state = self.state.display_element_states.get_mut(&port_name);
-        if let Some(display_element) = self.display_elements.get_mut(&port_name) {
+        let display_element_state = self.state.monitor_states.get_mut(&port_name);
+        if let Some(display_element) = self.monitors.get_mut(&port_name) {
             let display_element_state = display_element_state.unwrap();
             display_element_state.position = moved_position.clone();
             display_element.update_ui(display_element_state.clone());
 
-            self.display_elements_fixed.move_(display_element.get_widget(), moved_position.get_x(), moved_position.get_y());
+            self.monitors_fixed.move_(display_element.get_widget(), moved_position.get_x(), moved_position.get_y());
         }
     }
 
     pub fn get_width(&self) -> f64 {
-        self.display_elements_fixed.width() as f64
+        self.monitors_fixed.width() as f64
     }
 
     pub fn get_height(&self) -> f64 {
-        self.display_elements_fixed.height() as f64
+        self.monitors_fixed.height() as f64
     }
 
     pub fn get_size(&self) -> Vector {
         Vector::new(
-            self.display_elements_fixed.width() as f64,
-            self.display_elements_fixed.height() as f64
+            self.monitors_fixed.width() as f64,
+            self.monitors_fixed.height() as f64
         )
     }
 
-    pub fn get_state(&self) -> DisplayConfiguratorState {
+    pub fn get_state(&self) -> MonitorConfiguratorState {
         self.state.clone()
     }
 
-    pub fn init_events_by_manager(&mut self, manager: DisplayConfiguratorManager) {
-        for (monitor_port, display_element) in &self.display_elements {
-            let state = self.state.display_element_states.get(monitor_port);
+    pub fn init_events_by_manager(&mut self, manager: MonitorConfiguratorManager) {
+        for (monitor_port, display_element) in &self.monitors {
+            let state = self.state.monitor_states.get(monitor_port);
             if let None = state {
                 continue;
             }
@@ -331,7 +331,7 @@ impl DisplayConfigurator {
 
             let selected_port = display_configuration_state.selected_monitor;
             if let Some(selected_port) = selected_port {
-                let display_element_state = display_configuration_state.display_element_states
+                let display_element_state = display_configuration_state.monitor_states
                     .get(&selected_port);
 
                 if let Some(display_element_state) = display_element_state {
@@ -355,7 +355,7 @@ impl DisplayConfigurator {
 
             let selected_port = display_configuration_state.selected_monitor;
             if let Some(selected_port) = selected_port {
-                let display_element_state = display_configuration_state.display_element_states
+                let display_element_state = display_configuration_state.monitor_states
                     .get(&selected_port);
 
                 if let Some(display_element_state) = display_element_state {
@@ -371,6 +371,6 @@ impl DisplayConfigurator {
                 }
             }
         });
-        self.display_elements_fixed.add_controller(controller);
+        self.monitors_fixed.add_controller(controller);
     }
 }

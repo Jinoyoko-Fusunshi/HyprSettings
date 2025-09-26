@@ -75,5 +75,5 @@ The development of this project originated with the main idea to actively learn 
 Since it formed into a kind of usable tool, the idea was set to make it public for everyone.
 
 > ⚠️ This tool will receive updates since not all features are fully implemented and only contains the basic features 
-> for hyprland beginners. It may have some problems regarding the display settings 
+> for hyprland beginners. It may have some problems regarding the monitor settings 
 > and other areas.

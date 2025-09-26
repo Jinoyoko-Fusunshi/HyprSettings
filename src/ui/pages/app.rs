@@ -13,16 +13,16 @@ use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::general_settings_state::GeneralSettingsState;
 use crate::ui::controls::Control;
 use crate::ui::pages::appearance::Appearance;
-use crate::ui::pages::displays::Displays;
+use crate::ui::pages::monitors::Monitors;
 use crate::ui::pages::infos::Infos;
 use crate::ui::pages::keybinds::Keybinds;
 use crate::ui::pages::lockscreen::Lockscreen;
 use crate::ui::pages::overview::Overview;
-use crate::ui::pages::{APPEARANCE_PAGE, DISPLAY_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 use crate::ui::pages::input::Input;
 use crate::ui::pages::startup_programs::StartupPrograms;
 use crate::ui::pages::wallpaper::Wallpaper;
-use crate::ui::states::display_settings_state::DisplaySettingsState;
+use crate::ui::states::monitor_settings_state::MonitorSettingsState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
@@ -58,10 +58,10 @@ impl App {
         program_settings.init_events();
         program_settings.update_ui(state);
 
-        let state = DisplaySettingsState::from(&application_provider);
-        let mut display_settings = Box::new(Displays::new(application_provider.clone()));
-        display_settings.init_events();
-        display_settings.update_ui(state);
+        let state = MonitorSettingsState::from(&application_provider);
+        let mut monitor_settings = Box::new(Monitors::new(application_provider.clone()));
+        monitor_settings.init_events();
+        monitor_settings.update_ui(state);
 
         let state = WallpaperPageState::from(&application_provider);
         let mut wallpaper_settings = Box::new(Wallpaper::new(application_provider.clone()));
@@ -90,7 +90,7 @@ impl App {
         settings_switcher.borrow_mut()
             .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
             .insert_control(GENERAL_PAGE.to_string(), program_settings)
-            .insert_control(DISPLAY_PAGE.to_string(), display_settings)
+            .insert_control(MONITORS_PAGE.to_string(), monitor_settings)
             .insert_control(WALLPAPER_PAGE.to_string(), wallpaper_settings)
             .insert_control(LOCKSCREEN_PAGE.to_string(), lockscreen_settings)
             .insert_control(APPEARANCE_PAGE.to_string(), appearance_settings)

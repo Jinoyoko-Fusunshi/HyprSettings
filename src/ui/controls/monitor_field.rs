@@ -9,7 +9,7 @@ use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::statable_control::StatableControl;
-use crate::ui::states::display_field_state::DisplayFieldState;
+use crate::ui::states::monitor_field_state::MonitorFieldState;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::spin_button_state::SpinButtonState;
 use crate::ui::updatable_control::UpdatableControl;
@@ -22,28 +22,28 @@ const REFRESH_PAGE_INCREMENT: f64 = 10.0;
 const REFRESH_CLIMB_RATE: f64 = 2.0;
 const FLOAT_DIGITS: u32 = 0;
 
-pub struct DisplayField {
-    display_field_box: GTKBox,
+pub struct MonitorField {
+    monitor_field_box: GTKBox,
     monitor_active_switch: Switch,
     monitor_port_label: Label,
-    monitor_display_label: Label,
+    monitor_name_label: Label,
     width_spin_button: SpinButton,
     height_spin_button: SpinButton,
     refresh_rate_spin_button: SpinButton,
     resolution_scale_spin_button: SpinButton,
-    display_mode_selection_box: SelectionBox,
+    orientation_selection_box: SelectionBox,
 }
 
-impl Control for DisplayField {
+impl Control for MonitorField {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &GTKBox {
-        &self.display_field_box
+        &self.monitor_field_box
     }
 }
 
-impl UpdatableControl<DisplayFieldState> for DisplayField {
-    fn update_ui(&mut self, state: DisplayFieldState) {
+impl UpdatableControl<MonitorFieldState> for MonitorField {
+    fn update_ui(&mut self, state: MonitorFieldState) {
         self.monitor_active_switch.set_active(state.monitor_configuration.enabled);
 
         if state.monitor_configuration.enabled {
@@ -56,9 +56,9 @@ impl UpdatableControl<DisplayFieldState> for DisplayField {
         self.monitor_port_label.set_label(monitor_port_name.as_str());
 
         let monitor_information = state.monitor_configuration.information.clone();
-        let monitor_display_name = monitor_information.model_name.clone() + " - "
+        let monitor_name = monitor_information.model_name.clone() + " - "
             + monitor_information.brand_name.as_str();
-        self.monitor_display_label.set_label(monitor_display_name.as_str());
+        self.monitor_name_label.set_label(monitor_name.as_str());
 
         let min_video_mode = state.monitor_configuration.information.min_video_mode.clone();
         let max_video_mode = state.monitor_configuration.information.max_video_mode.clone();
@@ -120,7 +120,7 @@ impl UpdatableControl<DisplayFieldState> for DisplayField {
         };
         self.resolution_scale_spin_button.update_ui(resolution_scale_spin_button_state);
 
-        let video_mode_selection_box_state = SelectionBoxState {
+        let orientation_selection_box_state = SelectionBoxState {
             label_text: "Rotation:".to_string(),
             selected_option: Some(state.monitor_configuration.orientation.to_string()),
             options: vec![
@@ -129,33 +129,33 @@ impl UpdatableControl<DisplayFieldState> for DisplayField {
                 "180° Flipped".to_string(), "270° Flipped".to_string(),
             ],
         };
-        self.display_mode_selection_box.update_state(video_mode_selection_box_state.clone());
-        self.display_mode_selection_box.update_ui(video_mode_selection_box_state.clone());
+        self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
+        self.orientation_selection_box.update_ui(orientation_selection_box_state.clone());
     }
 }
 
-impl ActivableControl for DisplayField {
+impl ActivableControl for MonitorField {
     fn enable_control(&self) {
         self.width_spin_button.enable_control();
         self.height_spin_button.enable_control();
         self.refresh_rate_spin_button.enable_control();
-        self.display_mode_selection_box.enable_control();
+        self.orientation_selection_box.enable_control();
     }
 
     fn disable_control(&self) {
         self.width_spin_button.disable_control();
         self.height_spin_button.disable_control();
         self.refresh_rate_spin_button.disable_control();
-        self.display_mode_selection_box.disable_control();
+        self.orientation_selection_box.disable_control();
     }
 }
 
-impl DisplayField {
+impl MonitorField {
     pub fn new() -> Self {
         const SIZE_BOX_LABEL_WIDTH: u32 = 50;
         const REFRESH_BOX_LABEL_WIDTH: u32 = 100;
 
-        let display_field_box = BoxBuilder::new("display-field")
+        let monitor_field_box = BoxBuilder::new("monitor-field")
             .set_orientation(Orientation::Vertical)
             .build();
 
@@ -175,12 +175,12 @@ impl DisplayField {
         let monitor_port_name = "".to_string();
         let monitor_port_label = Self::create_label(&monitor_port_name, 80);
 
-        let monitor_display_name = "".to_string();
-        let monitor_display_label = Self::create_label(&monitor_display_name, 180);
+        let monitor_name = "".to_string();
+        let monitor_name_label = Self::create_label(&monitor_name, 180);
 
         monitor_info_box.append(&monitor_active_switch);
         monitor_info_box.append(&monitor_port_label);
-        monitor_info_box.append(&monitor_display_label);
+        monitor_info_box.append(&monitor_name_label);
 
         let size_field_box = BoxBuilder::new("size-field")
             .set_orientation(Orientation::Vertical)
@@ -219,19 +219,19 @@ impl DisplayField {
         video_setting_box.append(&refresh_rate_box);
         video_setting_box.append(&rotation_mode_box);
 
-        display_field_box.append(&monitor_info_box);
-        display_field_box.append(&video_setting_box);
+        monitor_field_box.append(&monitor_info_box);
+        monitor_field_box.append(&video_setting_box);
 
         Self {
-            display_field_box,
+            monitor_field_box,
             monitor_active_switch,
             monitor_port_label,
-            monitor_display_label,
+            monitor_name_label,
             width_spin_button,
             height_spin_button,
             refresh_rate_spin_button,
             resolution_scale_spin_button,
-            display_mode_selection_box: rotation_mode_selection_box
+            orientation_selection_box: rotation_mode_selection_box
         }
     }
 
@@ -256,7 +256,7 @@ impl DisplayField {
     }
 
     pub fn set_orientation_change(&self, value_change: impl Fn(&ComboBoxText) + 'static) {
-        self.display_mode_selection_box.set_selection_change(value_change);
+        self.orientation_selection_box.set_selection_change(value_change);
     }
 
     fn create_label(text: &String, width: i32) -> Label {

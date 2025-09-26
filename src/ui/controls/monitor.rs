@@ -4,43 +4,43 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::states::display_element_state::DisplayElementState;
+use crate::ui::states::monitor_state::DisplayElementState;
 use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
-pub struct DisplayElement {
-    display_element_box: GTKBox,
-    display_port_label: Label,
-    display_offset_label: Label,
+pub struct Monitor {
+    monitor_box: GTKBox,
+    port_label: Label,
+    offset_label: Label,
 }
 
-impl Control for DisplayElement {
+impl Control for Monitor {
     fn init_events(&self) {}
 
     fn get_widget(&self) -> &GTKBox {
-        &self.display_element_box
+        &self.monitor_box
     }
 }
 
-impl UpdatableControl<DisplayElementState> for DisplayElement {
+impl UpdatableControl<DisplayElementState> for Monitor {
     fn update_ui(&mut self, state: DisplayElementState) {
         let size = state.size;
 
-        self.display_element_box.set_width_request(size.get_x() as i32);
-        self.display_element_box.set_height_request(size.get_y() as i32);
-        self.display_port_label.set_text(&state.port_name);
+        self.monitor_box.set_width_request(size.get_x() as i32);
+        self.monitor_box.set_height_request(size.get_y() as i32);
+        self.port_label.set_text(&state.port_name);
 
         let display_text = format!(
-            "x: {:.0}, y: {:.0}", state.position.get_x() * 10.0, state.position.get_y() * 10.0
+            "x: {:.0} y: {:.0}", state.position.get_x() * 10.0, state.position.get_y() * 10.0
         );
-        self.display_offset_label.set_text(&display_text);
+        self.offset_label.set_text(&display_text);
     }
 }
 
-impl DisplayElement {
+impl Monitor {
     pub fn new() -> Self {
         let display_element_box = BoxBuilder::new("display-element")
-            .set_class(CSSStyles::DISPLAY_ELEMENT_BOX)
+            .set_class(CSSStyles::MONITOR_BOX)
             .build();
         display_element_box.set_can_focus(true);
         display_element_box.set_focusable(true);
@@ -63,17 +63,17 @@ impl DisplayElement {
         display_element_box.append(&display_information_box);
 
         Self {
-            display_element_box,
-            display_port_label,
-            display_offset_label,
+            monitor_box: display_element_box,
+            port_label: display_port_label,
+            offset_label: display_offset_label,
         }
     }
 
     pub fn focus(&self) {
-        self.display_element_box.grab_focus();
+        self.monitor_box.grab_focus();
     }
 
     pub fn set_click_controller(&self, click_controller: GestureClick) {
-        self.display_element_box.add_controller(click_controller);
+        self.monitor_box.add_controller(click_controller);
     }
 }

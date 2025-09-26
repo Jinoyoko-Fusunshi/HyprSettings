@@ -1,7 +1,7 @@
 pub mod general_settings_state;
 pub mod settings_switcher_state;
-pub mod display_settings_state;
-pub mod display_field_state;
+pub mod monitor_settings_state;
+pub mod monitor_field_state;
 pub mod spin_button_state;
 pub mod keybind_input_state;
 pub mod custom_keybind_input_field_state;
@@ -13,5 +13,5 @@ pub mod color_selector_state;
 pub mod editable_control_element_state;
 pub mod input_field_state;
 pub mod selection_box_state;
-pub mod display_element_state;
-pub mod display_configurator_state;
+pub mod monitor_state;
+pub mod monitor_configurator_state;

@@ -44,8 +44,8 @@ impl SettingsSwitcherManager {
                 let program_settings = self.application_provider
                     .get_program_provider().borrow().get_settings();
 
-                let display_settings = self.application_provider
-                    .get_display_provider().borrow().get_settings();
+                let monitor_settings = self.application_provider
+                    .get_monitor_provider().borrow().get_settings();
 
 
                 let appearance_settings = self.application_provider
@@ -62,7 +62,7 @@ impl SettingsSwitcherManager {
 
                 let hyprland_settings = HyprlandSettings::new(
                     program_settings.clone(),
-                    display_settings.clone(),
+                    monitor_settings.clone(),
                     appearance_settings.clone(),
                     input_settings.clone(),
                     keybind_settings.clone(),

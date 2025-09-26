@@ -1,7 +1,7 @@
 pub mod app;
 pub mod settings;
 pub mod programs;
-pub mod displays;
+pub mod monitors;
 pub mod infos;
 pub mod keybinds;
 pub mod appearance;
@@ -13,7 +13,7 @@ mod input;
 
 pub const OVERVIEW_PAGE: &str = "overview-page";
 pub const GENERAL_PAGE: &str = "general-page";
-pub const DISPLAY_PAGE: &str = "display-page";
+pub const MONITORS_PAGE: &str = "monitors-page";
 pub const WALLPAPER_PAGE: &str = "wallpaper-page";
 pub const LOCKSCREEN_PAGE: &str = "lockscreen-page";
 pub const APPEARANCE_PAGE: &str = "appearance-page";
