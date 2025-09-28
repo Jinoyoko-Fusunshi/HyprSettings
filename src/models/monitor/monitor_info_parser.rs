@@ -76,20 +76,25 @@ impl MonitorInfoParser {
             }
 
             monitor_video_modes.sort_by(|first_mode, second_mode| {
-                let first_screen_area = first_mode.width_resolution * first_mode.height_resolution;
-                let second_screen_area = second_mode.width_resolution * second_mode.height_resolution;
-
-                second_screen_area.cmp(&first_screen_area)
-                    .then(second_mode.refresh_rate.cmp(&first_mode.refresh_rate))
+                first_mode.height_resolution.cmp(&second_mode.height_resolution)
+                    .then(first_mode.width_resolution.cmp(&second_mode.width_resolution))
+                    .then(first_mode.refresh_rate.cmp(&second_mode.refresh_rate))
             });
+
+            let mut min_video_mode = monitor_video_modes[0].clone();
+            let max_video_mode = monitor_video_modes[monitor_video_modes.len() -1].clone();
+
+            if min_video_mode.refresh_rate > max_video_mode.refresh_rate {
+                min_video_mode.refresh_rate = max_video_mode.refresh_rate;
+            }
 
             let monitor_information = MonitorInformation {
                 port_name,
                 brand_name,
                 model_name,
                 serial_number,
-                min_video_mode: monitor_video_modes[monitor_video_modes.len() -1].clone(),
-                max_video_mode: monitor_video_modes[0].clone(),
+                min_video_mode,
+                max_video_mode,
             };
 
             self.monitor_infos.push(monitor_information);
