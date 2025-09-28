@@ -37,7 +37,7 @@ cargo build --release
 
 Copy the styles css file to its required directory:
 ```shell
-bash copy-resources.sh
+bash scripts/copy-resources.sh
 ```
 
 Run the program via terminal:
@@ -56,16 +56,32 @@ Run the program via terminal:
 - **[serde_yaml](https://github.com/dtolnay/serde-yaml)** = 0.9.34
 
 ## Installation
-Install the program via the script (requires root)
+
+### From package manager
 ```shell
-bash install.sh
-```
-Uninstall the program via the script (requires root)
-```shell
-bash uninstall.sh
+sudo pacman -Sy hyprsettings
 ```
 
-Run the program via terminal
+### From release artifacts
+Select the wanted version and download the **hypersettings-(version)-(arch).pkg.tar.zst**.
+Install the downloaded package file.
+```shell
+sudo pacman -Uy hypersettings-(version)-(architecture).pkg.tar.zst
+```
+
+### From local build
+Build and install the program as pacman package via the script (requires root).
+```shell
+bash scripts/build.sh
+bash scripts/install.sh
+```
+
+Uninstall the program via the script (requires root).
+```shell
+bash scripts/uninstall.sh
+```
+
+Run the program via terminal or current program launcher.
 ```shell
 hyprsettings
 ```
@@ -77,3 +93,18 @@ Since it formed into a kind of usable tool, the idea was set to make it public f
 > ⚠️ This tool will receive updates since not all features are fully implemented and only contains the basic features 
 > for hyprland beginners. It may have some problems regarding the monitor settings 
 > and other areas.
+
+## Signing
+> 🔒 All release artifacts are signed by the signature files in the signing directory and by the following key: 
+> - **Name**: Jinoyoko
+> - **EMail**: jinoyoko@outlook.com
+> - **Key-ID**: 776E84AEFEA15A4
+> - **Fingerprint**: A589 AE05 83C6 1CA3 84C5  6076 1776 E84A EFEA 15A4
+> - **Key-File**: /signing/gpg-key.asc
+
+To validate the signed packages:
+```shell
+gpg --import signing/gpg-key.asc
+gpg --verify signing/SHA256SUMS.asc signing/SHA256SUMS
+sha256sum -c signing/SHA256SUMS
+```

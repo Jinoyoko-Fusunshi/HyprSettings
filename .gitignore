@@ -1,5 +1,6 @@
-# ouput directories
+# build and files directories
 /target
+/out
 
 # IDE files
 .idea/

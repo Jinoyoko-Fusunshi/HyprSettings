@@ -1,0 +1,32 @@
+pkgname=hyprsettings
+pkgver=0.1.0
+pkgrel=1
+arch=('x86_64')
+pkgdesc="A generical independent tool to configure the hyprland environment by a GTK GUI."
+url="https://github.com/Jinoyoko-Fusunshi/HyprSettings"
+depends=("gtk4")
+makedepends=('rust' 'cargo')
+options=('!debug')
+source=()
+sha256sums=()
+
+build() {
+    cd "$srcdir"
+    cargo build --release
+}
+
+package() {
+    # Build and move binary
+    cd "$srcdir"
+    cargo build --release
+
+    cd ..
+    install -Dm755 ../../target/release/$pkgname "$pkgdir/usr/bin/$pkgname"
+
+    # Move assets
+    install -d "$pkgdir/usr/share/$pkgname"
+    install -d "$pkgdir/usr/share/applications"
+
+    cp ../../res/style.css "$pkgdir/usr/share/$pkgname/style.css"
+    cp ../../res/$pkgname.desktop "$pkgdir/usr/share/applications/$pkgname.desktop"
+}
