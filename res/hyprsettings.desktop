@@ -5,3 +5,4 @@ Type=Application
 Categories=Utility
 StartupNotify=true
 Terminal=false
+Version=1.0

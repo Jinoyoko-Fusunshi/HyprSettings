@@ -104,7 +104,5 @@ Since it formed into a kind of usable tool, the idea was set to make it public f
 
 To validate the signed packages:
 ```shell
-gpg --import signing/gpg-key.asc
-gpg --verify signing/SHA256SUMS.asc signing/SHA256SUMS
-sha256sum -c signing/SHA256SUMS
+bash scripts/verify.sh
 ```

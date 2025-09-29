@@ -1,7 +1,7 @@
-pkgname=hyprsettings
-pkgver=0.1.0
-pkgrel=1
-arch=('x86_64')
+pkgname=${APPLICATION_NAME}
+pkgver=${APPLICATION_VERSION}
+pkgrel=${PACKAGE_VERSION}
+arch=(${APPLICATION_ARCH})
 pkgdesc="A generical independent tool to configure the hyprland environment by a GTK GUI."
 url="https://github.com/Jinoyoko-Fusunshi/HyprSettings"
 depends=("gtk4")
@@ -10,23 +10,29 @@ options=('!debug')
 source=()
 sha256sums=()
 
+prepare() {
+    # recreate out output directory
+    if [ -f "out" ]; then
+      rm -r "out"
+    fi
+}
+
 build() {
     cd "$srcdir"
+
+    # build binary
     cargo build --release
 }
 
 package() {
-    # Build and move binary
-    cd "$srcdir"
-    cargo build --release
+    cd ../../../
 
-    cd ..
-    install -Dm755 ../../target/release/$pkgname "$pkgdir/usr/bin/$pkgname"
-
-    # Move assets
+    # setup package directory structure
     install -d "$pkgdir/usr/share/$pkgname"
     install -d "$pkgdir/usr/share/applications"
 
-    cp ../../res/style.css "$pkgdir/usr/share/$pkgname/style.css"
-    cp ../../res/$pkgname.desktop "$pkgdir/usr/share/applications/$pkgname.desktop"
+    # copy binary with resources into the package
+    install -Dm755 target/release/$pkgname "$pkgdir/usr/bin/$pkgname"
+    install -Dm755 res/style.css "$pkgdir/usr/share/$pkgname/style.css"
+    install -Dm755 res/$pkgname.desktop "$pkgdir/usr/share/applications/$pkgname.desktop"
 }
