@@ -14,10 +14,10 @@ impl From<&ApplicationProvider> for MonitorSettingsState {
             .borrow()
             .get_monitor_configurations();
 
-        let enabled = value.get_program_provider()
+        let enabled = value
+            .get_program_provider()
             .borrow()
-            .get_module("wlr-randr".to_string())
-            .is_some();
+            .has_dependency_module("wlr-randr".to_string());
 
         Self {
             monitor_configurations,

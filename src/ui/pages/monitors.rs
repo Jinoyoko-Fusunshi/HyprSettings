@@ -1,6 +1,6 @@
 use gtk::{ComboBoxText, Orientation, Separator, Switch};
 use gtk::glib::Propagation;
-use gtk::prelude::{BoxExt, WidgetExt};
+use gtk::prelude::BoxExt;
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::{GTKBox, GTKSpinButton};
@@ -22,7 +22,6 @@ use crate::utils::new_rc_mut;
 pub struct Monitors {
     application_provider: ApplicationProvider,
     monitor_box: GTKBox,
-    monitor_fields_box: GTKBox
 }
 
 impl Control for Monitors {
@@ -35,12 +34,11 @@ impl Control for Monitors {
 
 impl UpdatableControl<MonitorSettingsState> for Monitors {
     fn update_ui(&mut self, state: MonitorSettingsState) {
-        self.clear_monitor_fields();
-
         if state.enabled {
-            Self::create_monitor_fields(self, state);
+            self.create_monitor_fields(state);
+            self.create_monitor_configurator();
         } else {
-            Self::create_monitors_warning(self);
+            self.create_monitors_warning();
         }
     }
 }
@@ -51,46 +49,17 @@ impl Monitors {
             .create_header_elements("Available monitors")
             .build().expect("Failed to create monitor settings section box");
 
-        monitor_box.set_margin_top(10);
-        monitor_box.set_margin_bottom(10);
-        monitor_box.set_margin_start(10);
-        monitor_box.set_margin_end(10);
+        Self {
+            application_provider,
+            monitor_box,
+        }
+    }
 
+    fn create_monitor_fields(&mut self, state: MonitorSettingsState) {
         let monitor_fields_box = BoxBuilder::new("monitor-fields")
             .set_orientation(Orientation::Vertical)
             .build();
 
-        let monitor_provider = application_provider.get_monitor_provider();
-        let monitor_configurator_state = MonitorConfiguratorState::from(monitor_provider);
-        let monitor_configurator = new_rc_mut(
-            MonitorConfigurator::new(application_provider.get_monitor_provider())
-        );
-
-        for (port, _) in &monitor_configurator_state.monitor_states {
-            monitor_configurator.borrow_mut().insert_monitor(port);
-        }
-
-        monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
-        monitor_configurator.borrow_mut().update_ui(monitor_configurator_state.clone());
-
-        let monitor_configurator_manager = MonitorConfiguratorManager::new(monitor_configurator.clone());
-        monitor_configurator.borrow_mut().init_events_by_manager(monitor_configurator_manager);
-
-        monitor_box.append(&monitor_fields_box);
-        monitor_box.append(monitor_configurator.borrow().get_widget());
-
-        Self {
-            application_provider,
-            monitor_box,
-            monitor_fields_box
-        }
-    }
-
-    fn clear_monitor_fields(&mut self) {
-        Boxes::clear_box_content(&self.monitor_fields_box);
-    }
-
-    fn create_monitor_fields(&mut self, state: MonitorSettingsState) {
         for (port, configuration) in state.monitor_configurations {
             let separator = Separator::new(Orientation::Horizontal);
             let monitor_field = new_rc_mut(MonitorField::new());
@@ -148,16 +117,41 @@ impl Monitors {
             };
             monitor_field.borrow_mut().set_orientation_change(monitor_mode_selection_box_change);
 
-            self.monitor_fields_box.append(monitor_field.borrow().get_widget());
-            self.monitor_fields_box.append(&separator);
+            monitor_fields_box.append(monitor_field.borrow().get_widget());
+            monitor_fields_box.append(&separator);
         }
+
+        self.monitor_box.append(&monitor_fields_box);
+    }
+
+    fn create_monitor_configurator(&mut self) {
+        let monitor_provider = self.application_provider.get_monitor_provider();
+        let monitor_configurator_state = MonitorConfiguratorState::from(monitor_provider);
+
+        let monitor_configurator = new_rc_mut(
+            MonitorConfigurator::new(self.application_provider.get_monitor_provider())
+        );
+
+        for (port, _) in &monitor_configurator_state.monitor_states {
+            monitor_configurator.borrow_mut().insert_monitor(port);
+        }
+
+        monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
+        monitor_configurator.borrow_mut().update_ui(monitor_configurator_state.clone());
+
+        let monitor_configurator_manager = MonitorConfiguratorManager::new(
+            monitor_configurator.clone()
+        );
+        monitor_configurator.borrow_mut().init_events_by_manager(monitor_configurator_manager);
+        
+        self.monitor_box.append(monitor_configurator.borrow().get_widget());
     }
 
     fn create_monitors_warning(&mut self) {
         let monitors_warning_box = Boxes::create_warning_box(
-            "⚠️ Wayland RandR program module not found. This is required to configure the monitors."
+            "⚠️ wlr-randr dependency module not found. This is required to configure the monitors."
         );
 
-        self.monitor_fields_box.append(&monitors_warning_box);
+        self.monitor_box.append(&monitors_warning_box);
     }
 }

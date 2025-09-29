@@ -31,7 +31,11 @@ impl ApplicationProvider {
     pub fn new() -> Self {
         let hyprland_settings = Self::get_config_settings();
         let module_provider = Self::create_module_provider(&hyprland_settings);
-        let monitor_provider = Self::create_monitor_provider(&hyprland_settings);
+        let has_wlrrandr_module = module_provider
+            .borrow()
+            .has_dependency_module("wlr-randr".to_string());
+
+        let monitor_provider = Self::create_monitor_provider(&hyprland_settings, has_wlrrandr_module);
         let appearance_provider = Self::create_appearance_provider(&hyprland_settings);
         let lockscreen_provider = Self::create_lockscreen_provider(&hyprland_settings);
         let keybind_provider = Self::create_keybind_provider(&hyprland_settings);
@@ -82,12 +86,15 @@ impl ApplicationProvider {
         new_rc_mut(module_provider)
     }
 
-    fn create_monitor_provider(settings: &Option<HyprlandSettings>) -> RcMut<MonitorProvider> {
+    fn create_monitor_provider(settings: &Option<HyprlandSettings>, has_wlrrandr_module: bool) -> RcMut<MonitorProvider> {
         let monitor_provider = if let Some(settings) = settings {
             MonitorProvider::new(settings.monitor_settings.clone())
         } else {
             let mut monitor_provider = MonitorProvider::new(MonitorSettings::default());
-            monitor_provider.fetch_monitors();
+            if has_wlrrandr_module {
+                monitor_provider.fetch_monitors();
+            }
+
             monitor_provider
         };
 

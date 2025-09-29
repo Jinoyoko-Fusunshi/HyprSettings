@@ -88,6 +88,18 @@ impl ModuleProvider {
             .collect::<Vec<ProgramModule>>()
     }
 
+    pub fn has_dependency_module(&self, module_name: String) -> bool {
+        let module = self.program_modules.iter()
+            .filter(|(_, module)| matches!(module.info.category, ProgramModuleCategory::Dependency))
+            .find(|(name, _)| **name == module_name);
+
+        if let Some((_, module)) = module {
+            module.version.is_some()
+        } else {
+            false
+        }
+    }
+
     pub fn add_program(&mut self, name: String, path: String) {
         self.settings.programs.insert(name, path);
     }
