@@ -13,7 +13,6 @@ use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::color_selector_state::ColorSelectorState;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::selection_box_state::SelectionBoxState;
@@ -94,10 +93,10 @@ impl Appearance {
         let state = SelectionBoxState {
             label_text: "Force default wallpaper:".to_string(),
             selected_option: Some(appearance_provider.borrow().get_force_default_wallpaper().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         force_default_wallpaper_selection.update_state(state.clone());
-        force_default_wallpaper_selection.update_ui(state.clone());
+        force_default_wallpaper_selection.update_state(state.clone());
         force_default_wallpaper_selection.set_selection_change(force_default_wallpaper_selection_change);
 
         // Disable hyprland logo option
@@ -114,10 +113,10 @@ impl Appearance {
         let state = SelectionBoxState {
             label_text: "Disable hyprland logo:".to_string(),
             selected_option: Some(appearance_provider.borrow().get_disable_hyprland_logo().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         disable_hyprland_logo_selection.update_state(state.clone());
-        disable_hyprland_logo_selection.update_ui(state.clone());
+        disable_hyprland_logo_selection.update_state(state.clone());
         disable_hyprland_logo_selection.set_selection_change(disable_hyprland_logo_selection_change);
         
         wallpaper_section_box.append(force_default_wallpaper_selection.get_widget());
@@ -152,7 +151,7 @@ impl Appearance {
 
         let mut cursor_size_spin_button = SpinButton::new();
         cursor_size_spin_button.set_text_width(APPEARANCE_LABEL_WIDTH);
-        cursor_size_spin_button.update_ui(state);
+        cursor_size_spin_button.update_state(state);
         cursor_size_spin_button.set_value_change(cursor_size_spin_button_change);
 
         let appearance_provider_clone = appearance_provider.clone();
@@ -168,7 +167,7 @@ impl Appearance {
         let mut cursor_theme_selection_box = SelectionBox::new();
         cursor_theme_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         cursor_theme_selection_box.update_state(state.clone());
-        cursor_theme_selection_box.update_ui(state.clone());
+        cursor_theme_selection_box.update_state(state.clone());
         cursor_theme_selection_box.set_selection_change(cursor_theme_spin_button_change);
 
         cursor_section_box.append(cursor_size_spin_button.get_widget());
@@ -223,7 +222,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        inner_gap_spin_button.update_ui(state);
+        inner_gap_spin_button.update_state(state);
         inner_gap_spin_button.set_value_change(inner_gap_spin_button_change);
 
         // Outer gap option
@@ -245,7 +244,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        outer_gap_spin_button.update_ui(state);
+        outer_gap_spin_button.update_state(state);
         outer_gap_spin_button.set_value_change(outer_gap_spin_button_change);
 
         // Border size option
@@ -267,7 +266,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        border_size_spin_button.update_ui(state);
+        border_size_spin_button.update_state(state);
         border_size_spin_button.set_value_change(border_size_spin_button_change);
 
         // Active border option
@@ -281,7 +280,7 @@ impl Appearance {
             label_text: "Active Border:".to_string(),
             selected_color: Some(appearance_provider.borrow().get_active_border_color()),
         };
-        active_border_color_selector.update_ui(state);
+        active_border_color_selector.update_state(state);
         active_border_color_selector.set_color_change(active_border_color_change);
 
         // Inactive border option
@@ -295,7 +294,7 @@ impl Appearance {
             label_text: "Inactive Border:".to_string(),
             selected_color: Some(appearance_provider.borrow().get_inactive_border_color()),
         };
-        inactive_border_color_selector.update_ui(state);
+        inactive_border_color_selector.update_state(state);
         inactive_border_color_selector.set_color_change(inactive_border_color_change);
 
         // Resize on border option
@@ -310,10 +309,10 @@ impl Appearance {
         let state = SelectionBoxState {
             label_text: "Resize on border:".to_string(),
             selected_option: Some(appearance_provider.borrow().get_resize_on_border().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         border_resize_selection_box.update_state(state.clone());
-        border_resize_selection_box.update_ui(state.clone());
+        border_resize_selection_box.update_state(state.clone());
         border_resize_selection_box.set_selection_change(border_resize_selection_change);
 
         // Allow tearing option
@@ -328,10 +327,10 @@ impl Appearance {
         let state = SelectionBoxState {
             label_text: "Allow tearing:".to_string(),
             selected_option: Some(appearance_provider.borrow().get_allow_tearing().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         allow_tearing_selection_box.update_state(state.clone());
-        allow_tearing_selection_box.update_ui(state.clone());
+        allow_tearing_selection_box.update_state(state.clone());
         allow_tearing_selection_box.set_selection_change(tearing_selection_change);
 
         styling_section_box.append(inner_gap_spin_button.get_widget());
@@ -371,7 +370,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        rounding_spin_button.update_ui(state);
+        rounding_spin_button.update_state(state);
         rounding_spin_button.set_value_change(rounding_spin_button_changed_callback);
 
         // Rounding power option
@@ -393,7 +392,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        rounding_spin_power_button.update_ui(state);
+        rounding_spin_power_button.update_state(state);
         rounding_spin_power_button.set_value_change(rounding_spin_power_button_changed_callback);
 
         // Dim inactive option
@@ -407,11 +406,11 @@ impl Appearance {
         dim_inactive_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
             label_text: "Dim inactive:".to_string(),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
             selected_option: Some(appearance_provider.borrow().get_dim_inactive().to_string()),
         };
         dim_inactive_selection_box.update_state(state.clone());
-        dim_inactive_selection_box.update_ui(state.clone());
+        dim_inactive_selection_box.update_state(state.clone());
         dim_inactive_selection_box.set_selection_change(dim_inactive_selection_changed_callback);
 
         // Active opacity option
@@ -433,7 +432,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        active_opacity_spin_button.update_ui(state);
+        active_opacity_spin_button.update_state(state);
         active_opacity_spin_button.set_value_change(active_opacity_spin_button_changed_callback);
 
         // Inactive opacity option
@@ -455,7 +454,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        inactive_opacity_spin_button.update_ui(state);
+        inactive_opacity_spin_button.update_state(state);
         inactive_opacity_spin_button.set_value_change(inactive_opacity_spin_button_changed_callback);
 
         // Active shadows option
@@ -469,11 +468,11 @@ impl Appearance {
         active_shadows_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
             label_text: "Active shadows:".to_string(),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
             selected_option: Some(appearance_provider.borrow().get_active_shadow().to_string()),
         };
         active_shadows_selection_box.update_state(state.clone());
-        active_shadows_selection_box.update_ui(state.clone());
+        active_shadows_selection_box.update_state(state.clone());
         active_shadows_selection_box.set_selection_change(active_shadows_selection_changed_callback);
 
         // Shadow range option
@@ -495,7 +494,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        shadow_range_spin_button.update_ui(state);
+        shadow_range_spin_button.update_state(state);
         shadow_range_spin_button.set_value_change(shadow_range_spin_button_changed_callback);
 
         // Shadow render power option
@@ -517,7 +516,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        shadow_render_power_spin_button.update_ui(state);
+        shadow_render_power_spin_button.update_state(state);
         shadow_render_power_spin_button.set_value_change(shadow_render_power_spin_button_changed_callback);
 
         // Shadow color option
@@ -531,7 +530,7 @@ impl Appearance {
             label_text: "Shadow color:".to_string(),
             selected_color: Some(appearance_provider.borrow().get_shadow_color()),
         };
-        shadow_color_selector.update_ui(state);
+        shadow_color_selector.update_state(state);
         shadow_color_selector.set_color_change(shadow_color_button_changed_callback);
 
         // Active blur option
@@ -545,11 +544,11 @@ impl Appearance {
         active_blur_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
             label_text: "Active blur:".to_string(),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
             selected_option: Some(appearance_provider.borrow().get_active_blur().to_string()),
         };
         active_blur_selection_box.update_state(state.clone());
-        active_blur_selection_box.update_ui(state.clone());
+        active_blur_selection_box.update_state(state.clone());
         active_blur_selection_box.set_selection_change(active_blur_selection_changed_callback);
 
         // Blur size option
@@ -571,7 +570,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        blur_size_spin_button.update_ui(state);
+        blur_size_spin_button.update_state(state);
         blur_size_spin_button.set_value_change(blur_size_spin_button_changed_callback);
 
         // Blur passes option
@@ -593,7 +592,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        blur_passes_spin_button.update_ui(state);
+        blur_passes_spin_button.update_state(state);
         blur_passes_spin_button.set_value_change(blur_passes_spin_button_changed_callback);
 
         // Blur vibrancy option
@@ -615,7 +614,7 @@ impl Appearance {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        blur_vibrancy_spin_button.update_ui(state);
+        blur_vibrancy_spin_button.update_state(state);
         blur_vibrancy_spin_button.set_value_change(blur_vibrancy_spin_button_change);
 
         decorations_section_box.append(rounding_spin_button.get_widget());
@@ -661,7 +660,7 @@ impl Appearance {
             placeholder_text: "e.g. dwindle, ".to_string(),
             entry_text: Some(appearance_provider.borrow().get_layout()),
         };
-        layout_input_field.update_ui(state);
+        layout_input_field.update_state(state);
         layout_input_field.set_input_callback(layout_input_change);
 
         // Pseudo tiling option
@@ -675,11 +674,11 @@ impl Appearance {
         pseudo_tiling_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
             label_text: "Pseudo tiling:".to_string(),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
             selected_option: Some(appearance_provider.borrow().get_pseudo_tiling().to_string()),
         };
         pseudo_tiling_selection_box.update_state(state.clone());
-        pseudo_tiling_selection_box.update_ui(state.clone());
+        pseudo_tiling_selection_box.update_state(state.clone());
         pseudo_tiling_selection_box.set_selection_change(pseudo_tiling_selection_change);
 
         // Split preservation option
@@ -693,11 +692,11 @@ impl Appearance {
         split_preservation_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
             label_text: "Split preservation:".to_string(),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
             selected_option: Some(appearance_provider.borrow().get_split_preservation().to_string()),
         };
         split_preservation_selection_box.update_state(state.clone());
-        split_preservation_selection_box.update_ui(state.clone());
+        split_preservation_selection_box.update_state(state.clone());
         split_preservation_selection_box.set_selection_change(split_preservation_selection_change);
 
         // Master status option
@@ -711,7 +710,7 @@ impl Appearance {
             placeholder_text: "e.g. master, ".to_string(),
             entry_text: Some(appearance_provider.borrow().get_master_status()),
         };
-        master_status_input_field.update_ui(state);
+        master_status_input_field.update_state(state);
         master_status_input_field.set_input_callback(master_status_input_change);
 
         layout_section_box.append(layout_input_field.get_widget());

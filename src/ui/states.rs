@@ -1,6 +1,6 @@
-pub mod general_settings_state;
+pub mod programs_state;
 pub mod settings_switcher_state;
-pub mod monitor_settings_state;
+pub mod monitors_state;
 pub mod monitor_field_state;
 pub mod spin_button_state;
 pub mod keybind_input_state;

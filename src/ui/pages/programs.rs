@@ -7,13 +7,14 @@ use crate::providers::module_provider::{
 use crate::types::GTKBox;
 use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::input_field::InputField;
-use crate::ui::states::general_settings_state::GeneralSettingsState;
+use crate::ui::states::programs_state::ProgramsState;
 use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct Programs {
+    state: ProgramsState,
     application_provider: ApplicationProvider,
     general_box: GTKBox,
     terminal_input_field: InputField,
@@ -62,35 +63,41 @@ impl Control for Programs {
     }
 }
 
-impl UpdatableControl<GeneralSettingsState> for Programs {
-    fn update_ui(&mut self, state: GeneralSettingsState) {
+impl UpdatableControl<ProgramsState> for Programs {
+    fn update_state(&mut self, state: ProgramsState) {
         let input_field_state = InputFieldState {
             label_text: "Virtual terminal program path:".to_string(),
-            entry_text: state.terminal_path,
+            entry_text: state.terminal_path.clone(),
             placeholder_text: "e.g. /usr/bin/alacritty".to_string(),
         };
-        self.terminal_input_field.update_ui(input_field_state);
+        self.terminal_input_field.update_state(input_field_state);
 
         let input_field_state = InputFieldState {
             label_text: "File manager program path:".to_string(),
-            entry_text: state.file_manager_path,
+            entry_text: state.file_manager_path.clone(),
             placeholder_text: "e.g. /usr/bin/nautilus".to_string(),
         };
-        self.files_input_field.update_ui(input_field_state);
+        self.files_input_field.update_state(input_field_state);
 
         let input_field_state = InputFieldState {
             label_text: "Quick search program path:".to_string(),
-            entry_text: state.quick_search_path,
+            entry_text: state.quick_search_path.clone(),
             placeholder_text: "e.g. /usr/bin/anyrun".to_string(),
         };
-        self.quick_search_input_field.update_ui(input_field_state);
+        self.quick_search_input_field.update_state(input_field_state);
 
         let input_field_state = InputFieldState {
             label_text: "Notification handler program path:".to_string(),
-            entry_text: state.notification_handler_path,
+            entry_text: state.notification_handler_path.clone(),
             placeholder_text: "e.g. /usr/bin/dryrun".to_string(),
         };
-        self.notifications_input_field.update_ui(input_field_state);
+        self.notifications_input_field.update_state(input_field_state);
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> ProgramsState {
+        self.state.clone()
     }
 }
 
@@ -109,7 +116,7 @@ impl Programs {
             entry_text: None,
             placeholder_text: "e.g. /usr/bin/alacritty".to_string(),
         };
-        terminal_input_field.update_ui(state);
+        terminal_input_field.update_state(state);
 
         let mut files_input_field = InputField::new();
         let state = InputFieldState {
@@ -117,7 +124,7 @@ impl Programs {
             entry_text: None,
             placeholder_text: "e.g. /usr/bin/nautilus".to_string(),
         };
-        files_input_field.update_ui(state);
+        files_input_field.update_state(state);
 
         let mut quick_search_input_field = InputField::new();
         let state = InputFieldState {
@@ -125,7 +132,7 @@ impl Programs {
             entry_text: None,
             placeholder_text: "e.g. /usr/bin/anyrun".to_string(),
         };
-        quick_search_input_field.update_ui(state);
+        quick_search_input_field.update_state(state);
 
         let mut notifications_input_field = InputField::new();
         let state = InputFieldState {
@@ -133,14 +140,17 @@ impl Programs {
             entry_text: None,
             placeholder_text: "e.g. /usr/bin/dryrun".to_string(),
         };
-        notifications_input_field.update_ui(state);
+        notifications_input_field.update_state(state);
 
         general_box.append(terminal_input_field.get_widget());
         general_box.append(files_input_field.get_widget());
         general_box.append(quick_search_input_field.get_widget());
         general_box.append(notifications_input_field.get_widget());
 
+        let state = Default::default();
+
         Self {
+            state,
             application_provider,
             general_box,
             terminal_input_field,

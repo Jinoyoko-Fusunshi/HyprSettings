@@ -8,7 +8,6 @@ use crate::ui::controls::Control;
 use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::monitor_field_state::MonitorFieldState;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::spin_button_state::SpinButtonState;
@@ -23,6 +22,7 @@ const REFRESH_CLIMB_RATE: f64 = 2.0;
 const FLOAT_DIGITS: u32 = 0;
 
 pub struct MonitorField {
+    state: MonitorFieldState,
     monitor_field_box: GTKBox,
     monitor_active_switch: Switch,
     monitor_port_label: Label,
@@ -43,7 +43,7 @@ impl Control for MonitorField {
 }
 
 impl UpdatableControl<MonitorFieldState> for MonitorField {
-    fn update_ui(&mut self, state: MonitorFieldState) {
+    fn update_state(&mut self, state: MonitorFieldState) {
         self.monitor_active_switch.set_active(state.monitor_configuration.enabled);
 
         if state.monitor_configuration.enabled {
@@ -52,7 +52,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             self.disable_control()
         }
 
-        let monitor_port_name = state.monitor_port + ": ";
+        let monitor_port_name = state.monitor_port.clone() + ": ";
         self.monitor_port_label.set_label(monitor_port_name.as_str());
 
         let monitor_information = state.monitor_configuration.information.clone();
@@ -76,7 +76,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             page_size: 0.0,
             page_increment_value: RESOLUTION_PAGE_INCREMENT
         };
-        self.width_spin_button.update_ui(width_button_state);
+        self.width_spin_button.update_state(width_button_state);
 
         let height_spin_button_state = SpinButtonState {
             label_text: "Height:".to_string(),
@@ -90,7 +90,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             page_size: 0.0,
             page_increment_value: RESOLUTION_PAGE_INCREMENT
         };
-        self.height_spin_button.update_ui(height_spin_button_state);
+        self.height_spin_button.update_state(height_spin_button_state);
 
         let refresh_rate_spin_button_state = SpinButtonState {
             label_text: "Refresh Rate:".to_string(),
@@ -104,7 +104,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             page_size: 0.0,
             page_increment_value: REFRESH_PAGE_INCREMENT
         };
-        self.refresh_rate_spin_button.update_ui(refresh_rate_spin_button_state);
+        self.refresh_rate_spin_button.update_state(refresh_rate_spin_button_state);
 
         let resolution_scale_spin_button_state = SpinButtonState {
             label_text: "Scale:".to_string(),
@@ -118,7 +118,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             page_size: 0.0,
             page_increment_value: 0.5
         };
-        self.resolution_scale_spin_button.update_ui(resolution_scale_spin_button_state);
+        self.resolution_scale_spin_button.update_state(resolution_scale_spin_button_state);
 
         let orientation_selection_box_state = SelectionBoxState {
             label_text: "Rotation:".to_string(),
@@ -130,7 +130,13 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             ],
         };
         self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
-        self.orientation_selection_box.update_ui(orientation_selection_box_state.clone());
+        self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> MonitorFieldState {
+        self.state.clone()
     }
 }
 
@@ -212,8 +218,8 @@ impl MonitorField {
             .set_orientation(Orientation::Vertical)
             .build();
 
-        let rotation_mode_selection_box = SelectionBox::new();
-        rotation_mode_box.append(rotation_mode_selection_box.get_widget());
+        let orientation_selection_box = SelectionBox::new();
+        rotation_mode_box.append(orientation_selection_box.get_widget());
 
         video_setting_box.append(&size_field_box);
         video_setting_box.append(&refresh_rate_box);
@@ -222,7 +228,10 @@ impl MonitorField {
         monitor_field_box.append(&monitor_info_box);
         monitor_field_box.append(&video_setting_box);
 
+        let state = Default::default();
+        
         Self {
+            state,
             monitor_field_box,
             monitor_active_switch,
             monitor_port_label,
@@ -231,7 +240,7 @@ impl MonitorField {
             height_spin_button,
             refresh_rate_spin_button,
             resolution_scale_spin_button,
-            orientation_selection_box: rotation_mode_selection_box
+            orientation_selection_box
         }
     }
 

@@ -8,6 +8,7 @@ use crate::ui::states::color_selector_state::ColorSelectorState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct ColorSelector {
+    state: ColorSelectorState,
     color_button_box: GTKBox,
     color_button_label: Label,
     color_button: ColorButton,
@@ -28,11 +29,17 @@ impl LabeledControl for ColorSelector {
 }
 
 impl UpdatableControl<ColorSelectorState> for ColorSelector {
-    fn update_ui(&mut self, state: ColorSelectorState) {
+    fn update_state(&mut self, state: ColorSelectorState) {
         self.color_button_label.set_text(&state.label_text);
-        if let Some(color) = state.selected_color {
+        if let Some(color) = state.selected_color.clone() {
             self.color_button.set_rgba(color.get_rgba());
         }
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> ColorSelectorState {
+        self.state.clone()
     }
 }
 
@@ -50,8 +57,11 @@ impl ColorSelector {
         color_button.set_use_alpha(true);
         color_button_box.append(&color_button_label);
         color_button_box.append(&color_button);
-        
+
+        let state = Default::default();
+
         Self {
+            state,
             color_button_box,
             color_button_label,
             color_button

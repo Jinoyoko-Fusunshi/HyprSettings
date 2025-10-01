@@ -10,7 +10,7 @@ use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
 use crate::ui::pages::programs::Programs;
 use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
-use crate::ui::states::general_settings_state::GeneralSettingsState;
+use crate::ui::states::programs_state::ProgramsState;
 use crate::ui::controls::Control;
 use crate::ui::pages::appearance::Appearance;
 use crate::ui::pages::monitors::Monitors;
@@ -22,7 +22,7 @@ use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, 
 use crate::ui::pages::input::Input;
 use crate::ui::pages::startup_programs::StartupPrograms;
 use crate::ui::pages::wallpaper::Wallpaper;
-use crate::ui::states::monitor_settings_state::MonitorSettingsState;
+use crate::ui::states::monitors_state::MonitorsState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
@@ -52,22 +52,22 @@ impl App {
 
         let overview_settings = new_rc_mut(Overview::new(application_provider.clone()));
 
-        let state = GeneralSettingsState::from(&application_provider);
+        let state = ProgramsState::from(&application_provider);
         let programs = new_rc_mut(Programs::new(application_provider.clone()));
         programs.borrow_mut().init_events();
-        programs.borrow_mut().update_ui(state);
+        programs.borrow_mut().update_state(state);
 
-        let state = MonitorSettingsState::from(&application_provider);
+        let state = MonitorsState::from(&application_provider);
         let monitors = new_rc_mut(Monitors::new(application_provider.clone()));
-        monitors.borrow_mut().update_ui(state);
+        monitors.borrow_mut().update_state(state);
 
         let state = WallpaperPageState::from(&application_provider);
         let wallpaper = new_rc_mut(Wallpaper::new(application_provider.clone()));
-        wallpaper.borrow_mut().update_ui(state.clone());
+        wallpaper.borrow_mut().update_state(state.clone());
 
         let state = LockScreenPageState::from(&application_provider);
         let lockscreen = new_rc_mut(Lockscreen::new(application_provider.clone()));
-        lockscreen.borrow_mut().update_ui(state.clone());
+        lockscreen.borrow_mut().update_state(state.clone());
 
         let appearance = new_rc_mut(Appearance::new(application_provider.clone()));
 
@@ -93,7 +93,7 @@ impl App {
             .insert_control(INFO_PAGE.to_string(), infos);
 
         let settings_switcher_state = SettingsSwitcherState::new(OVERVIEW_PAGE.to_string());
-        settings_switcher.borrow_mut().update_ui(settings_switcher_state);
+        settings_switcher.borrow_mut().update_state(settings_switcher_state);
         
         let settings_switcher_manager = SettingsSwitcherManager::new(settings_switcher.clone(), application_provider.clone());
         let navigation = Navigation::new(settings_switcher_manager.clone());

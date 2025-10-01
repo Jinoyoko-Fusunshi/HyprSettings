@@ -9,9 +9,8 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::monitor::Monitor;
 use crate::ui::manager::monitor_configurator_manager::{DisplayConfiguratorEvent, MonitorConfiguratorManager};
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::monitor_configurator_state::MonitorConfiguratorState;
-use crate::ui::states::monitor_state::DisplayElementState;
+use crate::ui::states::monitor_state::MonitorState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::RcMut;
 
@@ -32,20 +31,20 @@ impl Control for MonitorConfigurator {
 }
 
 impl UpdatableControl<MonitorConfiguratorState> for MonitorConfigurator {
-    fn update_ui(&mut self, state: MonitorConfiguratorState) {
-        for (port, state) in state.monitor_states {
+    fn update_state(&mut self, state: MonitorConfiguratorState) {
+        for (port, state) in state.monitor_states.clone() {
             let monitor = self.monitors.get_mut(&port).unwrap();
-            monitor.update_ui(state.clone());
+            monitor.update_state(state.clone());
             self.monitors_fixed.move_(
                 monitor.get_widget(), state.position.get_x(), state.position.get_y()
             );
         }
-    }
-}
 
-impl StatableControl<MonitorConfiguratorState> for MonitorConfigurator {
-    fn update_state(&mut self, state: MonitorConfiguratorState) {
         self.state = state;
+    }
+
+    fn get_current_state(&self) -> MonitorConfiguratorState {
+        self.state.clone()
     }
 }
 
@@ -119,7 +118,7 @@ impl MonitorConfigurator {
 
     fn adjust_current_display_element_to_intersecting_closest_one(
         &mut self, port_name: &String, placed_position: &Vector,
-        current_display_element_state: &mut DisplayElementState
+        current_display_element_state: &mut MonitorState
     ) {
         let adjacent_display_element_position = self.get_adjacent_position_to_closest_display_element(
           port_name, placed_position, current_display_element_state
@@ -140,7 +139,7 @@ impl MonitorConfigurator {
 
     fn get_adjacent_position_to_closest_display_element(
         &self, port_name: &String, placed_position: &Vector,
-        current_display_element_state: &DisplayElementState
+        current_display_element_state: &MonitorState
     ) -> Option<Vector> {
         let concurrent_display_elements = self.get_other_display_element_states(port_name);
         let intersecting_display_elements = self.get_intersecting_display_elements(
@@ -209,7 +208,7 @@ impl MonitorConfigurator {
     }
 
     fn get_concurrent_display_element_aabbs(
-        &self, port_name: &String, intersecting_display_elements: &HashMap<String, DisplayElementState>
+        &self, port_name: &String, intersecting_display_elements: &HashMap<String, MonitorState>
     ) -> HashMap<String, AABB> {
         intersecting_display_elements.iter()
             .filter(|(monitor_port, _)| {
@@ -221,7 +220,7 @@ impl MonitorConfigurator {
             .collect::<HashMap<String, AABB>>()
     }
 
-    fn get_other_display_element_states(&self, port_name: &String) -> HashMap<String, DisplayElementState> {
+    fn get_other_display_element_states(&self, port_name: &String) -> HashMap<String, MonitorState> {
         self.state.monitor_states.iter()
             .filter(|(monitor_port, _)| {
                 *monitor_port != port_name
@@ -233,12 +232,12 @@ impl MonitorConfigurator {
     }
 
     fn get_intersecting_display_elements(
-        &self, current_display_element_state: &DisplayElementState,
-        concurrent_display_element_states: &HashMap<String, DisplayElementState>
-    ) -> HashMap<String, DisplayElementState> {
+        &self, current_display_element_state: &MonitorState,
+        concurrent_display_element_states: &HashMap<String, MonitorState>
+    ) -> HashMap<String, MonitorState> {
         let current_display_element_aabb = current_display_element_state.get_aabb();
 
-        let mut intersecting_display_elements: HashMap<String, DisplayElementState> = HashMap::new();
+        let mut intersecting_display_elements: HashMap<String, MonitorState> = HashMap::new();
         for (monitor_port, display_element_state) in concurrent_display_element_states {
             let concurrent_display_element_aabb = display_element_state.get_aabb();
             if current_display_element_aabb.intersects_with(&concurrent_display_element_aabb) ||
@@ -280,7 +279,7 @@ impl MonitorConfigurator {
         if let Some(display_element) = self.monitors.get_mut(&port_name) {
             let display_element_state = display_element_state.unwrap();
             display_element_state.position = moved_position.clone();
-            display_element.update_ui(display_element_state.clone());
+            display_element.update_state(display_element_state.clone());
 
             self.monitors_fixed.move_(display_element.get_widget(), moved_position.get_x(), moved_position.get_y());
         }
@@ -299,10 +298,6 @@ impl MonitorConfigurator {
             self.monitors_fixed.width() as f64,
             self.monitors_fixed.height() as f64
         )
-    }
-
-    pub fn get_state(&self) -> MonitorConfiguratorState {
-        self.state.clone()
     }
 
     pub fn init_events_by_manager(&mut self, manager: MonitorConfiguratorManager) {
@@ -327,7 +322,7 @@ impl MonitorConfigurator {
             let display_configuration_state = manager_clone
                 .get_display_configurator()
                 .borrow()
-                .get_state();
+                .get_current_state();
 
             let selected_port = display_configuration_state.selected_monitor;
             if let Some(selected_port) = selected_port {
@@ -351,7 +346,7 @@ impl MonitorConfigurator {
             let display_configuration_state = manager_clone
                 .get_display_configurator()
                 .borrow()
-                .get_state();
+                .get_current_state();
 
             let selected_port = display_configuration_state.selected_monitor;
             if let Some(selected_port) = selected_port {

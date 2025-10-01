@@ -15,7 +15,6 @@ use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
 use crate::ui::controls::keybinds::custom_keybind_input_field::CustomKeyBindInputField;
 use crate::ui::controls::keybinds::keybind_input_field::KeybindInputField;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
@@ -319,7 +318,7 @@ impl Keybinds {
             command
         };
         custom_keybind_input_field.update_state(custom_keybind_input_field_state.clone());
-        custom_keybind_input_field.update_ui(custom_keybind_input_field_state.clone());
+        custom_keybind_input_field.update_state(custom_keybind_input_field_state.clone());
         custom_keybind_input_field.init_events();
 
         let custom_keybind_input_field_rc = Rc::new(RefCell::new(custom_keybind_input_field));
@@ -327,7 +326,7 @@ impl Keybinds {
             edit_mode
         };
         let mut editable_control_element = EditableControlElement::new(custom_keybind_input_field_rc.clone());
-        editable_control_element.update_ui(editable_control_element_state.clone());
+        editable_control_element.update_state(editable_control_element_state.clone());
         editable_control_element.update_state(editable_control_element_state.clone());
 
         let editable_control_element_rc = Rc::new(
@@ -366,7 +365,7 @@ impl Keybinds {
             input_text: entry_field_name,
             configuration: program_keybind,
         };
-        keybind_iput_field.update_ui(state);
+        keybind_iput_field.update_state(state);
         keybind_iput_field.set_input_callback(keybind_entry_changed_callback);
         keybind_iput_field
     }

@@ -7,7 +7,6 @@ use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
 use crate::ui::controls::Control;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
@@ -30,7 +29,7 @@ impl Control for Wallpaper {
 }
 
 impl UpdatableControl<WallpaperPageState> for Wallpaper {
-    fn update_ui(&mut self, state: WallpaperPageState) {
+    fn update_state(&mut self, state: WallpaperPageState) {
         Boxes::clear_box_content(&self.wallpaper_sections_box);
 
         if state.enabled {
@@ -38,12 +37,12 @@ impl UpdatableControl<WallpaperPageState> for Wallpaper {
         } else {
             self.create_wallpaper_warning()
         }
-    }
-}
 
-impl StatableControl<WallpaperPageState> for Wallpaper {
-    fn update_state(&mut self, state: WallpaperPageState) {
         self.state = state;
+    }
+
+    fn get_current_state(&self) -> WallpaperPageState {
+        self.state.clone()
     }
 }
 
@@ -88,7 +87,7 @@ impl Wallpaper {
             placeholder_text: "e.g. ~/Pictures/wallpaper.png".to_string(),
             entry_text: Some(appearance_provider.borrow().get_wallpaper_path()),
         };
-        wallpaper_path_input_field.update_ui(state);
+        wallpaper_path_input_field.update_state(state);
         wallpaper_path_input_field.set_input_callback(wallpaper_path_input_change);
 
         self.wallpaper_sections_box.append(wallpaper_path_input_field.get_widget());

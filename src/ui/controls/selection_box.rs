@@ -6,7 +6,6 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::labeled_control::LabeledControl;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::updatable_control::UpdatableControl;
 
@@ -32,20 +31,20 @@ impl LabeledControl for SelectionBox {
 }
 
 impl UpdatableControl<SelectionBoxState> for SelectionBox {
-    fn update_ui(&mut self, state: SelectionBoxState) {
+    fn update_state(&mut self, state: SelectionBoxState) {
         self.selection_label.set_text(&state.label_text);
 
-        self.set_items(state.options);
+        self.set_items(state.options.clone());
 
-        if let Some(selected_option) = state.selected_option {
+        if let Some(selected_option) = state.selected_option.clone() {
             self.set_selected_by_name(selected_option)
         }
-    }
-}
 
-impl StatableControl<SelectionBoxState> for SelectionBox {
-    fn update_state(&mut self, state: SelectionBoxState) {
         self.state = state;
+    }
+
+    fn get_current_state(&self) -> SelectionBoxState {
+        self.state.clone()
     }
 }
 
@@ -104,6 +103,8 @@ impl SelectionBox {
     }
 
     pub fn set_items(&mut self, items: Vec<String>) {
+        self.selection_combobox.remove_all();
+        
         for item in items {
             self.selection_combobox.append_text(item.as_str());
         }

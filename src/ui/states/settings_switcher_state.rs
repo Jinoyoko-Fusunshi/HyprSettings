@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct SettingsSwitcherState {
     pub active_settings_name: String,
 }

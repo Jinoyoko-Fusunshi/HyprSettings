@@ -4,11 +4,12 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::states::monitor_state::DisplayElementState;
+use crate::ui::states::monitor_state::MonitorState;
 use crate::ui::updatable_control::UpdatableControl;
 
 #[derive(Clone)]
 pub struct Monitor {
+    state: MonitorState,
     monitor_box: GTKBox,
     port_label: Label,
     offset_label: Label,
@@ -22,9 +23,9 @@ impl Control for Monitor {
     }
 }
 
-impl UpdatableControl<DisplayElementState> for Monitor {
-    fn update_ui(&mut self, state: DisplayElementState) {
-        let size = state.size;
+impl UpdatableControl<MonitorState> for Monitor {
+    fn update_state(&mut self, state: MonitorState) {
+        let size = state.size.clone();
 
         self.monitor_box.set_width_request(size.get_x() as i32);
         self.monitor_box.set_height_request(size.get_y() as i32);
@@ -34,18 +35,24 @@ impl UpdatableControl<DisplayElementState> for Monitor {
             "x: {:.0} y: {:.0}", state.position.get_x() * 10.0, state.position.get_y() * 10.0
         );
         self.offset_label.set_text(&display_text);
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> MonitorState {
+        self.state.clone()
     }
 }
 
 impl Monitor {
     pub fn new() -> Self {
-        let display_element_box = BoxBuilder::new("display-element")
+        let monitor_box = BoxBuilder::new("display-element")
             .set_class(CSSStyles::MONITOR_BOX)
             .build();
-        display_element_box.set_can_focus(true);
-        display_element_box.set_focusable(true);
-        display_element_box.set_vexpand(false);
-        display_element_box.set_hexpand(false);
+        monitor_box.set_can_focus(true);
+        monitor_box.set_focusable(true);
+        monitor_box.set_vexpand(false);
+        monitor_box.set_hexpand(false);
 
         let display_information_box = BoxBuilder::new("display-information")
             .set_orientation(Orientation::Vertical)
@@ -55,17 +62,20 @@ impl Monitor {
         display_information_box.set_vexpand(true);
         display_information_box.set_hexpand(true);
 
-        let display_port_label = Label::new(None);
-        let display_offset_label = Label::new(None);
-        display_information_box.append(&display_port_label);
-        display_information_box.append(&display_offset_label);
+        let port_label = Label::new(None);
+        let offset_label = Label::new(None);
+        display_information_box.append(&port_label);
+        display_information_box.append(&offset_label);
 
-        display_element_box.append(&display_information_box);
+        monitor_box.append(&display_information_box);
+
+        let state = Default::default();
 
         Self {
-            monitor_box: display_element_box,
-            port_label: display_port_label,
-            offset_label: display_offset_label,
+            state,
+            monitor_box,
+            port_label,
+            offset_label,
         }
     }
 

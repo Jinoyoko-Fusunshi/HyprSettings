@@ -9,7 +9,6 @@ use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::manager::startup_program_field_manager::{StartupProgramFieldEvent, StartupProgramFieldManager};
 use crate::ui::pages::keybinds::CUSTOM_ITEM;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
@@ -35,7 +34,7 @@ impl Control for StartupProgramField {
 }
 
 impl UpdatableControl<StartupProgramFieldState> for StartupProgramField {
-    fn update_ui(&mut self, state: StartupProgramFieldState) {
+    fn update_state(&mut self, state: StartupProgramFieldState) {
         let program = if state.program_name == CUSTOM_ITEM {
             None
         } else {
@@ -44,26 +43,18 @@ impl UpdatableControl<StartupProgramFieldState> for StartupProgramField {
 
         self.change_input_access(program.clone());
         self.set_program_fields(program.clone());
-
+        *self.state.borrow_mut() = state.clone();
+        
         let state = SelectionBoxState {
             label_text: "Program: ".to_string(),
             options: state.programs,
             selected_option: program
         };
-        self.selection_box.update_ui(state);
+        self.selection_box.update_state(state.clone());
     }
-}
 
-impl StatableControl<StartupProgramFieldState> for StartupProgramField {
-    fn update_state(&mut self, state: StartupProgramFieldState) {
-        *self.state.borrow_mut() = state.clone();
-
-        let selection_box_state = SelectionBoxState {
-            label_text: "Program: ".to_string(),
-            selected_option: Some(state.program_name.clone()),
-            options: state.programs.clone(),
-        };
-        self.selection_box.update_state(selection_box_state)
+    fn get_current_state(&self) -> StartupProgramFieldState {
+        self.state.borrow().clone()
     }
 }
 

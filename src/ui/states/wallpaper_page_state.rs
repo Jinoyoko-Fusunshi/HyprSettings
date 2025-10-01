@@ -1,7 +1,7 @@
 use crate::models::modules::HYPRPAPER_MODULE;
 use crate::providers::application_provider::ApplicationProvider;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct WallpaperPageState {
     pub enabled: bool,
 }

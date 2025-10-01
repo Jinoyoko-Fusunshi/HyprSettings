@@ -10,7 +10,6 @@ use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
 use crate::ui::states::input_field_state::InputFieldState;
@@ -55,37 +54,31 @@ impl Control for CustomKeyBindInputField {
 }
 
 impl UpdatableControl<CustomKeybindInputFieldState> for CustomKeyBindInputField {
-    fn update_ui(&mut self, state: CustomKeybindInputFieldState) {
+    fn update_state(&mut self, state: CustomKeybindInputFieldState) {
         let input_field_state = InputFieldState {
             label_text: "Shortcut name:".to_string(),
-            entry_text: state.shortcut_name,
+            entry_text: state.shortcut_name.clone(),
             placeholder_text: "Open program".to_string(),
         };
-        self.shortcut_input_field.update_ui(input_field_state);
+        self.shortcut_input_field.update_state(input_field_state);
 
         let input_field_state = InputFieldState {
             label_text: "Command:".to_string(),
-            entry_text: state.command,
+            entry_text: state.command.clone(),
             placeholder_text: "Command:".to_string(),
         };
-        self.command_input_field.update_ui(input_field_state);
+        self.command_input_field.update_state(input_field_state);
 
         let keybind_input_state = KeybindInputState {
-            configuration: state.keybind,
+            configuration: state.keybind.clone(),
         };
-        self.keybind_input.borrow_mut().update_ui(keybind_input_state);
-    }
-}
-
-impl StatableControl<CustomKeybindInputFieldState> for CustomKeyBindInputField {
-    fn update_state(&mut self, state: CustomKeybindInputFieldState) {
-        *self.state.borrow_mut() = state.clone();
-
-        let keybind_input_state = KeybindInputState {
-            configuration: state.keybind,
-        };
-
+        
         self.keybind_input.borrow_mut().update_state(keybind_input_state);
+        *self.state.borrow_mut() = state.clone();
+    }
+
+    fn get_current_state(&self) -> CustomKeybindInputFieldState {
+        self.state.borrow().clone()
     }
 }
 

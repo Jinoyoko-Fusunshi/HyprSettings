@@ -9,6 +9,7 @@ use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::RcMut;
 
 pub struct SettingsSwitcher {
+    state: SettingsSwitcherState,
     settings_switcher_box: GTKBox,
     settings_switcher_stack: Stack,
     controls: HashMap<String, RcMut<dyn Control>>,
@@ -25,8 +26,12 @@ impl Control for SettingsSwitcher {
 }
 
 impl UpdatableControl<SettingsSwitcherState> for SettingsSwitcher {
-    fn update_ui(&mut self, state: SettingsSwitcherState) {
+    fn update_state(&mut self, state: SettingsSwitcherState) {
         self.set_control_visible(state.active_settings_name.as_str());
+        self.state = state.clone();
+    }
+    fn get_current_state(&self) -> SettingsSwitcherState {
+        self.state.clone()
     }
 }
 
@@ -40,10 +45,14 @@ impl SettingsSwitcher {
             .build();
         settings_switcher_box.append(&settings_switcher_stack);
 
+        let state = Default::default();
+        let controls = HashMap::new();
+        
         Self {
+            state,
             settings_switcher_box,
             settings_switcher_stack,
-            controls: HashMap::new(),
+            controls,
         }
     }
 

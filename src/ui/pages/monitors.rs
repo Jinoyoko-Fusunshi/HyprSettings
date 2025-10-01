@@ -12,14 +12,14 @@ use crate::ui::controls::monitor_field::MonitorField;
 use crate::ui::manager::monitor_configurator_manager::MonitorConfiguratorManager;
 use crate::ui::manager::monitor_field_manager::{MonitorFieldEvent, MonitorFieldManager};
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::monitor_configurator_state::MonitorConfiguratorState;
 use crate::ui::states::monitor_field_state::MonitorFieldState;
-use crate::ui::states::monitor_settings_state::MonitorSettingsState;
+use crate::ui::states::monitors_state::MonitorsState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::new_rc_mut;
 
 pub struct Monitors {
+    state: MonitorsState,
     application_provider: ApplicationProvider,
     monitor_box: GTKBox,
 }
@@ -32,14 +32,20 @@ impl Control for Monitors {
     }
 }
 
-impl UpdatableControl<MonitorSettingsState> for Monitors {
-    fn update_ui(&mut self, state: MonitorSettingsState) {
+impl UpdatableControl<MonitorsState> for Monitors {
+    fn update_state(&mut self, state: MonitorsState) {
         if state.enabled {
-            self.create_monitor_fields(state);
+            self.create_monitor_fields(state.clone());
             self.create_monitor_configurator();
         } else {
             self.create_monitors_warning();
         }
+        
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> MonitorsState {
+        self.state.clone()
     }
 }
 
@@ -49,13 +55,16 @@ impl Monitors {
             .create_header_elements("Available monitors")
             .build().expect("Failed to create monitor settings section box");
 
+        let state = Default::default();
+        
         Self {
+            state,
             application_provider,
             monitor_box,
         }
     }
 
-    fn create_monitor_fields(&mut self, state: MonitorSettingsState) {
+    fn create_monitor_fields(&mut self, state: MonitorsState) {
         let monitor_fields_box = BoxBuilder::new("monitor-fields")
             .set_orientation(Orientation::Vertical)
             .build();
@@ -68,7 +77,7 @@ impl Monitors {
                 monitor_port: port.clone(),
                 monitor_configuration: configuration.clone(),
             };
-            monitor_field.borrow_mut().update_ui(monitor_field_state);
+            monitor_field.borrow_mut().update_state(monitor_field_state);
 
             let monitor_field_manager = MonitorFieldManager::new(monitor_field.clone());
             let monitor_provider = self.application_provider.get_monitor_provider();
@@ -137,7 +146,7 @@ impl Monitors {
         }
 
         monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
-        monitor_configurator.borrow_mut().update_ui(monitor_configurator_state.clone());
+        monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
 
         let monitor_configurator_manager = MonitorConfiguratorManager::new(
             monitor_configurator.clone()

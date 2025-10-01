@@ -9,6 +9,7 @@ use crate::ui::states::spin_button_state::SpinButtonState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct SpinButton {
+    state: SpinButtonState,
     spin_button_box: GTKBox,
     spin_button_label: Label,
     spin_button: GTKSpinButton,
@@ -23,7 +24,7 @@ impl Control for SpinButton {
 }
 
 impl UpdatableControl<SpinButtonState> for SpinButton {
-    fn update_ui(&mut self, state: SpinButtonState) {
+    fn update_state(&mut self, state: SpinButtonState) {
         self.spin_button_label.set_text(state.label_text.as_str());
 
         let adjustment = Adjustment::new(
@@ -38,6 +39,12 @@ impl UpdatableControl<SpinButtonState> for SpinButton {
         self.spin_button.set_climb_rate(state.climb_rate);
         self.spin_button.set_digits(state.digit_count);
         self.spin_button.set_numeric(state.use_integral_numbers);
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> SpinButtonState {
+        self.state.clone()
     }
 }
 
@@ -72,8 +79,11 @@ impl SpinButton {
         
         spin_button_box.append(&spin_button_label);
         spin_button_box.append(&spin_button);
-        
+
+        let state = Default::default();
+
         Self {
+            state,
             spin_button_box,
             spin_button_label,
             spin_button

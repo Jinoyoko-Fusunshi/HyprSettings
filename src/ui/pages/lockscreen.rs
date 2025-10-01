@@ -12,7 +12,6 @@ use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::color_selector_state::ColorSelectorState;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
@@ -38,7 +37,7 @@ impl Control for Lockscreen {
 }
 
 impl UpdatableControl<LockScreenPageState> for Lockscreen {
-    fn update_ui(&mut self, state: LockScreenPageState) {
+    fn update_state(&mut self, state: LockScreenPageState) {
         Boxes::clear_box_content(&self.lockscreen_sections_box);
 
         if state.enabled {
@@ -46,12 +45,12 @@ impl UpdatableControl<LockScreenPageState> for Lockscreen {
         } else {
             self.create_lockscreen_warning();
         }
-    }
-}
 
-impl StatableControl<LockScreenPageState> for Lockscreen {
-    fn update_state(&mut self, state: LockScreenPageState) {
         self.state = state;
+    }
+
+    fn get_current_state(&self) -> LockScreenPageState {
+        self.state.clone()
     }
 }
 
@@ -137,10 +136,10 @@ impl Lockscreen {
         let state = SelectionBoxState {
             label_text: "Hide cursor".to_string(),
             selected_option: Some(lockscreen_state.hide_cursor.to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         hide_cursor_selection_box.update_state(state.clone());
-        hide_cursor_selection_box.update_ui(state.clone());
+        hide_cursor_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_cursor_selection_change = move |combobox: &ComboBoxText| {
@@ -165,7 +164,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: true,
         };
-        grace_spin_button.update_ui(state);
+        grace_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let fall_timeout_change = move |spin_button: &GTKSpinButton| {
@@ -189,7 +188,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: true,
         };
-        fall_timeout.update_ui(state);
+        fall_timeout.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let fall_timeout_change = move |spin_button: &GTKSpinButton| {
@@ -217,7 +216,7 @@ impl Lockscreen {
             entry_text: lockscreen_state.lockscreen_wallpaper.clone(),
             placeholder_text: "e.g. ~/Pictures/lockscreen.png".to_string(),
         };
-        lockscreen_wallpaper_input_field.update_ui(state);
+        lockscreen_wallpaper_input_field.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let lockscreen_wallpaper_input_field_change = move |entry: &Entry| {
@@ -241,7 +240,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        blur_size_spin_button.update_ui(state);
+        blur_size_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let blur_size_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -265,7 +264,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        blur_passes_spin_button.update_ui(state);
+        blur_passes_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let blur_passes_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -289,7 +288,7 @@ impl Lockscreen {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        noise_spin_button.update_ui(state);
+        noise_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let noise_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -313,7 +312,7 @@ impl Lockscreen {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        contrast_spin_button.update_ui(state);
+        contrast_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let contrast_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -337,7 +336,7 @@ impl Lockscreen {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        brightness_spin_button.update_ui(state);
+        brightness_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let brightness_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -367,7 +366,7 @@ impl Lockscreen {
             digit_count: 1,
             use_integral_numbers: false,
         };
-        vibrancy_spin_button.update_ui(state);
+        vibrancy_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let vibrancy_spin_change = move |spin_button: &GTKSpinButton| {
@@ -407,7 +406,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_width_spin_button.update_ui(state);
+        input_width_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_width_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -431,7 +430,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_height_spin_button.update_ui(state);
+        input_height_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_height_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -455,7 +454,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_outline_thickness_spin_button.update_ui(state);
+        input_outline_thickness_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_outline_thickness_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -479,7 +478,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_dots_size_spin_button.update_ui(state);
+        input_dots_size_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_size_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -503,7 +502,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_dots_spacing_spin_button.update_ui(state);
+        input_dots_spacing_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_spacing_spin_button_change = move |spin_button: &GTKSpinButton| {
@@ -518,10 +517,10 @@ impl Lockscreen {
         let state = SelectionBoxState {
             label_text: "Dots center".to_string(),
             selected_option: Some(lockscreen_state.input_dots_center.to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         input_dots_center_selection_box.update_state(state.clone());
-        input_dots_center_selection_box.update_ui(state.clone());
+        input_dots_center_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_center_selection_box_change = move |combo_box_text: &ComboBoxText| {
@@ -538,7 +537,7 @@ impl Lockscreen {
             label_text: "Outer color".to_string(),
             selected_color: Some(lockscreen_state.input_outer_color.clone()),
         };
-        outer_color_selector.update_ui(state);
+        outer_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let outer_color_selector_change = move |color_button: &ColorButton| {
@@ -554,7 +553,7 @@ impl Lockscreen {
             label_text: "Inner color".to_string(),
             selected_color: Some(lockscreen_state.input_inner_color.clone()),
         };
-        inner_color_selector.update_ui(state);
+        inner_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let inner_color_selector_change = move |color_button: &ColorButton| {
@@ -570,7 +569,7 @@ impl Lockscreen {
             label_text: "Font color".to_string(),
             selected_color: Some(lockscreen_state.input_font_color.clone()),
         };
-        font_color_selector.update_ui(state);
+        font_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let font_color_selector_change = move |color_button: &ColorButton| {
@@ -586,7 +585,7 @@ impl Lockscreen {
             entry_text: lockscreen_state.input_placeholder_text.clone(),
             placeholder_text: "e.g. insert password here...".to_string(),
         };
-        input_placeholder_text_input_field.update_ui(state);
+        input_placeholder_text_input_field.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_placeholder_text_change = move |entry: &Entry| {
@@ -601,10 +600,10 @@ impl Lockscreen {
         let state = SelectionBoxState {
             label_text: "Hide input".to_string(),
             selected_option: Some(lockscreen_state.hide_input.to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         hide_input_selection_box.update_state(state.clone());
-        hide_input_selection_box.update_ui(state.clone());
+        hide_input_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_input_selection_box_change = move |combo_box_text: &ComboBoxText| {
@@ -629,7 +628,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_x_position.update_ui(state);
+        input_x_position.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_x_position_change = move |spin_button: &GTKSpinButton| {
@@ -653,7 +652,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        input_y_position.update_ui(state);
+        input_y_position.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_y_position_change = move |spin_button: &GTKSpinButton| {
@@ -671,7 +670,7 @@ impl Lockscreen {
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
         vertical_align_selection_box.update_state(state.clone());
-        vertical_align_selection_box.update_ui(state.clone());
+        vertical_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let vertical_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
@@ -689,7 +688,7 @@ impl Lockscreen {
             options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
         };
         horizontal_align_selection_box.update_state(state.clone());
-        horizontal_align_selection_box.update_ui(state.clone());
+        horizontal_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let horizontal_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
@@ -729,7 +728,7 @@ impl Lockscreen {
             entry_text: lockscreen_state.display_text.clone(),
             placeholder_text: "$time (current formatted datetime)".to_string(),
         };
-        display_text_input_field.update_ui(state);
+        display_text_input_field.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let display_text_input_field_change = move |entry: &Entry| {
@@ -745,7 +744,7 @@ impl Lockscreen {
             label_text: "Text Color".to_string(),
             selected_color: Some(lockscreen_state.display_text_color.clone()),
         };
-        text_color_picker.update_ui(state);
+        text_color_picker.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_color_picker_change = move |color_button: &ColorButton| {
@@ -769,7 +768,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        text_font_size_spin_button.update_ui(state);
+        text_font_size_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_font_size_spin_change = move |spin_button: &GTKSpinButton| {
@@ -785,7 +784,7 @@ impl Lockscreen {
             entry_text: lockscreen_state.display_text_font.clone(),
             placeholder_text: "e.g. Calibri".to_string(),
         };
-        text_font.update_ui(state);
+        text_font.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_font_change = move |entry: &Entry| {
@@ -809,7 +808,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        text_x_position_spin_button.update_ui(state);
+        text_x_position_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_x_position_spin_change = move |spin_button: &GTKSpinButton| {
@@ -833,7 +832,7 @@ impl Lockscreen {
             digit_count: 0,
             use_integral_numbers: false,
         };
-        text_y_position_spin_button.update_ui(state);
+        text_y_position_spin_button.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_y_position_spin_change = move |spin_button: &GTKSpinButton| {
@@ -851,7 +850,7 @@ impl Lockscreen {
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
         text_vertical_align_selection_box.update_state(state.clone());
-        text_vertical_align_selection_box.update_ui(state.clone());
+        text_vertical_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_vertical_align_selection_box_change = move |combobox: &ComboBoxText| {
@@ -869,7 +868,7 @@ impl Lockscreen {
             options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
         };
         text_horizontal_align_selection_box.update_state(state.clone());
-        text_horizontal_align_selection_box.update_ui(state.clone());
+        text_horizontal_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let text_horizontal_align_selection_box_change = move |combobox: &ComboBoxText| {

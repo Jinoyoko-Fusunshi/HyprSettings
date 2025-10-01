@@ -3,15 +3,15 @@ use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
 
-#[derive(Clone)]
-pub struct GeneralSettingsState {
+#[derive(Clone, Default)]
+pub struct ProgramsState {
     pub terminal_path: Option<String>,
     pub file_manager_path: Option<String>,
     pub quick_search_path: Option<String>,
     pub notification_handler_path: Option<String>,
 }
 
-impl From<&ApplicationProvider> for GeneralSettingsState {
+impl From<&ApplicationProvider> for ProgramsState {
     fn from(value: &ApplicationProvider) -> Self {
         let program_provider = value.get_program_provider();
         let program_provider_ref = program_provider.borrow();

@@ -11,7 +11,6 @@ use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputM
 use crate::ui::controls::keybinds::key_symbol::KeySymbol;
 use crate::ui::controls::keybinds::keybind_converter::KeybindConverter;
 use crate::ui::css_styles::CSSStyles;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::{new_rc_mut, RcMut};
@@ -46,18 +45,18 @@ impl Control for KeybindInput {
 }
 
 impl UpdatableControl<KeybindInputState> for KeybindInput {
-    fn update_ui(&mut self, state: KeybindInputState) {
-        if let Some(configuration) = state.configuration {
+    fn update_state(&mut self, state: KeybindInputState) {
+        if let Some(configuration) = state.configuration.clone() {
             self.set_keybind(configuration);
         } else {
             self.reset_input();
         }
-    }
-}
 
-impl StatableControl<KeybindInputState> for KeybindInput {
-    fn update_state(&mut self, state: KeybindInputState) {
         *self.state.borrow_mut() = state;
+    }
+
+    fn get_current_state(&self) -> KeybindInputState {
+        self.state.borrow().clone()
     }
 }
 

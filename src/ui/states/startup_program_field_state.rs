@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct StartupProgramFieldState {
     pub previous_program_name: String,
     pub program_name: String,

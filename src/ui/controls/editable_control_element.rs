@@ -5,14 +5,14 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::Control;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::{new_rc_mut, RcMut};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub enum EditMode {
+    #[default]
     Locked,
     Edit
 }
@@ -73,15 +73,13 @@ impl<Element: ActivableControl + Control + StateSavableControl> Control for Edit
 
 impl<Element: ActivableControl + Control + StateSavableControl>
 UpdatableControl<EditableControlElementState> for EditableControlElement<Element> {
-    fn update_ui(&mut self, state: EditableControlElementState) {
-        self.change_mode(state.edit_mode);
-    }
-}
-
-impl<Element: ActivableControl + Control + StateSavableControl>
-StatableControl<EditableControlElementState> for EditableControlElement<Element> {
     fn update_state(&mut self, state: EditableControlElementState) {
+        self.change_mode(state.edit_mode.clone());
         *self.state.borrow_mut() = state;
+    }
+
+    fn get_current_state(&self) -> EditableControlElementState{
+        self.state.borrow().clone()
     }
 }
 

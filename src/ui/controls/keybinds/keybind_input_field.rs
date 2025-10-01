@@ -6,13 +6,13 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::keybinds::keybind_input::KeybindInput;
 use crate::ui::manager::keybind_input_manager::KeybindInputManager;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::{new_rc_mut, RcMut};
 
 pub struct KeybindInputField {
+    state: KeybindInputFieldState,   
     keybind_input_field_box: GTKBox,
     keybind_input_label: Label,
     keybind_input: RcMut<KeybindInput>
@@ -27,7 +27,7 @@ impl Control for KeybindInputField {
 }
 
 impl UpdatableControl<KeybindInputFieldState> for KeybindInputField {
-    fn update_ui(&mut self, state: KeybindInputFieldState) {
+    fn update_state(&mut self, state: KeybindInputFieldState) {
         self.keybind_input_label.set_text(state.input_text.as_str());
 
         let keybind_input_state = KeybindInputState {
@@ -35,7 +35,13 @@ impl UpdatableControl<KeybindInputFieldState> for KeybindInputField {
         };
 
         self.keybind_input.borrow_mut().update_state(keybind_input_state.clone());
-        self.keybind_input.borrow_mut().update_ui(keybind_input_state.clone());
+        self.keybind_input.borrow_mut().update_state(keybind_input_state.clone());
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> KeybindInputFieldState {
+        self.state.clone()
     }
 }
 
@@ -60,7 +66,10 @@ impl KeybindInputField {
         keybind_input_field_box.append(&keybind_input_label);
         keybind_input_field_box.append(keybind_input.borrow().get_widget());
 
+        let state = Default::default();
+        
         Self {
+            state,
             keybind_input_label,
             keybind_input,
             keybind_input_field_box

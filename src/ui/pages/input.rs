@@ -11,7 +11,6 @@ use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::controls::spin_button::SpinButton;
 use crate::ui::labeled_control::LabeledControl;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::states::selection_box_state::SelectionBoxState;
 use crate::ui::states::spin_button_state::SpinButtonState;
@@ -67,7 +66,7 @@ impl Input {
             placeholder_text: "e.g us".to_string(),
         };
         let mut layout_input_field = InputField::new();
-        layout_input_field.update_ui(state);
+        layout_input_field.update_state(state);
         layout_input_field.set_input_callback(layout_input_field_change);
 
 
@@ -79,12 +78,12 @@ impl Input {
         let state = SelectionBoxState {
             label_text: "Numlock enabled:".to_string(),
             selected_option: Some(input_provider.borrow().get_numlock_enabled().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         let mut numlock_enabled = SelectionBox::new();
         numlock_enabled.set_text_width(INPUT_LABEL_WIDTH);
         numlock_enabled.update_state(state.clone());
-        numlock_enabled.update_ui(state.clone());
+        numlock_enabled.update_state(state.clone());
         numlock_enabled.set_selection_change(numlock_enabled_selection_box_change);
 
 
@@ -106,7 +105,7 @@ impl Input {
         };
         let mut repeat_rate_spin_button = SpinButton::new();
         repeat_rate_spin_button.set_text_width(INPUT_LABEL_WIDTH);
-        repeat_rate_spin_button.update_ui(state);
+        repeat_rate_spin_button.update_state(state);
         repeat_rate_spin_button.set_value_change(repeat_rate_spin_button_change);
 
 
@@ -128,7 +127,7 @@ impl Input {
         };
         let mut repeat_delay_spin_button = SpinButton::new();
         repeat_delay_spin_button.set_text_width(INPUT_LABEL_WIDTH);
-        repeat_delay_spin_button.update_ui(state);
+        repeat_delay_spin_button.update_state(state);
         repeat_delay_spin_button.set_value_change(repeat_delay_spin_button_change);
 
         keyboard_section.append(layout_input_field.get_widget());
@@ -161,7 +160,7 @@ impl Input {
         };
         let mut sensitivity_spin_button = SpinButton::new();
         sensitivity_spin_button.set_text_width(INPUT_LABEL_WIDTH);
-        sensitivity_spin_button.update_ui(state);
+        sensitivity_spin_button.update_state(state);
         sensitivity_spin_button.set_value_change(sensitivity_spin_button_change);
 
         let input_provider_clone = input_provider.clone();
@@ -172,12 +171,12 @@ impl Input {
         let state = SelectionBoxState {
             label_text: "Left handed:".to_string(),
             selected_option: Some(input_provider.borrow().get_mouse_left_handed().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         let mut left_handed_selection_box = SelectionBox::new();
         left_handed_selection_box.set_text_width(INPUT_LABEL_WIDTH);
         left_handed_selection_box.update_state(state.clone());
-        left_handed_selection_box.update_ui(state.clone());
+        left_handed_selection_box.update_state(state.clone());
         left_handed_selection_box.set_selection_change(left_handed_selection_box_change);
 
         let input_provider_clone = input_provider.clone();
@@ -198,7 +197,7 @@ impl Input {
         };
         let mut scroll_factor_spin_button = SpinButton::new();
         scroll_factor_spin_button.set_text_width(INPUT_LABEL_WIDTH);
-        scroll_factor_spin_button.update_ui(state);
+        scroll_factor_spin_button.update_state(state);
         scroll_factor_spin_button.set_value_change(scroll_factor_spin_button_change);
 
         let input_provider_clone = input_provider.clone();
@@ -209,12 +208,12 @@ impl Input {
         let state = SelectionBoxState {
             label_text: "Natural Scroll:".to_string(),
             selected_option: Some(input_provider.borrow().get_mouse_natural_scroll().to_string()),
-            options: vec!["false".to_string(), "true".to_string()],
+            options: SelectionBoxState::get_false_true_options(),
         };
         let mut natural_scroll_enabled_selection_box = SelectionBox::new();
         natural_scroll_enabled_selection_box.set_text_width(INPUT_LABEL_WIDTH);
         natural_scroll_enabled_selection_box.update_state(state.clone());
-        natural_scroll_enabled_selection_box.update_ui(state.clone());
+        natural_scroll_enabled_selection_box.update_state(state.clone());
         natural_scroll_enabled_selection_box.set_selection_change(natural_scroll_enabled_selection_box_change);
 
         mouse_section.append(sensitivity_spin_button.get_widget());

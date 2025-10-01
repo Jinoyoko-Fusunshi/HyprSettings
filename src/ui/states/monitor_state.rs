@@ -2,8 +2,8 @@ use crate::math::geometry::aabb::AABB;
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::math::vector::Vector;
 
-#[derive(Default, Clone)]
-pub struct DisplayElementState {
+#[derive(Clone, Default)]
+pub struct MonitorState {
     pub port_name: String,
     pub orientation: MonitorOrientation,
     pub previous_position: Vector,
@@ -11,7 +11,7 @@ pub struct DisplayElementState {
     pub size: Vector,
 }
 
-impl DisplayElementState {
+impl MonitorState {
     pub fn get_orientated_size(&self) -> Vector {
         self.orientation.get_size_by_orientation(self.size.clone())
     }

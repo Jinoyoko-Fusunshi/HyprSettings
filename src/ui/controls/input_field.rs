@@ -9,6 +9,7 @@ use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
 pub struct InputField {
+    state: InputFieldState,
     input_field_box: GTKBox,
     input_label: Label,
     input_entry: Entry
@@ -23,15 +24,21 @@ impl Control for InputField {
 }
 
 impl UpdatableControl<InputFieldState> for InputField {
-    fn update_ui(&mut self, state: InputFieldState) {
+    fn update_state(&mut self, state: InputFieldState) {
         self.input_label.set_text(state.label_text.as_str());
         self.input_entry.set_placeholder_text(Some(state.placeholder_text.as_str()));
 
-        if let Some(text) = state.entry_text && !text.is_empty() {
+        if let Some(text) = state.entry_text.clone() && !text.is_empty() {
             self.input_entry.set_text(text.as_str());
         } else {
             self.input_entry.set_text("");
         }
+
+        self.state = state;
+    }
+
+    fn get_current_state(&self) -> InputFieldState {
+        self.state.clone()
     }
 }
 
@@ -47,7 +54,7 @@ impl ActivableControl for InputField {
 
 impl InputField {
     pub fn new () -> Self {
-        let panel = BoxBuilder::new("input-field")
+        let input_field_box = BoxBuilder::new("input-field")
             .set_orientation(Orientation::Vertical)
             .set_margin_bottom(DEFAULT_MARGIN)
             .build();
@@ -58,11 +65,14 @@ impl InputField {
 
         let input_entry = Entry::new();
 
-        panel.append(&input_label);
-        panel.append(&input_entry);
-
+        input_field_box.append(&input_label);
+        input_field_box.append(&input_entry);
+        
+        let state = Default::default();
+        
         Self {
-            input_field_box: panel,
+            state,
+            input_field_box,
             input_label,
             input_entry
         }

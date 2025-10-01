@@ -38,7 +38,7 @@ impl SettingsSwitcherManager {
             SettingsSwitcherEvent::NewControlName(name) => {
                 let settings_switcher_state = SettingsSwitcherState::new(name);
                 let mut settings_switcher = self.settings_switcher.borrow_mut();
-                settings_switcher.update_ui(settings_switcher_state);
+                settings_switcher.update_state(settings_switcher_state);
             },
             SettingsSwitcherEvent::SaveSettings => {
                 let program_settings = self.application_provider

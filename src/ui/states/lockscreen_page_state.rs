@@ -2,7 +2,7 @@ use crate::models::modules::HYPRLOCK_MODULE;
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct LockScreenPageState {
     pub enabled: bool,
     pub hide_cursor: bool,

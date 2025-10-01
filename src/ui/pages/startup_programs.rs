@@ -13,7 +13,6 @@ use crate::ui::controls::editable_control_element::{EditMode, EditableControlEle
 use crate::ui::manager::startup_program_field_manager::StartupProgramFieldManager;
 use crate::ui::pages::keybinds::CUSTOM_ITEM;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::statable_control::StatableControl;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::editable_control_element_state::EditableControlElementState;
 use crate::ui::states::startup_program_field_state::StartupProgramFieldState;
@@ -113,7 +112,7 @@ impl StartupPrograms {
         let startup_program_field = new_rc_mut(StartupProgramField::new(application_provider.clone()));
         let startup_program_field_manager = StartupProgramFieldManager::new(startup_program_field.clone());
         startup_program_field.borrow_mut().update_state(state.clone());
-        startup_program_field.borrow_mut().update_ui(state.clone());
+        startup_program_field.borrow_mut().update_state(state.clone());
         startup_program_field.borrow().init_events(startup_program_field_manager);
 
         let editable_control_element_state = EditableControlElementState {
@@ -123,7 +122,7 @@ impl StartupPrograms {
             startup_program_field.clone()
         );
         editable_control_element.update_state(editable_control_element_state.clone());
-        editable_control_element.update_ui(editable_control_element_state.clone());
+        editable_control_element.update_state(editable_control_element_state.clone());
 
         let editable_control_element_rc = new_rc_mut(editable_control_element);
         let editable_control_element_manager = EditableControlElementManager::new(
