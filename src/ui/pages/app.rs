@@ -27,6 +27,7 @@ use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::new_rc_mut;
 
 pub struct App {
     app_box: GTKBox
@@ -49,41 +50,35 @@ impl App {
             .set_margin(DEFAULT_MARGIN)
             .build();
 
-        let overview_settings = Box::new(Overview::new(application_provider.clone()));
+        let overview_settings = new_rc_mut(Overview::new(application_provider.clone()));
 
         let state = GeneralSettingsState::from(&application_provider);
-        let mut programs = Box::new(Programs::new(application_provider.clone()));
-        programs.init_events();
-        programs.update_ui(state);
+        let programs = new_rc_mut(Programs::new(application_provider.clone()));
+        programs.borrow_mut().init_events();
+        programs.borrow_mut().update_ui(state);
 
         let state = MonitorSettingsState::from(&application_provider);
-        let mut monitors = Box::new(Monitors::new(application_provider.clone()));
-        monitors.init_events();
-        monitors.update_ui(state);
+        let monitors = new_rc_mut(Monitors::new(application_provider.clone()));
+        monitors.borrow_mut().update_ui(state);
 
         let state = WallpaperPageState::from(&application_provider);
-        let mut wallpaper = Box::new(Wallpaper::new(application_provider.clone()));
-        wallpaper.update_ui(state.clone());
+        let wallpaper = new_rc_mut(Wallpaper::new(application_provider.clone()));
+        wallpaper.borrow_mut().update_ui(state.clone());
 
         let state = LockScreenPageState::from(&application_provider);
-        let mut lockscreen = Box::new(Lockscreen::new(application_provider.clone()));
-        lockscreen.update_ui(state.clone());
+        let lockscreen = new_rc_mut(Lockscreen::new(application_provider.clone()));
+        lockscreen.borrow_mut().update_ui(state.clone());
 
-        let appearance = Box::new(Appearance::new(application_provider.clone()));
-        appearance.init_events();
+        let appearance = new_rc_mut(Appearance::new(application_provider.clone()));
 
-        let input_settings = Box::new(Input::new(application_provider.clone()));
-        input_settings.init_events();
+        let input = new_rc_mut(Input::new(application_provider.clone()));
+        let keybinds = new_rc_mut(Keybinds::new(application_provider.clone()));
 
-        let keybinds = Box::new(Keybinds::new(application_provider.clone()));
-        keybinds.init_events();
-
-        let startup_program = Box::new(StartupPrograms::new());
-        startup_program.init_events(application_provider.clone());
-        startup_program.init_ui(application_provider.clone());
+        let startup_program = new_rc_mut(StartupPrograms::new());
+        startup_program.borrow_mut().init_events(application_provider.clone());
+        startup_program.borrow_mut().init_ui(application_provider.clone());
         
-        let infos = Box::new(Infos::new());
-
+        let infos = new_rc_mut(Infos::new());
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
             .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
@@ -94,7 +89,7 @@ impl App {
             .insert_control(APPEARANCE_PAGE.to_string(), appearance)
             .insert_control(KEYBINDS_PAGE.to_string(), keybinds)
             .insert_control(STARTUP_PROGRAMS_PAGE.to_string(), startup_program)
-            .insert_control(INPUT_PAGE.to_string(), input_settings)
+            .insert_control(INPUT_PAGE.to_string(), input)
             .insert_control(INFO_PAGE.to_string(), infos);
 
         let settings_switcher_state = SettingsSwitcherState::new(OVERVIEW_PAGE.to_string());

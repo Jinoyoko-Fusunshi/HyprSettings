@@ -6,11 +6,12 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::RcMut;
 
 pub struct SettingsSwitcher {
     settings_switcher_box: GTKBox,
     settings_switcher_stack: Stack,
-    controls: HashMap<String, Box<dyn Control>>,
+    controls: HashMap<String, RcMut<dyn Control>>,
 }
 
 impl Control for SettingsSwitcher {
@@ -46,8 +47,8 @@ impl SettingsSwitcher {
         }
     }
 
-    pub fn insert_control(&mut self, name: String, control: Box<dyn Control>) -> &mut Self {
-        self.settings_switcher_stack.add_named(control.get_widget(), Some(name.as_str()));
+    pub fn insert_control(&mut self, name: String, control: RcMut<dyn Control>) -> &mut Self {
+        self.settings_switcher_stack.add_named(control.borrow().get_widget(), Some(name.as_str()));
         self.controls.insert(name, control);
         self
     }
