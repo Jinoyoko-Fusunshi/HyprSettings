@@ -10,3 +10,4 @@ mod manager;
 pub mod pages;
 pub mod boxes;
 mod box_builder;
+mod managed_control;

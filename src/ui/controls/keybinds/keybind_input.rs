@@ -11,6 +11,7 @@ use crate::ui::manager::keybind_input_manager::{KeybindInputEvent, KeybindInputM
 use crate::ui::controls::keybinds::key_symbol::KeySymbol;
 use crate::ui::controls::keybinds::keybind_converter::KeybindConverter;
 use crate::ui::css_styles::CSSStyles;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::states::keybind_input_state::KeybindInputState;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::{new_rc_mut, RcMut};

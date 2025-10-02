@@ -8,6 +8,8 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
 use crate::ui::controls::monitor::Monitor;
+use crate::ui::managed_control::ManagedControl;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::manager::monitor_configurator_manager::{DisplayConfiguratorEvent, MonitorConfiguratorManager};
 use crate::ui::states::monitor_configurator_state::MonitorConfiguratorState;
 use crate::ui::states::monitor_state::MonitorState;
@@ -45,6 +47,77 @@ impl UpdatableControl<MonitorConfiguratorState> for MonitorConfigurator {
 
     fn get_current_state(&self) -> MonitorConfiguratorState {
         self.state.clone()
+    }
+}
+
+impl ManagedControl<MonitorConfiguratorManager> for MonitorConfigurator {
+    fn init_events_by_manager(&self, manager: MonitorConfiguratorManager) {
+        for (monitor_port, display_element) in &self.monitors {
+            let state = self.state.monitor_states.get(monitor_port);
+            if let None = state {
+                continue;
+            }
+
+            let controller = GestureClick::new();
+            let monitor_port_clone = monitor_port.clone();
+            let manager_clone = manager.clone();
+            controller.connect_pressed(move |_, _, _, _| {
+                manager_clone.send_event(DisplayConfiguratorEvent::DisplaySelected(monitor_port_clone.clone()))
+            });
+            display_element.set_click_controller(controller);
+        }
+
+        let manager_clone = manager.clone();
+        let controller = GestureDrag::new();
+        controller.connect_drag_update(move |_: &GestureDrag, xoffset, yoffset| {
+            let display_configuration_state = manager_clone
+                .get_control()
+                .borrow()
+                .get_current_state();
+
+            let selected_port = display_configuration_state.selected_monitor;
+            if let Some(selected_port) = selected_port {
+                let display_element_state = display_configuration_state.monitor_states
+                    .get(&selected_port);
+
+                if let Some(display_element_state) = display_element_state {
+                    let previous_position = display_element_state.previous_position.clone();
+                    manager_clone.send_event(
+                        DisplayConfiguratorEvent::DisplayMoving(selected_port, Vector::new(
+                            previous_position.get_x() + xoffset,
+                            previous_position.get_y() + yoffset
+                        ))
+                    );
+                }
+            }
+        });
+
+        let manager_clone = manager.clone();
+        controller.connect_drag_end(move |_: &GestureDrag, xoffset, yoffset| {
+            let display_configuration_state = manager_clone
+                .get_control()
+                .borrow()
+                .get_current_state();
+
+            let selected_port = display_configuration_state.selected_monitor;
+            if let Some(selected_port) = selected_port {
+                let display_element_state = display_configuration_state.monitor_states
+                    .get(&selected_port);
+
+                if let Some(display_element_state) = display_element_state {
+                    let previous_position = display_element_state.previous_position.clone();
+                    let placed_position = Vector::new(
+                        previous_position.get_x() + xoffset,
+                        previous_position.get_y() + yoffset
+                    );
+
+                    manager_clone.send_event(DisplayConfiguratorEvent::DisplayPlaced(
+                        selected_port, placed_position,
+                    ));
+                }
+            }
+        });
+        self.monitors_fixed.add_controller(controller);
     }
 }
 
@@ -298,74 +371,5 @@ impl MonitorConfigurator {
             self.monitors_fixed.width() as f64,
             self.monitors_fixed.height() as f64
         )
-    }
-
-    pub fn init_events_by_manager(&mut self, manager: MonitorConfiguratorManager) {
-        for (monitor_port, display_element) in &self.monitors {
-            let state = self.state.monitor_states.get(monitor_port);
-            if let None = state {
-                continue;
-            }
-
-            let controller = GestureClick::new();
-            let monitor_port_clone = monitor_port.clone();
-            let manager_clone = manager.clone();
-            controller.connect_pressed(move |_, _, _, _| {
-                manager_clone.send_event(DisplayConfiguratorEvent::DisplaySelected(monitor_port_clone.clone()))
-            });
-            display_element.set_click_controller(controller);
-        }
-
-        let manager_clone = manager.clone();
-        let controller = GestureDrag::new();
-        controller.connect_drag_update(move |_: &GestureDrag, xoffset, yoffset| {
-            let display_configuration_state = manager_clone
-                .get_display_configurator()
-                .borrow()
-                .get_current_state();
-
-            let selected_port = display_configuration_state.selected_monitor;
-            if let Some(selected_port) = selected_port {
-                let display_element_state = display_configuration_state.monitor_states
-                    .get(&selected_port);
-
-                if let Some(display_element_state) = display_element_state {
-                    let previous_position = display_element_state.previous_position.clone();
-                    manager_clone.send_event(
-                        DisplayConfiguratorEvent::DisplayMoving(selected_port, Vector::new(
-                            previous_position.get_x() + xoffset,
-                            previous_position.get_y() + yoffset
-                        ))
-                    );
-                }
-            }
-        });
-
-        let manager_clone = manager.clone();
-        controller.connect_drag_end(move |_: &GestureDrag, xoffset, yoffset| {
-            let display_configuration_state = manager_clone
-                .get_display_configurator()
-                .borrow()
-                .get_current_state();
-
-            let selected_port = display_configuration_state.selected_monitor;
-            if let Some(selected_port) = selected_port {
-                let display_element_state = display_configuration_state.monitor_states
-                    .get(&selected_port);
-
-                if let Some(display_element_state) = display_element_state {
-                    let previous_position = display_element_state.previous_position.clone();
-                    let placed_position = Vector::new(
-                        previous_position.get_x() + xoffset,
-                        previous_position.get_y() + yoffset
-                    );
-
-                    manager_clone.send_event(DisplayConfiguratorEvent::DisplayPlaced(
-                        selected_port, placed_position,
-                    ));
-                }
-            }
-        });
-        self.monitors_fixed.add_controller(controller);
     }
 }

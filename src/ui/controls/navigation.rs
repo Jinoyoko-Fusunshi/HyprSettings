@@ -4,6 +4,7 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::controls::Control;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
@@ -71,7 +72,7 @@ impl Navigation {
             settings_navigation_box,
             overview_button,
             general_button,
-            monitors_button: monitors_button,
+            monitors_button,
             wallpaper_button,
             lockscreen_button,
             appearance_button,
@@ -136,7 +137,7 @@ impl Navigation {
         self.info_button.connect_clicked(info_button_click);
 
         let save_button_click = move |_: &Button| {
-            settings_switcher_manager.notify_event(SettingsSwitcherEvent::SaveSettings);
+            settings_switcher_manager.send_event(SettingsSwitcherEvent::SaveSettings);
         };
         self.save_button.connect_clicked(save_button_click);
     }
@@ -159,7 +160,7 @@ impl Navigation {
     {
         move |_: &Button| {
             let new_control_name = SettingsSwitcherEvent::NewControlName(settings_name.clone());
-            settings_switcher_manager.notify_event(new_control_name);
+            settings_switcher_manager.send_event(new_control_name);
         }
     }
 }

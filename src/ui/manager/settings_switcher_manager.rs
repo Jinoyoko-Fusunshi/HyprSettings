@@ -8,8 +8,10 @@ use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::persistence::hyprlock_settings_writer::HyprlockSettingsWriter;
 use crate::persistence::hyprpaper_settings_writer::HyprpaperSettingsWriter;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::updatable_control::UpdatableControl;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
+use crate::utils::RcMut;
 
 #[derive(Clone)]
 pub struct SettingsSwitcherManager {
@@ -17,23 +19,8 @@ pub struct SettingsSwitcherManager {
     application_provider: ApplicationProvider
 }
 
-pub enum SettingsSwitcherEvent {
-    NewControlName(String),
-    SaveSettings,
-}
-
-impl SettingsSwitcherManager {
-    pub fn new(
-        settings_switcher: Rc<RefCell<SettingsSwitcher>>,
-        application_provider: ApplicationProvider
-    ) -> Self {
-        Self {
-            settings_switcher,
-            application_provider
-        }
-    }
-
-    pub fn notify_event(&self, event: SettingsSwitcherEvent) {
+impl ControlManager<SettingsSwitcher, SettingsSwitcherEvent> for SettingsSwitcherManager {
+    fn send_event(&self, event: SettingsSwitcherEvent) {
         match  event {
             SettingsSwitcherEvent::NewControlName(name) => {
                 let settings_switcher_state = SettingsSwitcherState::new(name);
@@ -53,7 +40,7 @@ impl SettingsSwitcherManager {
 
                 let input_settings = self.application_provider
                     .get_input_provider().borrow().get_settings();
-                
+
                 let keybind_settings = self.application_provider
                     .get_keybinds_provider().borrow().get_settings();
 
@@ -72,7 +59,7 @@ impl SettingsSwitcherManager {
                 let mut yaml_settings_writer = YamlSettingsWriter::new();
                 yaml_settings_writer.serialize_settings(hyprland_settings.clone());
                 yaml_settings_writer.write_to_config();
-                
+
                 let mut hyprland_settings_writer = HyprlandSettingsWriter::new();
                 hyprland_settings_writer.serialize_settings(hyprland_settings.clone());
                 hyprland_settings_writer.write_to_config();
@@ -80,11 +67,32 @@ impl SettingsSwitcherManager {
                 let mut hyprpaper_settings_writer = HyprpaperSettingsWriter::new();
                 hyprpaper_settings_writer.serialize_settings(appearance_settings.clone());
                 hyprpaper_settings_writer.write_to_config();
-                
+
                 let mut hyprlock_settings_writer = HyprlockSettingsWriter::new();
                 hyprlock_settings_writer.serialize_settings(lockscreen_settings.clone());
                 hyprlock_settings_writer.write_to_config();
             }
+        }
+    }
+
+    fn get_control(&self) -> RcMut<SettingsSwitcher> {
+        self.settings_switcher.clone()
+    }
+}
+
+pub enum SettingsSwitcherEvent {
+    NewControlName(String),
+    SaveSettings,
+}
+
+impl SettingsSwitcherManager {
+    pub fn new(
+        settings_switcher: Rc<RefCell<SettingsSwitcher>>,
+        application_provider: ApplicationProvider
+    ) -> Self {
+        Self {
+            settings_switcher,
+            application_provider
         }
     }
 }

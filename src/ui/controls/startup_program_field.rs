@@ -7,6 +7,7 @@ use crate::ui::css_styles::CSSStyles;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::controls::selection_box::SelectionBox;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::manager::startup_program_field_manager::{StartupProgramFieldEvent, StartupProgramFieldManager};
 use crate::ui::pages::keybinds::CUSTOM_ITEM;
 use crate::ui::state_savable_control::StateSavableControl;
@@ -44,7 +45,7 @@ impl UpdatableControl<StartupProgramFieldState> for StartupProgramField {
         self.change_input_access(program.clone());
         self.set_program_fields(program.clone());
         *self.state.borrow_mut() = state.clone();
-        
+
         let state = SelectionBoxState {
             label_text: "Program: ".to_string(),
             options: state.programs,

@@ -1,5 +1,6 @@
 use crate::math::vector::Vector;
 use crate::ui::controls::monitor_configurator::MonitorConfigurator;
+use crate::ui::manager::control_manager::ControlManager;
 use crate::utils::RcMut;
 
 #[derive(Clone)]
@@ -7,24 +8,12 @@ pub struct MonitorConfiguratorManager {
     display_configurator: RcMut<MonitorConfigurator>
 }
 
-pub enum DisplayConfiguratorEvent {
-    DisplaySelected(String),
-    DisplayMoving(String, Vector),
-    DisplayPlaced(String, Vector)
-}
-
-impl MonitorConfiguratorManager {
-    pub fn new(display_configurator: RcMut<MonitorConfigurator>) -> Self {
-        Self {
-            display_configurator
-        }
-    }
-
-    pub fn send_event(&self, event: DisplayConfiguratorEvent) {
+impl ControlManager<MonitorConfigurator, DisplayConfiguratorEvent> for MonitorConfiguratorManager {
+    fn send_event(&self, event: DisplayConfiguratorEvent) {
         let mut display_configurator = self.display_configurator.borrow_mut();
         match event {
             DisplayConfiguratorEvent::DisplaySelected(monitor_port) => {
-              display_configurator.select_monitor(Some(monitor_port));
+                display_configurator.select_monitor(Some(monitor_port));
             },
             DisplayConfiguratorEvent::DisplayMoving(monitor_port, moved_position) => {
                 let corrected_moved_position = Self::get_corrected_position(
@@ -47,8 +36,22 @@ impl MonitorConfiguratorManager {
         }
     }
 
-    pub fn get_display_configurator(&self) -> RcMut<MonitorConfigurator> {
+    fn get_control(&self) -> RcMut<MonitorConfigurator> {
         self.display_configurator.clone()
+    }
+}
+
+pub enum DisplayConfiguratorEvent {
+    DisplaySelected(String),
+    DisplayMoving(String, Vector),
+    DisplayPlaced(String, Vector)
+}
+
+impl MonitorConfiguratorManager {
+    pub fn new(display_configurator: RcMut<MonitorConfigurator>) -> Self {
+        Self {
+            display_configurator
+        }
     }
 
     fn get_corrected_position(position: Vector, field_size: Vector) -> Vector {
