@@ -102,7 +102,19 @@ Since it formed into a kind of usable tool, the idea was set to make it public f
 > - **Fingerprint**: A589 AE05 83C6 1CA3 84C5  6076 1776 E84A EFEA 15A4
 > - **Key-File**: /signing/gpg-key.asc
 
-To validate the signed packages:
+To validate the signed built package:
 ```shell
 bash scripts/verify.sh
+```
+
+To manually validate the downloaded package artifact:
+```shell
+# Move to the repository
+cd /path/to/repository
+
+# list built package hashes from SHA256SUMS
+cat signing/SHA256SUMS
+
+# Get hash of your package and compare it with the hash from SHA256SUMS
+sha256sum hypersettings-*.pkg.tar.zst
 ```
