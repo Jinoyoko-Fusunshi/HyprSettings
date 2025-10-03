@@ -15,3 +15,4 @@ pub mod input_field_state;
 pub mod selection_box_state;
 pub mod monitor_state;
 pub mod monitor_configurator_state;
+pub mod input_state;

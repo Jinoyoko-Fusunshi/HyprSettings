@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::rgba_color::RGBAColor;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct LockScreenSettings {
     pub hide_cursor: bool,
     pub grace: f32,

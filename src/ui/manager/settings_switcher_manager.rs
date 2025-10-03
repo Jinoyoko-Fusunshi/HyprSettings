@@ -33,8 +33,7 @@ impl ControlManager<SettingsSwitcher, SettingsSwitcherEvent> for SettingsSwitche
 
                 let monitor_settings = self.application_provider
                     .get_monitor_provider().borrow().get_settings();
-
-
+                
                 let appearance_settings = self.application_provider
                     .get_appearance_provider().borrow().get_settings();
 

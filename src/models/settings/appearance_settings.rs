@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::rgba_color::RGBAColor;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AppearanceSettings {
     pub wallpaper_path: String,
     pub cursor_size: u32,

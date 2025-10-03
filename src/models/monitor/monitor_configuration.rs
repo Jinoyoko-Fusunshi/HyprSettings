@@ -77,6 +77,27 @@ impl MonitorOrientation {
             Vector::new(size.get_y(), size.get_x())
         }
     }
+
+    pub fn get_orientation_option_names() -> Vec<String> {
+        vec![
+            "None".to_string(), "90°".to_string(), "180°".to_string(),
+            "270°".to_string(), "Flipped".to_string(), "90° Flipped".to_string(),
+            "180° Flipped".to_string(), "270° Flipped".to_string(),
+        ]
+    }
+
+    pub fn get_hyprland_orientation_code(&self) -> u8 {
+        match self {
+            MonitorOrientation::None => 0,
+            MonitorOrientation::Rotation90 => 1,
+            MonitorOrientation::Rotation180 => 2,
+            MonitorOrientation::Rotation270 => 3,
+            MonitorOrientation::Flipped => 4,
+            MonitorOrientation::FlippedRotation90 => 5,
+            MonitorOrientation::FlippedRotation180 => 6,
+            MonitorOrientation::FlippedRotation270 => 7,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

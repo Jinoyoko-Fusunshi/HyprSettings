@@ -7,6 +7,7 @@ use crate::models::settings::lockscreen_settings::LockScreenSettings;
 use crate::models::settings::program_settings::ProgramSettings;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct HyprlandSettings {
     pub program_settings: ProgramSettings,
     pub monitor_settings: MonitorSettings,

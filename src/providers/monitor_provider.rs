@@ -106,6 +106,10 @@ impl MonitorProvider {
         configuration.orientation = orientation;
     }
 
+    pub fn get_monitor_configuration(&self, monitor_port: String) -> Option<MonitorConfiguration> {
+        self.settings.monitor_configurations.get(&monitor_port).cloned()
+    }
+
     pub fn get_monitor_configurations(&self) -> HashMap<String, MonitorConfiguration> {
         self.settings.monitor_configurations.clone()
     }

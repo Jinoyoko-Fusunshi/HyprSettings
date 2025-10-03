@@ -12,6 +12,8 @@ use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::programs_state::ProgramsState;
 use crate::ui::controls::Control;
+use crate::ui::managed_control::ManagedControl;
+use crate::ui::manager::input_manager::InputManager;
 use crate::ui::pages::appearance::Appearance;
 use crate::ui::pages::monitors::Monitors;
 use crate::ui::pages::infos::Infos;
@@ -23,6 +25,7 @@ use crate::ui::pages::input::Input;
 use crate::ui::pages::startup_programs::StartupPrograms;
 use crate::ui::pages::wallpaper::Wallpaper;
 use crate::ui::states::monitors_state::MonitorsState;
+use crate::ui::states::input_state::InputState;
 use crate::ui::states::lockscreen_page_state::LockScreenPageState;
 use crate::ui::states::settings_switcher_state::SettingsSwitcherState;
 use crate::ui::states::wallpaper_page_state::WallpaperPageState;
@@ -68,7 +71,13 @@ impl App {
 
         let appearance = new_rc_mut(Appearance::new(application_provider.clone()));
 
+        let state = InputState::from(&application_provider);
         let input = new_rc_mut(Input::new(application_provider.clone()));
+        input.borrow_mut().update_state(state.clone());
+
+        let input_manager = InputManager::new(input.clone());
+        input.borrow_mut().init_events_by_manager(input_manager);
+
         let keybinds = new_rc_mut(Keybinds::new(application_provider.clone()));
 
         let startup_program = new_rc_mut(StartupPrograms::new());

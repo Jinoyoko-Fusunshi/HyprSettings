@@ -1,5 +1,4 @@
 use gtk::{Align, ComboBoxText, Label, Orientation};
-use gtk::glib::GString;
 use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
@@ -86,13 +85,19 @@ impl SelectionBox {
         }
     }
 
-    pub fn parse_selection_as_bool(selection: Option<GString>) -> bool {
-        if let Some(text) = selection {
-            text.to_string()
-                .parse::<bool>()
-                .unwrap_or(false)
+    pub fn get_selected_option_as_bool(combobox: &ComboBoxText) -> bool {
+        let selected_text = Self::get_selected_option(combobox);
+        selected_text
+            .parse::<bool>()
+            .unwrap_or(false)
+    }
+
+    pub fn get_selected_option(combobox: &ComboBoxText) -> String {
+        let active_text = combobox.active_text();
+        if let Some(active_text) = active_text {
+            active_text.to_string()
         } else {
-            false
+            "".to_string()
         }
     }
 

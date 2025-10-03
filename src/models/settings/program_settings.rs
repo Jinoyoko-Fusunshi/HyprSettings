@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ProgramSettings {
     pub programs: HashMap<String, String>,
     pub startup_programs: HashMap<String, String>,

@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use crate::models::keybinds::key_bind_configuration::KeyBindConfiguration;
 use crate::models::keybinds::system_keybind::SystemKeybind;
-use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::persistence::settings_writer::SettingsWriter;
 use crate::models::settings::hyprland_settings::HyprlandSettings;
 use crate::models::settings::keybind_settings::KeyBindSettings;
@@ -9,6 +8,7 @@ use crate::persistence::hyprland_writer_utils::{ConfigSectionBuilder, HyprlandWr
 use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
+use crate::ui::states::input_state::CURRENT_MONITOR;
 
 pub struct HyprlandSettingsWriter {
     program_variables: HashMap<String, (String, String)>,
@@ -93,17 +93,7 @@ impl HyprlandSettingsWriter {
             }
 
             let video_mode = monitor_configuration.video_mode;
-            let transformation_settings = match monitor_configuration.orientation {
-                MonitorOrientation::None => 0,
-                MonitorOrientation::Rotation90 => 1,
-                MonitorOrientation::Rotation180 => 2,
-                MonitorOrientation::Rotation270 => 3,
-                MonitorOrientation::Flipped => 4,
-                MonitorOrientation::FlippedRotation90 => 5,
-                MonitorOrientation::FlippedRotation180 => 6,
-                MonitorOrientation::FlippedRotation270 => 7,
-            };
-
+            let transformation_settings = monitor_configuration.orientation.get_hyprland_orientation_code();
             let monitor_entry = format!(
                 "monitor = {}, {}x{}@{}, {}x{}, {}, transform, {}",
                 monitor_port,
@@ -144,6 +134,7 @@ impl HyprlandSettingsWriter {
     fn serialize_input_settings(&mut self, settings: &HyprlandSettings) {
         let input_settings = &settings.input_settings;
 
+        let tablet_section_lines = self.serialize_tablet_sub_settings(settings);
         let input_section_lines = ConfigSectionBuilder::new("input".to_string())
             .add_line(HyprlandWriterUtils::create_value_pair(
                 "kb_layout".to_string(), input_settings.keyboard_layout.clone()
@@ -169,11 +160,72 @@ impl HyprlandSettingsWriter {
             .add_line(HyprlandWriterUtils::create_value_pair(
                 "natural_scroll".to_string(), input_settings.mouse_natural_scroll.to_string()
             ))
+            .add_line(HyprlandWriterUtils::create_new_line())
+            .add_lines(tablet_section_lines)
             .build();
 
         self.add_comment_section("INPUT".to_string());
         self.add_new_line();
         self.add_line_entries(input_section_lines);
+    }
+
+    fn serialize_tablet_sub_settings(&mut self, settings: &HyprlandSettings) -> Vec<String> {
+        let input_settings = &settings.input_settings;
+
+        let transform_value =  input_settings.tablet_orientation.get_hyprland_orientation_code()
+            .to_string();
+
+        let output_value = input_settings.tablet_monitor.clone();
+        let region_position_value = format!(
+            "{}, {}", input_settings.tablet_region_x, input_settings.tablet_region_y
+        );
+
+        let region_size_value = format!(
+            "{}, {}", input_settings.tablet_region_width, input_settings.tablet_region_height
+        );
+
+        let relative_input_value = input_settings.tablet_relative_input.to_string();
+        let left_handed_value = input_settings.tablet_left_handed.to_string();
+        let active_area_size_value = format!(
+            "{}, {}", input_settings.tablet_active_width, input_settings.tablet_active_height
+        );
+
+        let active_area_position_value = format!(
+            "{}, {}", input_settings.tablet_active_x, input_settings.tablet_active_y
+        );
+
+        let mut tablet_section_builder = ConfigSectionBuilder::new("tablet".to_string());
+        tablet_section_builder
+            .add_line(HyprlandWriterUtils::create_value_pair(
+                "output".to_string(), output_value
+            ));
+
+        if input_settings.tablet_monitor != CURRENT_MONITOR {
+            tablet_section_builder.
+                add_line(HyprlandWriterUtils::create_value_pair(
+                    "transform".to_string(), transform_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "region_position".to_string(), region_position_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "region_size".to_string(), region_size_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "relative_input".to_string(), relative_input_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "left_handed".to_string(), left_handed_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "active_area_size".to_string(), active_area_size_value
+                ))
+                .add_line(HyprlandWriterUtils::create_value_pair(
+                    "active_area_position".to_string(), active_area_position_value
+                ));
+        }
+
+        tablet_section_builder.build()
     }
 
     fn serialize_keybinds_settings(&mut self, settings: &HyprlandSettings) {

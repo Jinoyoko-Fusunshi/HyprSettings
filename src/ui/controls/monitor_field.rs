@@ -1,6 +1,7 @@
 use gtk::{Align, ComboBoxText, Label, Orientation, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
+use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::types::{GTKBox, GTKSpinButton};
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::activable_control::ActivableControl;
@@ -121,11 +122,7 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
         let orientation_selection_box_state = SelectionBoxState {
             label_text: "Rotation:".to_string(),
             selected_option: Some(state.monitor_configuration.orientation.to_string()),
-            options: vec![
-                "None".to_string(), "90°".to_string(), "180°".to_string(),
-                "270°".to_string(), "Flipped".to_string(), "90° Flipped".to_string(),
-                "180° Flipped".to_string(), "270° Flipped".to_string(),
-            ],
+            options: MonitorOrientation::get_orientation_option_names(),
         };
         self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
         self.orientation_selection_box.update_state(orientation_selection_box_state.clone());

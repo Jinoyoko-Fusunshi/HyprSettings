@@ -9,7 +9,7 @@ pub mod startup_programs;
 pub mod overview;
 pub mod wallpaper;
 pub mod lockscreen;
-mod input;
+pub mod input;
 
 pub const OVERVIEW_PAGE: &str = "overview-page";
 pub const GENERAL_PAGE: &str = "general-page";

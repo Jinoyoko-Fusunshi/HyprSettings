@@ -141,7 +141,7 @@ impl Lockscreen {
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_cursor_selection_change = move |combobox: &ComboBoxText| {
-            let bool_value = SelectionBox::parse_selection_as_bool(combobox.active_text());
+            let bool_value = SelectionBox::get_selected_option_as_bool(combobox);
             lockscreen_provider.borrow_mut().set_hide_cursor(bool_value);
         };
         hide_cursor_selection_box.set_selection_change(hide_cursor_selection_change);
@@ -515,14 +515,14 @@ impl Lockscreen {
         let state = SelectionBoxState {
             label_text: "Dots center".to_string(),
             selected_option: Some(lockscreen_state.input_dots_center.to_string()),
-            options: SelectionBoxState::get_false_true_options(),
+            options: SelectionBoxState::get_false_true_options()
         };
         input_dots_center_selection_box.update_state(state.clone());
         input_dots_center_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let input_dots_center_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
+            let bool_value = SelectionBox::get_selected_option_as_bool(combo_box_text);
             lockscreen_provider.borrow_mut().set_input_dots_center(bool_value);
         };
         input_dots_center_selection_box.set_selection_change(input_dots_center_selection_box_change);
@@ -605,7 +605,7 @@ impl Lockscreen {
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
         let hide_input_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            let bool_value = SelectionBox::parse_selection_as_bool(combo_box_text.active_text());
+            let bool_value = SelectionBox::get_selected_option_as_bool(combo_box_text);
             lockscreen_provider.borrow_mut().set_hide_input(bool_value);
         };
         hide_input_selection_box.set_selection_change(hide_input_selection_box_change);
