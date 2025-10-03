@@ -16,8 +16,6 @@ pub struct InputField {
 }
 
 impl Control for InputField {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.input_field_box
     }

@@ -35,8 +35,6 @@ pub struct MonitorField {
 }
 
 impl Control for MonitorField {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.monitor_field_box
     }

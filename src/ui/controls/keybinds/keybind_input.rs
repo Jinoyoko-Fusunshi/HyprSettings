@@ -24,22 +24,6 @@ pub struct KeybindInput {
 }
 
 impl Control for KeybindInput {
-    fn init_events(&self) {
-        let keybind_symbols_box = self.keybind_symbols_box.clone();
-        let click_input_controller = GestureClick::new();
-        let state = self.state.clone();
-
-        click_input_controller.connect_pressed(move |_, _, _, _| {
-            keybind_symbols_box.grab_focus();
-
-            if let None = state.borrow().configuration.clone() {
-                Self::set_keybind_symbols_text(&keybind_symbols_box, "Record keys individually ...");
-            }
-        });
-
-        self.keybind_symbols_box.add_controller(click_input_controller);
-    }
-
     fn get_widget(&self) -> &GTKBox {
         &self.keybind_input_box
     }
@@ -77,17 +61,31 @@ impl KeybindInput {
             .set_orientation(Orientation::Horizontal)
             .build();
 
+        let state = new_rc_mut(KeybindInputState {
+            configuration: None,
+        });
+
         let keybind_symbols_box = Self::create_keybind_symbols_box();
+        let keybind_symbols_box_clone = keybind_symbols_box.clone();
+        let click_input_controller = GestureClick::new();
+        let state_clone = state.clone();
+
+        click_input_controller.connect_pressed(move |_, _, _, _| {
+            keybind_symbols_box_clone.grab_focus();
+
+            if let None = state_clone.borrow().configuration.clone() {
+                Self::set_keybind_symbols_text(&keybind_symbols_box_clone, "Record keys individually ...");
+            }
+        });
+
+        keybind_symbols_box.add_controller(click_input_controller);
+
         let reset_key_button = Button::with_label("➖");
         reset_key_button.set_valign(Align::Center);
         reset_key_button.set_vexpand(false);
 
         keybind_input_box.append(&keybind_symbols_box);
         keybind_input_box.append(&reset_key_button);
-
-        let state = new_rc_mut(KeybindInputState {
-            configuration: None,
-        });
 
         Self {
             state,

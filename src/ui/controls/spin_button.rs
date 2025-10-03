@@ -16,8 +16,6 @@ pub struct SpinButton {
 }
 
 impl Control for SpinButton {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.spin_button_box
     }

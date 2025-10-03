@@ -34,8 +34,6 @@ pub struct App {
 }
 
 impl Control for App {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.app_box
     }
@@ -54,7 +52,6 @@ impl App {
 
         let state = ProgramsState::from(&application_provider);
         let programs = new_rc_mut(Programs::new(application_provider.clone()));
-        programs.borrow_mut().init_events();
         programs.borrow_mut().update_state(state);
 
         let state = MonitorsState::from(&application_provider);

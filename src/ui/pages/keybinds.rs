@@ -12,14 +12,17 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
-use crate::ui::controls::editable_control_element::{EditMode, EditableControlElement, EditableControlElementManager};
+use crate::ui::controls::editable_control::{EditableControl};
 use crate::ui::controls::keybinds::custom_keybind_input_field::CustomKeyBindInputField;
 use crate::ui::controls::keybinds::keybind_input_field::KeybindInputField;
+use crate::ui::managed_control::ManagedControl;
+use crate::ui::manager::editable_control_manager::EditableControlManager;
 use crate::ui::state_savable_control::StateSavableControl;
 use crate::ui::states::custom_keybind_input_field_state::CustomKeybindInputFieldState;
-use crate::ui::states::editable_control_element_state::EditableControlElementState;
+use crate::ui::states::editable_control_state::{EditMode, EditableControlState};
 use crate::ui::states::keybind_input_field_state::KeybindInputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
+use crate::utils::new_rc_mut;
 
 pub const CUSTOM_ITEM: &str = "Custom";
 
@@ -29,8 +32,6 @@ pub struct Keybinds {
 }
 
 impl Control for Keybinds {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.key_binds_panel_box
     }
@@ -318,35 +319,28 @@ impl Keybinds {
             command
         };
         custom_keybind_input_field.update_state(custom_keybind_input_field_state.clone());
-        custom_keybind_input_field.update_state(custom_keybind_input_field_state.clone());
-        custom_keybind_input_field.init_events();
 
         let custom_keybind_input_field_rc = Rc::new(RefCell::new(custom_keybind_input_field));
-        let editable_control_element_state = EditableControlElementState {
+        let editable_control_state = EditableControlState {
             edit_mode
         };
-        let mut editable_control_element = EditableControlElement::new(custom_keybind_input_field_rc.clone());
-        editable_control_element.update_state(editable_control_element_state.clone());
-        editable_control_element.update_state(editable_control_element_state.clone());
+        let editable_control = new_rc_mut(EditableControl::new(custom_keybind_input_field_rc.clone())) ;
+        editable_control.borrow_mut().update_state(editable_control_state.clone());
 
-        let editable_control_element_rc = Rc::new(
-            RefCell::new(editable_control_element
-        ));
-
-        let editable_control_element_manager =
-            EditableControlElementManager::new(editable_control_element_rc.clone(), application_provider.clone());
-        editable_control_element_rc.borrow_mut().init_events(editable_control_element_manager);
+        let editable_control_manager =
+            EditableControlManager::new(editable_control.clone(), application_provider.clone());
+        editable_control.borrow_mut().init_events_by_manager(editable_control_manager);
 
         let custom_keybind_entries_box_clone = custom_keybind_entries_box.clone();
-        let editable_control_element_clone = editable_control_element_rc.clone();
+        let editable_control_clone = editable_control.clone();
         let custom_keybind_entry_field_clone = custom_keybind_input_field_rc.clone();
         let application_provider_clone = application_provider.clone();
         let delete_button_click = move |_: &Button| {
-            custom_keybind_entries_box_clone.remove(editable_control_element_clone.borrow().get_widget());
+            custom_keybind_entries_box_clone.remove(editable_control_clone.borrow().get_widget());
             custom_keybind_entry_field_clone.borrow().remove_settings(application_provider_clone.clone());
         };
         custom_keybind_input_field_rc.borrow().set_delete_button_callback(delete_button_click);
-        custom_keybind_entries_box.append(editable_control_element_rc.borrow().get_widget());
+        custom_keybind_entries_box.append(editable_control.borrow().get_widget());
     }
 
     fn create_keybind_input_field(
@@ -360,14 +354,14 @@ impl Keybinds {
         let program_keybind = keybind_provider.borrow()
             .get_keybind(system_keybind.clone());
 
-        let mut keybind_iput_field = KeybindInputField::new();
+        let mut keybind_input_field = KeybindInputField::new();
         let state = KeybindInputFieldState {
             input_text: entry_field_name,
             configuration: program_keybind,
         };
-        keybind_iput_field.update_state(state);
-        keybind_iput_field.set_input_callback(keybind_entry_changed_callback);
-        keybind_iput_field
+        keybind_input_field.update_state(state);
+        keybind_input_field.set_input_callback(keybind_entry_changed_callback);
+        keybind_input_field
     }
 
     fn create_keybind_input_field_change(

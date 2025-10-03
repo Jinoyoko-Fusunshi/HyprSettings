@@ -27,27 +27,6 @@ pub struct CustomKeyBindInputField {
 }
 
 impl Control for CustomKeyBindInputField {
-    fn init_events(&self) {
-        let state = self.state.clone();
-        let shortcut_name_entry_callback = move |entry: &Entry| {
-            state.borrow_mut().shortcut_name = Some(entry.text().to_string());
-        };
-
-        let state = self.state.clone();
-        let command_entry_callback = move |entry: &Entry| {
-            state.borrow_mut().command = Some(entry.text().to_string());
-        };
-
-        let state = self.state.clone();
-        let keybind_input_change = move |keybind_configuration: KeyBindConfiguration| {
-            state.borrow_mut().keybind = Some(keybind_configuration);
-        };
-
-        self.shortcut_input_field.set_input_callback(shortcut_name_entry_callback);
-        self.command_input_field.set_input_callback(command_entry_callback);
-        self.keybind_input.borrow().set_input_change(keybind_input_change);
-    }
-
     fn get_widget(&self) -> &GTKBox {
         &self.key_bind_entry_box
     }
@@ -146,10 +125,27 @@ impl CustomKeyBindInputField {
         delete_button.set_valign(Align::Center);
 
         let shortcut_input_field = InputField::new();
+        let state_clone = state.clone();
+        let shortcut_name_entry_callback = move |entry: &Entry| {
+            state_clone.borrow_mut().shortcut_name = Some(entry.text().to_string());
+        };
+        shortcut_input_field.set_input_callback(shortcut_name_entry_callback);
+
         let command_input_field = InputField::new();
 
+        let state_clone = state.clone();
+        let command_entry_callback = move |entry: &Entry| {
+            state_clone.borrow_mut().command = Some(entry.text().to_string());
+        };
+        command_input_field.set_input_callback(command_entry_callback);
+
         let keybind_input = new_rc_mut(KeybindInput::new());
-        keybind_input.borrow().init_events();
+
+        let state_clone = state.clone();
+        let keybind_input_change = move |keybind_configuration: KeyBindConfiguration| {
+            state_clone.borrow_mut().keybind = Some(keybind_configuration);
+        };
+        keybind_input.borrow().set_input_change(keybind_input_change);
 
         let keybind_input_manager = KeybindInputManager::new(keybind_input.clone());
 
@@ -165,6 +161,10 @@ impl CustomKeyBindInputField {
         key_bind_entry_box.append(shortcut_input_field.get_widget());
         key_bind_entry_box.append(command_input_field.get_widget());
         key_bind_entry_box.append(keybind_input.borrow().get_widget());
+
+        //
+        //
+        //
 
         Self {
             state,

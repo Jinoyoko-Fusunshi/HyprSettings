@@ -15,7 +15,6 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub struct Programs {
     state: ProgramsState,
-    application_provider: ApplicationProvider,
     general_box: GTKBox,
     terminal_input_field: InputField,
     files_input_field: InputField,
@@ -24,40 +23,6 @@ pub struct Programs {
 }
 
 impl Control for Programs {
-    fn init_events(&self) {
-        let program_provider =  self.application_provider.get_program_provider();
-        let terminal_input_change = move |input: &Entry| {
-            program_provider.borrow_mut().set_program_path(
-                VIRTUAL_TERMINAL_ENTRY.to_string(), input.text().to_string()
-            );
-        };
-        self.terminal_input_field.set_input_callback(terminal_input_change);
-
-        let program_provider = self.application_provider.get_program_provider();
-        let files_input_change = move |input: &Entry| {
-            program_provider.borrow_mut().set_program_path(
-                FILE_MANAGER_ENTRY.to_string(), input.text().to_string()
-            );
-        };
-        self.files_input_field.set_input_callback(files_input_change);
-
-        let program_provider =  self.application_provider.get_program_provider();
-        let quick_search_change = move |input: &Entry| {
-            program_provider.borrow_mut().set_program_path(
-                QUICK_SEARCH_ENTRY.to_string(), input.text().to_string()
-            );
-        };
-        self.quick_search_input_field.set_input_callback(quick_search_change);
-
-        let program_provider =  self.application_provider.get_program_provider();
-        let notifications_input_change = move |input: &Entry| {
-            program_provider.borrow_mut().set_program_path(
-                NOTIFICATION_HANDLER_ENTRY.to_string(), input.text().to_string()
-            );
-        };
-        self.notifications_input_field.set_input_callback(notifications_input_change);
-    }
-
     fn get_widget(&self) -> &GTKBox {
         &self.general_box
     }
@@ -118,6 +83,14 @@ impl Programs {
         };
         terminal_input_field.update_state(state);
 
+        let program_provider =  application_provider.get_program_provider();
+        let terminal_input_change = move |input: &Entry| {
+            program_provider.borrow_mut().set_program_path(
+                VIRTUAL_TERMINAL_ENTRY.to_string(), input.text().to_string()
+            );
+        };
+        terminal_input_field.set_input_callback(terminal_input_change);
+
         let mut files_input_field = InputField::new();
         let state = InputFieldState {
             label_text: "File manager program path:".to_string(),
@@ -125,6 +98,14 @@ impl Programs {
             placeholder_text: "e.g. /usr/bin/nautilus".to_string(),
         };
         files_input_field.update_state(state);
+
+        let program_provider = application_provider.get_program_provider();
+        let files_input_change = move |input: &Entry| {
+            program_provider.borrow_mut().set_program_path(
+                FILE_MANAGER_ENTRY.to_string(), input.text().to_string()
+            );
+        };
+        files_input_field.set_input_callback(files_input_change);
 
         let mut quick_search_input_field = InputField::new();
         let state = InputFieldState {
@@ -134,6 +115,14 @@ impl Programs {
         };
         quick_search_input_field.update_state(state);
 
+        let program_provider =  application_provider.get_program_provider();
+        let quick_search_change = move |input: &Entry| {
+            program_provider.borrow_mut().set_program_path(
+                QUICK_SEARCH_ENTRY.to_string(), input.text().to_string()
+            );
+        };
+        quick_search_input_field.set_input_callback(quick_search_change);
+
         let mut notifications_input_field = InputField::new();
         let state = InputFieldState {
             label_text: "Notification handler program path:".to_string(),
@@ -141,6 +130,14 @@ impl Programs {
             placeholder_text: "e.g. /usr/bin/dryrun".to_string(),
         };
         notifications_input_field.update_state(state);
+
+        let program_provider =  application_provider.get_program_provider();
+        let notifications_input_change = move |input: &Entry| {
+            program_provider.borrow_mut().set_program_path(
+                NOTIFICATION_HANDLER_ENTRY.to_string(), input.text().to_string()
+            );
+        };
+        notifications_input_field.set_input_callback(notifications_input_change);
 
         general_box.append(terminal_input_field.get_widget());
         general_box.append(files_input_field.get_widget());
@@ -151,7 +148,6 @@ impl Programs {
 
         Self {
             state,
-            application_provider,
             general_box,
             terminal_input_field,
             files_input_field,

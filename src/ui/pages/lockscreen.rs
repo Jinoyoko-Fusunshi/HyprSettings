@@ -29,8 +29,6 @@ pub struct Lockscreen {
 }
 
 impl Control for Lockscreen {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.lockscreen_scroll_box
     }

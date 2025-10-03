@@ -27,8 +27,6 @@ pub struct StartupProgramField {
 }
 
 impl Control for StartupProgramField {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.startup_entry_box
     }

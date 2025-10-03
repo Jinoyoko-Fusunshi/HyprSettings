@@ -16,9 +16,6 @@ pub struct SettingsSwitcher {
 }
 
 impl Control for SettingsSwitcher {
-    fn init_events(&self) {
-
-    }
 
     fn get_widget(&self) -> &GTKBox {
         &self.settings_switcher_box

@@ -16,8 +16,6 @@ pub struct Monitor {
 }
 
 impl Control for Monitor {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.monitor_box
     }

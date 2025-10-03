@@ -26,8 +26,6 @@ pub struct Appearance {
 }
 
 impl Control for Appearance {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.widget
     }

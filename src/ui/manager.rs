@@ -4,3 +4,4 @@ pub mod keybind_input_manager;
 pub mod monitor_field_manager;
 pub mod monitor_configurator_manager;
 pub mod control_manager;
+pub mod editable_control_manager;

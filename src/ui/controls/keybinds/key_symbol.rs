@@ -10,8 +10,6 @@ pub struct KeySymbol {
 }
 
 impl Control for KeySymbol {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.key_symbol_box
     }

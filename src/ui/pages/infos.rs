@@ -12,8 +12,6 @@ pub struct Infos {
 }
 
 impl Control for Infos {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.info_settings_box
     }

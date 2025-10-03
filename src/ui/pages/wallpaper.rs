@@ -19,10 +19,6 @@ pub struct Wallpaper {
 }
 
 impl Control for Wallpaper {
-    fn init_events(&self) {
-
-    }
-
     fn get_widget(&self) -> &GTKBox {
         &self.wallpaper_box
     }

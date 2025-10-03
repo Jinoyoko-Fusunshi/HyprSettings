@@ -15,8 +15,6 @@ pub struct ColorSelector {
 }
 
 impl Control for ColorSelector {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.color_button_box
     }

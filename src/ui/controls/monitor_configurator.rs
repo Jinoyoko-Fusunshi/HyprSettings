@@ -25,8 +25,6 @@ pub struct MonitorConfigurator {
 }
 
 impl Control for MonitorConfigurator {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.monitor_configurator_box
     }

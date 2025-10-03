@@ -19,8 +19,6 @@ pub struct KeybindInputField {
 }
 
 impl Control for KeybindInputField {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.keybind_input_field_box
     }
@@ -58,7 +56,6 @@ impl KeybindInputField {
 
         let keybind_input = new_rc_mut(KeybindInput::new());
         let keybind_input_manager = KeybindInputManager::new(keybind_input.clone());
-        keybind_input.borrow().init_events();
         keybind_input.borrow().set_reset_button_click(
             keybind_input_manager.clone(), None::<fn()>
         );

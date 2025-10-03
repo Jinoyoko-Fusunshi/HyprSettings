@@ -24,9 +24,6 @@ pub struct Navigation {
 }
 
 impl Control for Navigation {
-    fn init_events(&self) {
-    }
-
     fn get_widget(&self) -> &GTKBox {
         &self.settings_navigation_box
     }

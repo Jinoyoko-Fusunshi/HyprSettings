@@ -17,8 +17,6 @@ pub struct SelectionBox {
 }
 
 impl Control for SelectionBox {
-    fn init_events(&self) {}
-
     fn get_widget(&self) -> &GTKBox {
         &self.selection_box
     }
