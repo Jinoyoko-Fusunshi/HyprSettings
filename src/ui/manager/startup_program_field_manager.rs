@@ -5,7 +5,7 @@ use crate::ui::manager::control_manager::ControlManager;
 use crate::utils::RcMut;
 
 pub struct StartupProgramFieldManager {
-    startup_program_field: Rc<RefCell<StartupProgramField>>,
+    startup_program_field: RcMut<StartupProgramField>,
 }
 
 impl ControlManager<StartupProgramField, StartupProgramFieldEvent> for StartupProgramFieldManager {

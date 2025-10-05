@@ -15,7 +15,7 @@ use crate::utils::RcMut;
 
 #[derive(Clone)]
 pub struct SettingsSwitcherManager {
-    settings_switcher: Rc<RefCell<SettingsSwitcher>>,
+    settings_switcher: RcMut<SettingsSwitcher>,
     application_provider: ApplicationProvider
 }
 

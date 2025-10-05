@@ -2,7 +2,6 @@ use gtk::{Align, Entry, Label, Orientation};
 use gtk::prelude::{BoxExt, EditableExt, EntryExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
-use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::Control;
 use crate::ui::controls::activable_control::ActivableControl;
 use crate::ui::states::input_field_state::InputFieldState;
@@ -54,7 +53,6 @@ impl InputField {
     pub fn new () -> Self {
         let input_field_box = BoxBuilder::new("input-field")
             .set_orientation(Orientation::Vertical)
-            .set_margin_bottom(DEFAULT_MARGIN)
             .build();
 
         let input_label = Label::new(None);

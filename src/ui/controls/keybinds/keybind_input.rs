@@ -57,8 +57,11 @@ impl ActivableControl for KeybindInput {
 
 impl KeybindInput {
     pub fn new() -> Self {
+        const KEY_INPUT_HEIGHT: u32 = 60;
+
         let keybind_input_box = BoxBuilder::new("keybind-input")
             .set_orientation(Orientation::Horizontal)
+            .set_height(KEY_INPUT_HEIGHT)
             .build();
 
         let state = new_rc_mut(KeybindInputState {
@@ -136,8 +139,7 @@ impl KeybindInput {
         Self::clear_input(keybind_symbols_box);
 
         let label = Label::new(Some(text));
-        label.set_hexpand(true);
-        label.set_xalign(0.5);
+        label.set_hexpand(false);
 
         keybind_symbols_box.append(&label);
     }

@@ -47,7 +47,6 @@ impl KeybindInputField {
     pub fn new() -> Self {
         let keybind_input_field_box = BoxBuilder::new("keybind-input-field")
             .set_orientation(Orientation::Horizontal)
-            .set_height(56)
             .build();
 
         let keybind_input_label = Label::new(None);

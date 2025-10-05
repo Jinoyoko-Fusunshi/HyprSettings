@@ -19,6 +19,7 @@ impl KeySymbol {
     pub fn new(key_name: String) -> Self {
         let key_symbol_box = BoxBuilder::new("key-symbol")
             .set_orientation(Orientation::Vertical)
+            .set_full_height(false)
             .set_class(CSSStyles::KEY_SYMBOL_BOX)
             .build();
 

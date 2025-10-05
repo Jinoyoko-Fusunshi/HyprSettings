@@ -9,7 +9,7 @@ use crate::utils::RcMut;
 
 #[derive(Clone)]
 pub struct KeybindInputManager {
-    keybind_input: Rc<RefCell<KeybindInput>>,
+    keybind_input: RcMut<KeybindInput>,
 }
 
 impl ControlManager<KeybindInput, KeybindInputEvent> for KeybindInputManager {

@@ -125,30 +125,29 @@ impl CustomKeyBindInputField {
         delete_button.set_valign(Align::Center);
 
         let shortcut_input_field = InputField::new();
+        shortcut_input_field.get_widget().set_valign(Align::End);
+
         let state_clone = state.clone();
-        let shortcut_name_entry_callback = move |entry: &Entry| {
+        shortcut_input_field.set_input_callback(move |entry: &Entry| {
             state_clone.borrow_mut().shortcut_name = Some(entry.text().to_string());
-        };
-        shortcut_input_field.set_input_callback(shortcut_name_entry_callback);
+        });
 
         let command_input_field = InputField::new();
+        command_input_field.get_widget().set_valign(Align::End);
 
         let state_clone = state.clone();
-        let command_entry_callback = move |entry: &Entry| {
+        command_input_field.set_input_callback(move |entry: &Entry| {
             state_clone.borrow_mut().command = Some(entry.text().to_string());
-        };
-        command_input_field.set_input_callback(command_entry_callback);
+        });
 
         let keybind_input = new_rc_mut(KeybindInput::new());
 
         let state_clone = state.clone();
-        let keybind_input_change = move |keybind_configuration: KeyBindConfiguration| {
+        keybind_input.borrow().set_input_change(move |keybind_configuration: KeyBindConfiguration| {
             state_clone.borrow_mut().keybind = Some(keybind_configuration);
-        };
-        keybind_input.borrow().set_input_change(keybind_input_change);
+        });
 
         let keybind_input_manager = KeybindInputManager::new(keybind_input.clone());
-
         let state_clone = state.clone();
         let reset_button_action = move || {
             state_clone.borrow_mut().keybind = None;
@@ -161,10 +160,6 @@ impl CustomKeyBindInputField {
         key_bind_entry_box.append(shortcut_input_field.get_widget());
         key_bind_entry_box.append(command_input_field.get_widget());
         key_bind_entry_box.append(keybind_input.borrow().get_widget());
-
-        //
-        //
-        //
 
         Self {
             state,
