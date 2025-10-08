@@ -7,14 +7,15 @@ mod types;
 mod math;
 
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, CssProvider, STYLE_PROVIDER_PRIORITY_USER};
-use gtk::gdk::Display;
-use gtk::gio::File;
+use gtk::{Application, ApplicationWindow};
 use crate::ui::controls::Control;
+use crate::ui::css_styler::CSSStyler;
+use crate::ui::managed_control::ManagedControl;
+use crate::ui::manager::css_styler_manager::CSSStylerManager;
 use crate::ui::pages::app::App;
+use crate::utils::new_rc_mut;
 
 fn main() {
-    // GTK application initialization
     let application = Application::builder()
         .application_id("jinoworks.hyprsettings")
         .build();
@@ -24,8 +25,12 @@ fn main() {
 }
 
 fn application_activation_setup(application: &Application) {
-    load_css_styles();
+    let css_styler = new_rc_mut(CSSStyler::new());
+    css_styler.borrow().apply_current_style_settings();
     
+    let css_styler_manager = CSSStylerManager::new(css_styler.clone());
+    css_styler.borrow().init_events_by_manager(css_styler_manager);
+
     let window = ApplicationWindow::builder()
         .application(application)
         .title("HyprSettings")
@@ -36,15 +41,4 @@ fn application_activation_setup(application: &Application) {
     let app = App::new();
     window.set_child(Some(app.get_widget()));
     window.present();
-}
-
-fn load_css_styles() {
-    const CSS_STYLE_PATH: &str = "/usr/share/hyprsettings/style.css";
-
-    let provider = CssProvider::new();
-    let css_file = File::for_path(CSS_STYLE_PATH);
-    provider.load_from_file(&css_file);
-
-    let display = Display::default().expect("Could not get default display");
-    gtk::style_context_add_provider_for_display(&display, &provider, STYLE_PROVIDER_PRIORITY_USER);
 }

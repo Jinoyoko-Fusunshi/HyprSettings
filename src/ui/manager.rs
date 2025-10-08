@@ -6,3 +6,4 @@ pub mod monitor_configurator_manager;
 pub mod control_manager;
 pub mod editable_control_manager;
 pub mod input_manager;
+pub mod css_styler_manager;

@@ -37,7 +37,7 @@ impl Navigation {
             .build();
 
         let overview_button =  Self::create_settings_button("👀 overview");
-        let general_button = Self::create_settings_button("💾 user programs");
+        let general_button = Self::create_settings_button("📝 user programs");
         let monitors_button = Self::create_settings_button("🖥️ monitors");
         let wallpaper_button = Self::create_settings_button("🖼️ wallpaper");
         let lockscreen_button = Self::create_settings_button("🔐 lockscreen");
@@ -45,11 +45,10 @@ impl Navigation {
         let input_button = Self::create_settings_button("🖱 input");
         let startup_button = Self::create_settings_button("🚀 startup");
         let keybinds_button = Self::create_settings_button("⌨️ keybinds");
-        let info_button = Self::create_settings_button("📝 info");
+        let info_button = Self::create_settings_button("ℹ️ info");
     
-        let save_button = Button::with_label("save");
+        let save_button = Self::create_settings_button("💾 save");
         save_button.set_widget_name("save-settings");
-        save_button.set_height_request(48);
         save_button.set_margin_top(10);
 
         settings_navigation_box.append(&overview_button);

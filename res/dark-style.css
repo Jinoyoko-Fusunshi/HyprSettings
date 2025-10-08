@@ -1,0 +1,96 @@
+* {
+    color: white;
+}
+
+window {
+    background: #232323;
+}
+
+box#settings-switcher {
+    background: #1a1a1a;
+}
+
+label#application-title {
+    font-size: 20px;
+}
+
+button.url-link {
+    padding: 0;
+    margin: 0;
+}
+
+button.url-link > label {
+    text-decoration: none;
+    color: dodgerblue;
+}
+
+.entry {
+    border: 2px solid red;
+}
+
+button#save-settings {
+    background: #2196ff;
+}
+
+.disabled_startup_program {
+    background-color: #232323;
+    color: gray;
+}
+
+button.create_startup_program {
+    margin-top: 8px;
+    padding: 4px 8px 4px 8px;
+}
+
+box.keybind-input {
+    padding: 8px;
+    background-color: #232323;
+    border: 1px solid #111111;
+    border-radius: 10px;
+    transition: 0.2s ease-in-out;
+}
+
+box.keybind-input:focus {
+    border: 1px solid #2196ff;
+}
+
+box.key-symbol {
+    margin-bottom: 8px;
+    background: #333333;
+    box-shadow: 0 8px 4px 0 #111111;
+    border: 1px solid #111111;
+    border-radius: 10px;
+}
+
+label.key-symbol {
+    font-size: 12px;
+    padding: 8px;
+    color: white;
+}
+
+label.module-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+label.warning {
+    font-weight: bold;
+    font-size: 16px;
+    color: yellow;
+}
+
+box#display-configurator {
+    background: #000000;
+    border-radius: 8px;
+    border: 1px #333333 solid;
+}
+
+box.monitor {
+    background: #111111;
+    border-radius: 8px;
+    border: 1px #333333 solid;
+}
+
+box.monitor:focus {
+    background: #2196ff;
+}

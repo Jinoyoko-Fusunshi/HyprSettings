@@ -25,6 +25,9 @@ build() {
 }
 
 package() {
+    shared_directory="/usr/share/$pkgname"
+    dark_style="dark-style.css"
+    light_style="light-style.css"
     cd ../../../
 
     # setup package directory structure
@@ -32,7 +35,9 @@ package() {
     install -d "$pkgdir/usr/share/applications"
 
     # copy binary with resources into the package
-    install -Dm755 target/release/$pkgname "$pkgdir/usr/bin/$pkgname"
-    install -Dm755 res/style.css "$pkgdir/usr/share/$pkgname/style.css"
-    install -Dm755 res/$pkgname.desktop "$pkgdir/usr/share/applications/$pkgname.desktop"
+    install -Dm755 "target/release/$pkgname" "$pkgdir/usr/bin/$pkgname"
+
+    install -Dm755 "res/$dark_style" "$pkgdir$shared_directory/$dark_style"
+    install -Dm755 "res/$light_style" "$pkgdir$shared_directory/$light_style"
+    install -Dm755 "res/$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
 }

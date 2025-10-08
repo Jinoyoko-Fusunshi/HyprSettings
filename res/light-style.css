@@ -1,9 +1,13 @@
-box#navigation {
-    background: #232323;
+* {
+    color: black;
+}
+
+window {
+    background: #dfdfdf;
 }
 
 box#settings-switcher {
-    background: #1a1a1a;
+    background: #ffffff;
 }
 
 label#application-title {
@@ -17,6 +21,7 @@ button.url-link {
 
 button.url-link > label {
     text-decoration: none;
+    color: dodgerblue;
 }
 
 .entry {
@@ -28,7 +33,7 @@ button#save-settings {
 }
 
 .disabled_startup_program {
-    background-color: #111111;
+    background-color: #dfdfdf;
     color: gray;
 }
 
@@ -39,8 +44,8 @@ button.create_startup_program {
 
 box.keybind-input {
     padding: 8px;
-    background-color: #232323;
-    border: 1px solid black;
+    background-color: #dfdfdf;
+    border: 1px solid #777777;
     border-radius: 10px;
     transition: 0.2s ease-in-out;
 }
@@ -51,16 +56,16 @@ box.keybind-input:focus {
 
 box.key-symbol {
     margin-bottom: 8px;
-    background: #333333;
-    box-shadow: 0 8px 4px 0 #000000;
-    border: 1px solid #000000;
+    background: #eeeeee;
+    box-shadow: 0 8px 4px 0 #777777;
+    border: 1px solid #777777;
     border-radius: 10px;
 }
 
 label.key-symbol {
     font-size: 12px;
     padding: 8px;
-    color: white;
+    color: black;
 }
 
 label.module-name {
@@ -75,14 +80,15 @@ label.warning {
 }
 
 box#display-configurator {
-    background: #000000;
-    border: 2px #333333 solid;
+    background: #eeeeee;
+    border-radius: 8px;
+    border: 1px #777777 solid;
 }
 
 box.monitor {
-    background: #111111;
+    background: #cccccc;
     border-radius: 8px;
-    border: 2px #333333 solid;
+    border: 1px #777777 solid;
 }
 
 box.monitor:focus {
