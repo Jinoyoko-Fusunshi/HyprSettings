@@ -5,7 +5,7 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::boxes::DEFAULT_MARGIN;
 
 pub mod app;
-pub mod programs;
+pub mod user_programs;
 pub mod monitors;
 pub mod infos;
 pub mod keybinds;

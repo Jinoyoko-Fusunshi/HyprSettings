@@ -7,7 +7,7 @@ use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::manager::settings_switcher_manager::SettingsSwitcherManager;
-use crate::ui::pages::programs::Programs;
+use crate::ui::pages::user_programs::UserPrograms;
 use crate::ui::controls::navigation::Navigation;
 use crate::ui::controls::settings_switcher::SettingsSwitcher;
 use crate::ui::states::programs_state::ProgramsState;
@@ -54,8 +54,8 @@ impl App {
         let overview_settings = new_rc_mut(Overview::new(application_provider.clone()));
 
         let state = ProgramsState::from(&application_provider);
-        let programs = new_rc_mut(Programs::new(application_provider.clone()));
-        programs.borrow_mut().update_state(state);
+        let user_programs = new_rc_mut(UserPrograms::new(application_provider.clone()));
+        user_programs.borrow_mut().update_state(state);
 
         let state = MonitorsState::from(&application_provider);
         let monitors = new_rc_mut(Monitors::new(application_provider.clone()));
@@ -88,7 +88,7 @@ impl App {
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
             .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
-            .insert_control(USER_PROGRAMS_PAGE.to_string(), programs)
+            .insert_control(USER_PROGRAMS_PAGE.to_string(), user_programs)
             .insert_control(MONITORS_PAGE.to_string(), monitors)
             .insert_control(WALLPAPER_PAGE.to_string(), wallpaper)
             .insert_control(LOCKSCREEN_PAGE.to_string(), lockscreen)

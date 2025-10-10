@@ -14,7 +14,7 @@ use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::states::input_field_state::InputFieldState;
 use crate::ui::updatable_control::UpdatableControl;
 
-pub struct Programs {
+pub struct UserPrograms {
     state: ProgramsState,
     user_programs_scroll_box: GTKBox,
     terminal_input_field: InputField,
@@ -23,13 +23,13 @@ pub struct Programs {
     notifications_input_field: InputField,
 }
 
-impl Control for Programs {
+impl Control for UserPrograms {
     fn get_widget(&self) -> &GTKBox {
         &self.user_programs_scroll_box
     }
 }
 
-impl UpdatableControl<ProgramsState> for Programs {
+impl UpdatableControl<ProgramsState> for UserPrograms {
     fn update_state(&mut self, state: ProgramsState) {
         let input_field_state = InputFieldState {
             label_text: "Virtual terminal program path:".to_string(),
@@ -67,7 +67,7 @@ impl UpdatableControl<ProgramsState> for Programs {
     }
 }
 
-impl Programs {
+impl UserPrograms {
     pub fn new(application_provider: ApplicationProvider) -> Self {
         const PROGRAMS_LABEL: &str = "User programs";
         
