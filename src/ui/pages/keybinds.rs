@@ -28,47 +28,46 @@ pub const CUSTOM_ITEM: &str = "Custom";
 
 #[derive(Clone)]
 pub struct Keybinds {
-    key_binds_panel_box: GTKBox
+    keybinds_scroll_box: GTKBox
 }
 
 impl Control for Keybinds {
     fn get_widget(&self) -> &GTKBox {
-        &self.key_binds_panel_box
+        &self.keybinds_scroll_box
     }
 }
 
 impl Keybinds {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let key_binds_panel_scroll_box = BoxBuilder::new("keybinds")
-            .set_orientation(Orientation::Vertical)
-            .set_margin(DEFAULT_MARGIN)
-            .set_full_height(true)
-            .build();
-
-        let scroll_window = ScrolledWindow::new();
-        scroll_window.set_vexpand(true);
-
         let system_keybinds_section_box = Self::create_system_keybinds_section_box(&application_provider);
         let focus_keybinds_section_box = Self::create_focus_keybinds_section_box(&application_provider);
         let workspace_keybinds_section_box = Self::create_workspace_keybinds_section_box(&application_provider);
         let move_window_keybinds_section_box = Self::create_move_window_keybinds_section_box(&application_provider);
         let custom_keybinds_section_box = Self::create_custom_keybinds_section_box(&application_provider);
 
-        let key_binds_panel_box = BoxBuilder::new("keybinds")
+        let keybinds_box = BoxBuilder::new("keybinds")
+            .set_orientation(Orientation::Vertical)
+            .set_margin(DEFAULT_MARGIN)
+            .set_full_height(true)
+            .build();
+        keybinds_box.append(&system_keybinds_section_box);
+        keybinds_box.append(&focus_keybinds_section_box);
+        keybinds_box.append(&workspace_keybinds_section_box);
+        keybinds_box.append(&move_window_keybinds_section_box);
+        keybinds_box.append(&custom_keybinds_section_box);
+
+        let keybinds_scroll_window = ScrolledWindow::new();
+        keybinds_scroll_window.set_widget_name("keybinds-scroll-window");
+        keybinds_scroll_window.set_vexpand(true);
+        keybinds_scroll_window.set_child(Some(&keybinds_box));
+
+        let keybinds_scroll_box = BoxBuilder::new("keybinds-scroll-box")
             .set_orientation(Orientation::Vertical)
             .build();
-
-        key_binds_panel_box.append(&system_keybinds_section_box);
-        key_binds_panel_box.append(&focus_keybinds_section_box);
-        key_binds_panel_box.append(&workspace_keybinds_section_box);
-        key_binds_panel_box.append(&move_window_keybinds_section_box);
-        key_binds_panel_box.append(&custom_keybinds_section_box);
-
-        scroll_window.set_child(Some(&key_binds_panel_box));
-        key_binds_panel_scroll_box.append(&scroll_window);
+        keybinds_scroll_box.append(&keybinds_scroll_window);
 
         Self {
-            key_binds_panel_box: key_binds_panel_scroll_box
+            keybinds_scroll_box
         }
     }
 

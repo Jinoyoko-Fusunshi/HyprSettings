@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
-use gtk::{Align, Button, Orientation};
+use gtk::{Align, Button, Orientation, ScrolledWindow};
 use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::GTKBox;
@@ -22,14 +22,14 @@ use crate::ui::updatable_control::UpdatableControl;
 use crate::utils::new_rc_mut;
 
 pub struct StartupPrograms {
-    startup_program_box: GTKBox,
-    startup_program_entries_box: GTKBox,
+    startup_programs_scroll_box: GTKBox,
+    startup_programs_entries_box: GTKBox,
     create_button: Button,
 }
 
 impl Control for StartupPrograms {
     fn get_widget(&self) -> &GTKBox {
-        &self.startup_program_box
+        &self.startup_programs_scroll_box
     }
 }
 
@@ -37,9 +37,19 @@ impl StartupPrograms {
     pub fn new() -> Self {
         const STARTUP_PROGRAMS_LABEL: &str = "Programs on system start";
 
-        let startup_program_box = SectionBoxBuilder::new("startup-programs", DEFAULT_MARGIN)
+        let startup_programs_box = SectionBoxBuilder::new("startup-programs", DEFAULT_MARGIN)
             .create_header_elements(STARTUP_PROGRAMS_LABEL)
             .build().expect("Failed to create startup programs box");
+
+        let startup_programs_scroll_window = ScrolledWindow::new();
+        startup_programs_scroll_window.set_widget_name("startup-programs-scroll-window");
+        startup_programs_scroll_window.set_vexpand(true);
+        startup_programs_scroll_window.set_child(Some(&startup_programs_box));
+
+        let startup_programs_scroll_box = BoxBuilder::new("startup-programs-scroll-box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        startup_programs_scroll_box.append(&startup_programs_scroll_window);
 
         let startup_program_entries_box = BoxBuilder::new(".startup-program-entries")
             .set_orientation(Orientation::Vertical)
@@ -50,12 +60,12 @@ impl StartupPrograms {
         create_button.set_halign(Align::Start);
         create_button.add_css_class(CSSStyles::CREATE_STARTUP_PROGRAM_BUTTON);
 
-        startup_program_box.append(&startup_program_entries_box);
-        startup_program_box.append(&create_button);
+        startup_programs_box.append(&startup_program_entries_box);
+        startup_programs_box.append(&create_button);
 
         Self {
-            startup_program_box,
-            startup_program_entries_box,
+            startup_programs_scroll_box,
+            startup_programs_entries_box: startup_program_entries_box,
             create_button
         }
     }
@@ -68,10 +78,10 @@ impl StartupPrograms {
 
         for (program_name, program_path) in program_provider.borrow().get_startup_programs() {
             let startup_program_field = Self::create_editable_startup_program_field(
-                application_provider.clone(), self.startup_program_entries_box.clone(),  program_name,
+                application_provider.clone(), self.startup_programs_entries_box.clone(),  program_name,
                 program_path, programs.clone(), EditMode::Locked
             );
-            self.startup_program_entries_box.append(startup_program_field.borrow().get_widget());
+            self.startup_programs_entries_box.append(startup_program_field.borrow().get_widget());
         }
     }
 
@@ -81,7 +91,7 @@ impl StartupPrograms {
         let mut programs = vec![CUSTOM_ITEM.to_string()];
         programs.append(&mut program_provider.borrow().get_program_and_module_names());
 
-        let startup_program_entries_box = self.startup_program_entries_box.clone();
+        let startup_program_entries_box = self.startup_programs_entries_box.clone();
         let create_startup_program_button_click = move |_ :&Button| {
             let editable_control = Self::create_editable_startup_program_field(
                 application_provider.clone(),

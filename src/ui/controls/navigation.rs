@@ -5,7 +5,7 @@ use crate::ui::box_builder::BoxBuilder;
 use crate::ui::manager::settings_switcher_manager::{SettingsSwitcherEvent, SettingsSwitcherManager};
 use crate::ui::controls::Control;
 use crate::ui::manager::control_manager::ControlManager;
-use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, USER_PROGRAMS_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 
 pub struct Navigation {
     settings_switcher_manager: SettingsSwitcherManager,
@@ -88,7 +88,7 @@ impl Navigation {
         self.overview_button.connect_clicked(overview_button_click);
 
         let general_button_click = Self::create_settings_button_click(
-            GENERAL_PAGE.to_string(), settings_switcher_manager.clone()
+            USER_PROGRAMS_PAGE.to_string(), settings_switcher_manager.clone()
         );
         self.general_button.connect_clicked(general_button_click);
 

@@ -33,11 +33,10 @@ fn application_activation_setup(application: &Application) {
 
     let window = ApplicationWindow::builder()
         .application(application)
+        .resizable(true)
         .title("HyprSettings")
-        .default_width(800)
-        .default_height(600)
         .build();
-    
+
     let app = App::new();
     window.set_child(Some(app.get_widget()));
     window.present();

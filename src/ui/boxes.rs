@@ -7,6 +7,7 @@ use crate::ui::css_styles::CSSStyles;
 pub struct Boxes;
 
 pub const DEFAULT_MARGIN: u32 = 10;
+pub const DEFAULT_SPACING: u32 = 10;
 
 impl Boxes {
     pub fn clear_box_content(box_container: &GTKBox) {

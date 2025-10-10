@@ -1,4 +1,4 @@
-use gtk::{Label, LinkButton, Orientation};
+use gtk::{Label, LinkButton, Orientation, ScrolledWindow};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::modules::program_module::ProgramModule;
 use crate::providers::application_provider::ApplicationProvider;
@@ -10,12 +10,12 @@ use crate::ui::section_box_builder::SectionBoxBuilder;
 use crate::ui::css_styles::CSSStyles;
 
 pub struct Overview {
-    overview_box: GTKBox,
+    overview_scroll_box: GTKBox,
 }
 
 impl Control for Overview {
     fn get_widget(&self) -> &GTKBox {
-        &self.overview_box
+        &self.overview_scroll_box
     }
 }
 
@@ -26,13 +26,23 @@ impl Overview {
             .set_margin(DEFAULT_MARGIN)
             .build();
 
+        let overview_scroll_window = ScrolledWindow::new();
+        overview_scroll_window.set_widget_name("overview-scroll-window");
+        overview_scroll_window.set_vexpand(true);
+        overview_scroll_window.set_child(Some(&overview_box));
+        
+        let overview_scroll_box = BoxBuilder::new("overview-scroll-box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        overview_scroll_box.append(&overview_scroll_window);
+        
         let hyprland_modules_box = Self::create_hyprland_modules_section_box(&application_provider);
         let dependency_modules_box = Self::create_dependency_modules_section_box(&application_provider);
         overview_box.append(&hyprland_modules_box);
         overview_box.append(&dependency_modules_box);
 
         Self {
-            overview_box
+            overview_scroll_box
         }
     }
 

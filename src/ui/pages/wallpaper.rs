@@ -1,5 +1,5 @@
-use gtk::{Entry, Orientation};
-use gtk::prelude::{BoxExt, EditableExt};
+use gtk::{Entry, Orientation, ScrolledWindow};
+use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
@@ -14,13 +14,13 @@ use crate::ui::updatable_control::UpdatableControl;
 pub struct Wallpaper {
     application_provider: ApplicationProvider,
     state: WallpaperPageState,
-    wallpaper_box: GTKBox,
+    wallpaper_scroll_box: GTKBox,
     wallpaper_sections_box: GTKBox,
 }
 
 impl Control for Wallpaper {
     fn get_widget(&self) -> &GTKBox {
-        &self.wallpaper_box
+        &self.wallpaper_scroll_box
     }
 }
 
@@ -49,6 +49,16 @@ impl Wallpaper {
             .create_header_elements(WALLPAPER_TITLE)
             .build().expect("Failed to create wallpaper section box");
 
+        let wallpaper_scroll_window = ScrolledWindow::new();
+        wallpaper_scroll_window.set_widget_name("wallpaper-scroll-window");
+        wallpaper_scroll_window.set_vexpand(true);
+        wallpaper_scroll_window.set_child(Some(&wallpaper_box));
+
+        let wallpaper_scroll_box = BoxBuilder::new("wallpaper-scroll-box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        wallpaper_scroll_box.append(&wallpaper_scroll_window);
+
         let wallpaper_sections_box = BoxBuilder::new("wallpaper_sections")
             .set_orientation(Orientation::Vertical)
             .build();
@@ -62,7 +72,7 @@ impl Wallpaper {
         Self {
             application_provider,
             state,
-            wallpaper_box,
+            wallpaper_scroll_box,
             wallpaper_sections_box,
         }
     }

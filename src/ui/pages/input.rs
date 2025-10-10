@@ -1,5 +1,5 @@
-use gtk::{ComboBoxText, Entry, Orientation};
-use gtk::prelude::{BoxExt, EditableExt};
+use gtk::{ComboBoxText, Entry, Orientation, ScrolledWindow};
+use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::providers::monitor_provider::MonitorProvider;
@@ -31,7 +31,7 @@ const RESOLUTION_DIGITS: u32 = 0;
 pub struct Input {
     state: InputState,
     application_provider: ApplicationProvider,
-    input_box: GTKBox,
+    input_scroll_box: GTKBox,
     layout_input_field: InputField,
     numlock_enabled_selection_box: SelectionBox,
     repeat_rate_spin_button: SpinButton,
@@ -56,7 +56,7 @@ pub struct Input {
 
 impl Control for Input {
     fn get_widget(&self) -> &GTKBox {
-        &self.input_box
+        &self.input_scroll_box
     }
 }
 
@@ -315,6 +315,16 @@ impl Input {
             .set_margin(DEFAULT_MARGIN)
             .build();
 
+        let input_scroll_window = ScrolledWindow::new();
+        input_scroll_window.set_widget_name("input_scroll_window");
+        input_scroll_window.set_vexpand(true);
+        input_scroll_window.set_child(Some(&input_box));
+
+        let input_scroll_box = BoxBuilder::new("input_scroll_box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        input_scroll_box.append(&input_scroll_window);
+
         let mut layout_input_field = InputField::new();
         let mut numlock_enabled_selection_box = SelectionBox::new();
         let mut repeat_rate_spin_button = SpinButton::new();
@@ -362,7 +372,7 @@ impl Input {
         Self {
             state,
             application_provider,
-            input_box,
+            input_scroll_box,
             layout_input_field,
             numlock_enabled_selection_box,
             repeat_rate_spin_button,

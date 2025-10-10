@@ -35,6 +35,7 @@ impl UpdatableControl<SettingsSwitcherState> for SettingsSwitcher {
 impl SettingsSwitcher {
     pub fn new() -> Self {
         let settings_switcher_stack = Stack::new();
+
         let settings_switcher_box = BoxBuilder::new("settings-switcher")
             .set_orientation(Orientation::Vertical)
             .set_full_height(true)

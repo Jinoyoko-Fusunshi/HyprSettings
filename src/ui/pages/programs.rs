@@ -1,11 +1,12 @@
-use gtk::Entry;
-use gtk::prelude::{BoxExt, EditableExt};
+use gtk::{Entry, ScrolledWindow};
+use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::providers::module_provider::{
     FILE_MANAGER_ENTRY, NOTIFICATION_HANDLER_ENTRY, QUICK_SEARCH_ENTRY, VIRTUAL_TERMINAL_ENTRY
 };
 use crate::types::GTKBox;
-use crate::ui::boxes::{Boxes, DEFAULT_MARGIN};
+use crate::ui::box_builder::BoxBuilder;
+use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::input_field::InputField;
 use crate::ui::states::programs_state::ProgramsState;
 use crate::ui::controls::Control;
@@ -15,7 +16,7 @@ use crate::ui::updatable_control::UpdatableControl;
 
 pub struct Programs {
     state: ProgramsState,
-    general_box: GTKBox,
+    user_programs_scroll_box: GTKBox,
     terminal_input_field: InputField,
     files_input_field: InputField,
     quick_search_input_field: InputField,
@@ -24,7 +25,7 @@ pub struct Programs {
 
 impl Control for Programs {
     fn get_widget(&self) -> &GTKBox {
-        &self.general_box
+        &self.user_programs_scroll_box
     }
 }
 
@@ -68,21 +69,23 @@ impl UpdatableControl<ProgramsState> for Programs {
 
 impl Programs {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        const PROGRAMS_LABEL: &str = "Programs";
+        const PROGRAMS_LABEL: &str = "User programs";
         
-        let general_box = SectionBoxBuilder::new("programs", DEFAULT_MARGIN)
+        let user_programs_box = SectionBoxBuilder::new("user-programs", DEFAULT_MARGIN)
             .create_header_elements(PROGRAMS_LABEL)
             .build().expect("Failed to create general box");
-        Boxes::set_margin(&general_box, DEFAULT_MARGIN);
 
-        let mut terminal_input_field = InputField::new();
-        let state = InputFieldState {
-            label_text: "Virtual terminal program path:".to_string(),
-            entry_text: None,
-            placeholder_text: "e.g. /usr/bin/alacritty".to_string(),
-        };
-        terminal_input_field.update_state(state);
+        let user_programs_scroll_window = ScrolledWindow::new();
+        user_programs_scroll_window.set_widget_name("user-programs-scroll-window");
+        user_programs_scroll_window.set_vexpand(true);
+        user_programs_scroll_window.set_child(Some(&user_programs_box));
 
+        let user_programs_scroll_box = BoxBuilder::new("user-programs-scroll-box")
+            .set_orientation(gtk::Orientation::Vertical)
+            .build();
+        user_programs_scroll_box.append(&user_programs_scroll_window);
+
+        let terminal_input_field = InputField::new();
         let program_provider =  application_provider.get_program_provider();
         let terminal_input_change = move |input: &Entry| {
             program_provider.borrow_mut().set_program_path(
@@ -91,14 +94,7 @@ impl Programs {
         };
         terminal_input_field.set_input_callback(terminal_input_change);
 
-        let mut files_input_field = InputField::new();
-        let state = InputFieldState {
-            label_text: "File manager program path:".to_string(),
-            entry_text: None,
-            placeholder_text: "e.g. /usr/bin/nautilus".to_string(),
-        };
-        files_input_field.update_state(state);
-
+        let files_input_field = InputField::new();
         let program_provider = application_provider.get_program_provider();
         let files_input_change = move |input: &Entry| {
             program_provider.borrow_mut().set_program_path(
@@ -107,14 +103,7 @@ impl Programs {
         };
         files_input_field.set_input_callback(files_input_change);
 
-        let mut quick_search_input_field = InputField::new();
-        let state = InputFieldState {
-            label_text: "Quick search program path:".to_string(),
-            entry_text: None,
-            placeholder_text: "e.g. /usr/bin/anyrun".to_string(),
-        };
-        quick_search_input_field.update_state(state);
-
+        let quick_search_input_field = InputField::new();
         let program_provider =  application_provider.get_program_provider();
         let quick_search_change = move |input: &Entry| {
             program_provider.borrow_mut().set_program_path(
@@ -139,16 +128,16 @@ impl Programs {
         };
         notifications_input_field.set_input_callback(notifications_input_change);
 
-        general_box.append(terminal_input_field.get_widget());
-        general_box.append(files_input_field.get_widget());
-        general_box.append(quick_search_input_field.get_widget());
-        general_box.append(notifications_input_field.get_widget());
+        user_programs_box.append(terminal_input_field.get_widget());
+        user_programs_box.append(files_input_field.get_widget());
+        user_programs_box.append(quick_search_input_field.get_widget());
+        user_programs_box.append(notifications_input_field.get_widget());
 
         let state = Default::default();
 
         Self {
             state,
-            general_box,
+            user_programs_scroll_box,
             terminal_input_field,
             files_input_field,
             quick_search_input_field,

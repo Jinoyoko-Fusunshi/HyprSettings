@@ -1,6 +1,6 @@
-use gtk::{ComboBoxText, Orientation, Separator, Switch};
+use gtk::{ComboBoxText, Orientation, ScrolledWindow, Separator, Switch};
 use gtk::glib::Propagation;
-use gtk::prelude::BoxExt;
+use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::{GTKBox, GTKSpinButton};
@@ -23,12 +23,13 @@ use crate::utils::new_rc_mut;
 pub struct Monitors {
     state: MonitorsState,
     application_provider: ApplicationProvider,
+    monitor_scroll_box: GTKBox,
     monitor_box: GTKBox,
 }
 
 impl Control for Monitors {
     fn get_widget(&self) -> &GTKBox {
-        &self.monitor_box
+        &self.monitor_scroll_box
     }
 }
 
@@ -55,12 +56,23 @@ impl Monitors {
             .create_header_elements("Available monitors")
             .build().expect("Failed to create monitor settings section box");
 
+        let monitor_scroll_window = ScrolledWindow::new();
+        monitor_scroll_window.set_widget_name("monitor-scroll-window");
+        monitor_scroll_window.set_vexpand(true);
+        monitor_scroll_window.set_child(Some(&monitor_box));
+
+        let monitor_scroll_box = BoxBuilder::new("monitor-scroll-box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        monitor_scroll_box.append(&monitor_scroll_window);
+
         let state = Default::default();
         
         Self {
             state,
             application_provider,
-            monitor_box,
+            monitor_scroll_box,
+            monitor_box
         }
     }
 

@@ -1,5 +1,6 @@
 use gtk::prelude::{OrientableExt, WidgetExt};
 use crate::types::GTKBox;
+use crate::ui::boxes::DEFAULT_SPACING;
 
 pub struct BoxBuilder {
     container_box: GTKBox,
@@ -7,7 +8,7 @@ pub struct BoxBuilder {
 
 impl BoxBuilder {
     pub fn new(id_name: &str) -> Self {
-        let container_box = GTKBox::new(gtk::Orientation::Vertical, 10);
+        let container_box = GTKBox::new(gtk::Orientation::Vertical, DEFAULT_SPACING as i32);
         container_box.set_widget_name(id_name);
 
         Self {

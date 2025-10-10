@@ -20,7 +20,7 @@ use crate::ui::pages::infos::Infos;
 use crate::ui::pages::keybinds::Keybinds;
 use crate::ui::pages::lockscreen::Lockscreen;
 use crate::ui::pages::overview::Overview;
-use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, GENERAL_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
+use crate::ui::pages::{APPEARANCE_PAGE, MONITORS_PAGE, USER_PROGRAMS_PAGE, INFO_PAGE, INPUT_PAGE, KEYBINDS_PAGE, LOCKSCREEN_PAGE, OVERVIEW_PAGE, STARTUP_PROGRAMS_PAGE, WALLPAPER_PAGE};
 use crate::ui::pages::input::Input;
 use crate::ui::pages::startup_programs::StartupPrograms;
 use crate::ui::pages::wallpaper::Wallpaper;
@@ -88,7 +88,7 @@ impl App {
         let settings_switcher = Rc::new(RefCell::new(SettingsSwitcher::new()));
         settings_switcher.borrow_mut()
             .insert_control(OVERVIEW_PAGE.to_string(), overview_settings)
-            .insert_control(GENERAL_PAGE.to_string(), programs)
+            .insert_control(USER_PROGRAMS_PAGE.to_string(), programs)
             .insert_control(MONITORS_PAGE.to_string(), monitors)
             .insert_control(WALLPAPER_PAGE.to_string(), wallpaper)
             .insert_control(LOCKSCREEN_PAGE.to_string(), lockscreen)

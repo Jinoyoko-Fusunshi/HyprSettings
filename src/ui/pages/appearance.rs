@@ -1,9 +1,9 @@
 use std::fs;
-use gtk::{ColorButton, ComboBoxText, Entry, Orientation, PolicyType, ScrolledWindow, SpinButton as GTKSpinButton};
+use gtk::{ColorButton, ComboBoxText, Entry, Orientation, ScrolledWindow};
 use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
-use crate::types::GTKBox;
+use crate::types::{GTKBox, GTKSpinButton};
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::boxes::DEFAULT_MARGIN;
 use crate::ui::controls::color_selector::ColorSelector;
@@ -22,30 +22,18 @@ use crate::ui::updatable_control::UpdatableControl;
 const APPEARANCE_LABEL_WIDTH: u32 = 180;
 
 pub struct Appearance {
-    widget: GTKBox,
+    appearance_scroll_box: GTKBox,
 }
 
 impl Control for Appearance {
     fn get_widget(&self) -> &GTKBox {
-        &self.widget
+        &self.appearance_scroll_box
     }
 }
 
 impl Appearance {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let appearance_scroll_box = BoxBuilder::new("appearance-scroll")
-            .set_orientation(Orientation::Vertical)
-            .set_full_height(true)
-            .build();
-
-        let scrolled_window = ScrolledWindow::new();
-        scrolled_window.set_policy(PolicyType::Never, PolicyType::Automatic);
-        scrolled_window.set_vexpand(true);
-
-        let appearance_box = BoxBuilder::new("appearance")
-            .set_orientation(Orientation::Vertical)
-            .set_margin(DEFAULT_MARGIN)
-            .build();
+        const APPEARANCE_NAME: &str = "appearance";
 
         let wallpaper_section = Appearance::create_wallpaper_section_box(&application_provider);
         let cursor_section = Appearance::create_cursor_section_box(&application_provider);
@@ -54,6 +42,22 @@ impl Appearance {
         let animations_section = Appearance::create_animations_section_box(&application_provider);
         let layouts_section = Appearance::create_layouts_section_box(&application_provider);
 
+        let appearance_box = BoxBuilder::new(APPEARANCE_NAME)
+            .set_orientation(Orientation::Vertical)
+            .set_margin(DEFAULT_MARGIN)
+            .build();
+
+        let appearance_scroll_window = ScrolledWindow::new();
+        appearance_scroll_window.set_widget_name("appearance-scroll-window");
+        appearance_scroll_window.set_hexpand(true);
+        appearance_scroll_window.set_vexpand(true);
+        appearance_scroll_window.set_child(Some(&appearance_box));
+
+        let appearance_scroll_box = BoxBuilder::new(format!("{}-scroll-box", APPEARANCE_NAME).as_str())
+            .set_full_height(true)
+            .build();
+        appearance_scroll_box.append(&appearance_scroll_window);
+
         appearance_box.append(&wallpaper_section);
         appearance_box.append(&cursor_section);
         appearance_box.append(&styling_section);
@@ -61,11 +65,8 @@ impl Appearance {
         appearance_box.append(&animations_section);
         appearance_box.append(&layouts_section);
 
-        scrolled_window.set_child(Some(&appearance_box));
-        appearance_scroll_box.append(&scrolled_window);
-
         Self {
-            widget: appearance_scroll_box
+            appearance_scroll_box
         }
     }
 

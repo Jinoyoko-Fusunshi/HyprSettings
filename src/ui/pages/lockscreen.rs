@@ -25,7 +25,7 @@ pub struct Lockscreen {
     application_provider: ApplicationProvider,
     state: LockScreenPageState,
     lockscreen_scroll_box: GTKBox,
-    lockscreen_sections_box: GTKBox,
+    lockscreen_box: GTKBox
 }
 
 impl Control for Lockscreen {
@@ -36,7 +36,7 @@ impl Control for Lockscreen {
 
 impl UpdatableControl<LockScreenPageState> for Lockscreen {
     fn update_state(&mut self, state: LockScreenPageState) {
-        Boxes::clear_box_content(&self.lockscreen_sections_box);
+        Boxes::clear_box_content(&self.lockscreen_box);
 
         if state.enabled {
             self.create_lockscreen_sections(&state);
@@ -54,71 +54,36 @@ impl UpdatableControl<LockScreenPageState> for Lockscreen {
 
 impl Lockscreen {
     pub fn new(application_provider: ApplicationProvider) -> Self {
-        let lockscreen_sections_box = BoxBuilder::new("lockscreen")
+        let lockscreen_box = BoxBuilder::new("lockscreen")
             .set_orientation(Orientation::Vertical)
             .set_margin(DEFAULT_MARGIN)
             .build();
 
-        let scroll_window = ScrolledWindow::new();
-        scroll_window.set_vexpand(true);
-        scroll_window.set_child(Some(&lockscreen_sections_box));
+        let lockscreen_scroll_window = ScrolledWindow::new();
+        lockscreen_scroll_window.set_widget_name("lockscreen-scroll-window");
+        lockscreen_scroll_window.set_vexpand(true);
+        lockscreen_scroll_window.set_child(Some(&lockscreen_box));
 
-        let lockscreen_scroll_box = BoxBuilder::new("lockscreen-scroll")
-            .set_orientation(Orientation::Vertical)
+        let lockscreen_scroll_box = BoxBuilder::new("lockscreen-scroll-box")
             .set_full_height(true)
             .build();
-        lockscreen_scroll_box.append(&scroll_window);
+        lockscreen_scroll_box.append(&lockscreen_scroll_window);
 
-        let state = LockScreenPageState {
-            enabled: true,
-            hide_cursor: false,
-            grace: 0.0,
-            fall_timeout: 0,
-            lockscreen_wallpaper: None,
-            blur_size: 0,
-            blur_passes: 0,
-            noise: 0.0,
-            contrast: 0.0,
-            brightness: 0.0,
-            vibrancy: 0.0,
-            input_width: 0,
-            input_height: 0,
-            input_outline_thickness: 0,
-            input_dots_size: 0,
-            input_dots_spacing: 0,
-            input_dots_center: false,
-            input_outer_color: Default::default(),
-            input_inner_color: Default::default(),
-            input_font_color: Default::default(),
-            input_placeholder_text: None,
-            hide_input: false,
-            input_x_position: 0,
-            input_y_position: 0,
-            input_vertical_alignment: None,
-            input_horizontal_alignment: None,
-            display_text: None,
-            display_text_color: Default::default(),
-            display_text_font_size: 0,
-            display_text_font: None,
-            display_text_x_position: 0,
-            display_text_y_position: 0,
-            display_text_vertical_alignment: None,
-            display_text_horizontal_alignment: None,
-        };
+        let state: LockScreenPageState = Default::default();
 
         Self {
             application_provider,
             state,
             lockscreen_scroll_box,
-            lockscreen_sections_box,
+            lockscreen_box
         }
     }
 
     fn create_lockscreen_sections(&self, lockscreen_state: &LockScreenPageState) {
-        self.lockscreen_sections_box.append(&self.create_general_section_box(lockscreen_state));
-        self.lockscreen_sections_box.append(&self.create_background_section_box(lockscreen_state));
-        self.lockscreen_sections_box.append(&self.create_password_input_field_section(lockscreen_state));
-        self.lockscreen_sections_box.append(&self.create_text_display_section_box(lockscreen_state));
+        self.lockscreen_box.append(&self.create_general_section_box(lockscreen_state));
+        self.lockscreen_box.append(&self.create_background_section_box(lockscreen_state));
+        self.lockscreen_box.append(&self.create_password_input_field_section(lockscreen_state));
+        self.lockscreen_box.append(&self.create_text_display_section_box(lockscreen_state));
     }
 
     fn create_general_section_box(&self, lockscreen_state: &LockScreenPageState) -> GTKBox {
@@ -889,6 +854,6 @@ impl Lockscreen {
         let lockscreen_warning = Boxes::create_warning_box(
             "⚠️ Hyprlock program module was not found. This is required to configure the lockscreen settings."
         );
-        self.lockscreen_sections_box.append(&lockscreen_warning);
+        self.lockscreen_box.append(&lockscreen_warning);
     }
 }

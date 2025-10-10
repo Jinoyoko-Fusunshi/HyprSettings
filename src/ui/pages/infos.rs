@@ -1,4 +1,4 @@
-use gtk::{Align, Label, LinkButton, Orientation, Separator};
+use gtk::{Align, Label, LinkButton, Orientation, ScrolledWindow, Separator};
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
@@ -8,12 +8,12 @@ use crate::ui::controls::Control;
 use crate::ui::section_box_builder::SectionBoxBuilder;
 
 pub struct Infos {
-    info_settings_box: GTKBox,
+    info_scroll_box: GTKBox,
 }
 
 impl Control for Infos {
     fn get_widget(&self) -> &GTKBox {
-        &self.info_settings_box
+        &self.info_scroll_box
     }
 }
 
@@ -25,6 +25,16 @@ impl Infos {
             .create_header_elements(INFO_LABEL)
             .build().expect("Failed to create info panel");
 
+        let info_scroll_window = ScrolledWindow::new();
+        info_scroll_window.set_widget_name("info-scroll-window");
+        info_scroll_window.set_vexpand(true);
+        info_scroll_window.set_child(Some(&info_box));
+        
+        let info_scroll_box = BoxBuilder::new("info-scroll-box")
+            .set_orientation(Orientation::Vertical)
+            .build();
+        info_scroll_box.append(&info_scroll_window);
+        
         let application_name = Self::create_label("HyprSettings");
         application_name.set_widget_name("application-title");
         application_name.set_margin_bottom(DEFAULT_MARGIN as i32);
@@ -50,7 +60,7 @@ impl Infos {
         info_box.append(&program_description_entry);
 
         Self {
-            info_settings_box: info_box
+            info_scroll_box
         }
     }
 
