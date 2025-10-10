@@ -33,7 +33,6 @@ impl UpdatableControl<KeybindInputFieldState> for KeybindInputField {
         };
 
         self.keybind_input.borrow_mut().update_state(keybind_input_state.clone());
-        self.keybind_input.borrow_mut().update_state(keybind_input_state.clone());
 
         self.state = state;
     }

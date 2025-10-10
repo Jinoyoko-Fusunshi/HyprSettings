@@ -20,7 +20,6 @@ impl ControlManager<KeybindInput, KeybindInputEvent> for KeybindInputManager {
                     configuration
                 };
                 self.keybind_input.borrow_mut().update_state(state.clone());
-                self.keybind_input.borrow_mut().update_state(state.clone());
             }
         }
     }

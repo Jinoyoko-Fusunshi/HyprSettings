@@ -1,4 +1,4 @@
-use gtk::{Align, ComboBoxText, Label, Orientation, Switch};
+use gtk::{Align, DropDown, Label, Orientation, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
@@ -124,7 +124,6 @@ impl UpdatableControl<MonitorFieldState> for MonitorField {
             selected_option: Some(state.monitor_configuration.orientation.to_string()),
             options: MonitorOrientation::get_orientation_option_names(),
         };
-        self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
         self.orientation_selection_box.update_state(orientation_selection_box_state.clone());
 
         self.state = state;
@@ -259,7 +258,7 @@ impl MonitorField {
         self.resolution_scale_spin_button.set_value_change(value_change);
     }
 
-    pub fn set_orientation_change(&self, value_change: impl Fn(&ComboBoxText) + 'static) {
+    pub fn set_orientation_change(&self, value_change: impl Fn(&DropDown) + 'static) {
         self.orientation_selection_box.set_selection_change(value_change);
     }
 

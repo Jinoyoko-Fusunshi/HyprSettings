@@ -122,7 +122,6 @@ impl StartupPrograms {
         let startup_program_field = new_rc_mut(StartupProgramField::new(application_provider.clone()));
         let startup_program_field_manager = StartupProgramFieldManager::new(startup_program_field.clone());
         startup_program_field.borrow_mut().update_state(state.clone());
-        startup_program_field.borrow_mut().update_state(state.clone());
         startup_program_field.borrow().init_events(startup_program_field_manager);
 
         let editable_control_state = EditableControlState {

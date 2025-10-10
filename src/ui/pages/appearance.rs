@@ -1,6 +1,6 @@
 use std::fs;
-use gtk::{ColorButton, ComboBoxText, Entry, Orientation, ScrolledWindow};
-use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
+use gtk::{ColorDialogButton, DropDown, Entry, Orientation, ScrolledWindow};
+use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::{GTKBox, GTKSpinButton};
@@ -80,13 +80,6 @@ impl Appearance {
 
         // Force the default wallpaper option
         let appearance_provider_clone = appearance_provider.clone();
-        let force_default_wallpaper_selection_change = {
-            move |entry: &ComboBoxText| {
-                let selected_text = entry.active_text().expect("Cannot read active selection text");
-                let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-                appearance_provider_clone.borrow_mut().set_force_default_wallpaper(bool_value);
-            }
-        };
         let mut force_default_wallpaper_selection = SelectionBox::new();
         force_default_wallpaper_selection.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -95,18 +88,13 @@ impl Appearance {
             options: SelectionBoxState::get_false_true_options(),
         };
         force_default_wallpaper_selection.update_state(state.clone());
-        force_default_wallpaper_selection.update_state(state.clone());
-        force_default_wallpaper_selection.set_selection_change(force_default_wallpaper_selection_change);
+        force_default_wallpaper_selection.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_force_default_wallpaper(selected_option);
+        });
 
         // Disable hyprland logo option
         let appearance_provider_clone = appearance_provider.clone();
-        let disable_hyprland_logo_selection_change = {
-            move |entry: &ComboBoxText| {
-                let selected_text = entry.active_text().expect("Cannot read active selection text");
-                let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-                appearance_provider_clone.borrow_mut().disable_hyprland_logo(bool_value);
-            }
-        };
         let mut disable_hyprland_logo_selection = SelectionBox::new();
         disable_hyprland_logo_selection.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -115,8 +103,10 @@ impl Appearance {
             options: SelectionBoxState::get_false_true_options(),
         };
         disable_hyprland_logo_selection.update_state(state.clone());
-        disable_hyprland_logo_selection.update_state(state.clone());
-        disable_hyprland_logo_selection.set_selection_change(disable_hyprland_logo_selection_change);
+        disable_hyprland_logo_selection.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().disable_hyprland_logo(selected_option);
+        });
         
         wallpaper_section_box.append(force_default_wallpaper_selection.get_widget());
         wallpaper_section_box.append(disable_hyprland_logo_selection.get_widget());
@@ -154,10 +144,6 @@ impl Appearance {
         cursor_size_spin_button.set_value_change(cursor_size_spin_button_change);
 
         let appearance_provider_clone = appearance_provider.clone();
-        let cursor_theme_spin_button_change = move |spin_button: &ComboBoxText| {
-            let selected_text = spin_button.active_text().expect("Cannot read active selection text");
-            appearance_provider_clone.borrow_mut().set_cursor_theme(selected_text.to_string());
-        };
         let state = SelectionBoxState {
             label_text: "Theme".to_string(),
             selected_option: Some(appearance_provider.borrow().get_cursor_theme()),
@@ -166,8 +152,10 @@ impl Appearance {
         let mut cursor_theme_selection_box = SelectionBox::new();
         cursor_theme_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         cursor_theme_selection_box.update_state(state.clone());
-        cursor_theme_selection_box.update_state(state.clone());
-        cursor_theme_selection_box.set_selection_change(cursor_theme_spin_button_change);
+        cursor_theme_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            appearance_provider_clone.borrow_mut().set_cursor_theme(selected_option);
+        });
 
         cursor_section_box.append(cursor_size_spin_button.get_widget());
         cursor_section_box.append(cursor_theme_selection_box.get_widget());
@@ -270,7 +258,7 @@ impl Appearance {
 
         // Active border option
         let appearance_provider_clone = appearance_provider.clone();
-        let active_border_color_change = move |color_button: &ColorButton| {
+        let active_border_color_change = move |color_button: &ColorDialogButton| {
             appearance_provider_clone.borrow_mut().set_active_border_color(RGBAColor::new(color_button.rgba()));
         };
         let mut active_border_color_selector = ColorSelector::new();
@@ -284,7 +272,7 @@ impl Appearance {
 
         // Inactive border option
         let appearance_provider_clone = appearance_provider.clone();
-        let inactive_border_color_change = move |color_button: &ColorButton| {
+        let inactive_border_color_change = move |color_button: &ColorDialogButton| {
             appearance_provider_clone.borrow_mut().set_inactive_border_color(RGBAColor::new(color_button.rgba()));
         };
         let mut inactive_border_color_selector = ColorSelector::new();
@@ -298,11 +286,6 @@ impl Appearance {
 
         // Resize on border option
         let appearance_provider_clone = appearance_provider.clone();
-        let border_resize_selection_change = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_resize_on_border(bool_value);
-        };
         let mut border_resize_selection_box = SelectionBox::new();
         border_resize_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -311,16 +294,13 @@ impl Appearance {
             options: SelectionBoxState::get_false_true_options(),
         };
         border_resize_selection_box.update_state(state.clone());
-        border_resize_selection_box.update_state(state.clone());
-        border_resize_selection_box.set_selection_change(border_resize_selection_change);
+        border_resize_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_resize_on_border(selected_option);
+        });
 
         // Allow tearing option
         let appearance_provider_clone = appearance_provider.clone();
-        let tearing_selection_change = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_allow_tearing(bool_value);
-        };
         let mut allow_tearing_selection_box = SelectionBox::new();
         allow_tearing_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -329,8 +309,10 @@ impl Appearance {
             options: SelectionBoxState::get_false_true_options(),
         };
         allow_tearing_selection_box.update_state(state.clone());
-        allow_tearing_selection_box.update_state(state.clone());
-        allow_tearing_selection_box.set_selection_change(tearing_selection_change);
+        allow_tearing_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_allow_tearing(selected_option);
+        });
 
         styling_section_box.append(inner_gap_spin_button.get_widget());
         styling_section_box.append(outer_gap_spin_button.get_widget());
@@ -396,11 +378,6 @@ impl Appearance {
 
         // Dim inactive option
         let appearance_provider_clone = appearance_provider.clone();
-        let dim_inactive_selection_changed_callback = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_dim_inactive(bool_value);
-        };
         let mut dim_inactive_selection_box = SelectionBox::new();
         dim_inactive_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -409,8 +386,10 @@ impl Appearance {
             selected_option: Some(appearance_provider.borrow().get_dim_inactive().to_string()),
         };
         dim_inactive_selection_box.update_state(state.clone());
-        dim_inactive_selection_box.update_state(state.clone());
-        dim_inactive_selection_box.set_selection_change(dim_inactive_selection_changed_callback);
+        dim_inactive_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_dim_inactive(selected_option);
+        });
 
         // Active opacity option
         let appearance_provider_clone = appearance_provider.clone();
@@ -458,11 +437,6 @@ impl Appearance {
 
         // Active shadows option
         let appearance_provider_clone = appearance_provider.clone();
-        let active_shadows_selection_changed_callback = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_active_shadow(bool_value);
-        };
         let mut active_shadows_selection_box = SelectionBox::new();
         active_shadows_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -471,8 +445,10 @@ impl Appearance {
             selected_option: Some(appearance_provider.borrow().get_active_shadow().to_string()),
         };
         active_shadows_selection_box.update_state(state.clone());
-        active_shadows_selection_box.update_state(state.clone());
-        active_shadows_selection_box.set_selection_change(active_shadows_selection_changed_callback);
+        active_shadows_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_active_shadow(selected_option);
+        });
 
         // Shadow range option
         let appearance_provider_clone = appearance_provider.clone();
@@ -520,7 +496,7 @@ impl Appearance {
 
         // Shadow color option
         let appearance_provider_clone = appearance_provider.clone();
-        let shadow_color_button_changed_callback = move |color_button: &ColorButton| {
+        let shadow_color_button_changed_callback = move |color_button: &ColorDialogButton| {
             appearance_provider_clone.borrow_mut().set_shadow_color(RGBAColor::new(color_button.rgba()));
         };
         let mut shadow_color_selector = ColorSelector::new();
@@ -534,11 +510,6 @@ impl Appearance {
 
         // Active blur option
         let appearance_provider_clone = appearance_provider.clone();
-        let active_blur_selection_changed_callback = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_active_blur(bool_value);
-        };
         let mut active_blur_selection_box = SelectionBox::new();
         active_blur_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -547,8 +518,10 @@ impl Appearance {
             selected_option: Some(appearance_provider.borrow().get_active_blur().to_string()),
         };
         active_blur_selection_box.update_state(state.clone());
-        active_blur_selection_box.update_state(state.clone());
-        active_blur_selection_box.set_selection_change(active_blur_selection_changed_callback);
+        active_blur_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_active_blur(selected_option);
+        });
 
         // Blur size option
         let appearance_provider_clone = appearance_provider.clone();
@@ -664,11 +637,6 @@ impl Appearance {
 
         // Pseudo tiling option
         let appearance_provider_clone = appearance_provider.clone();
-        let pseudo_tiling_selection_change = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_pseudo_tiling(bool_value);
-        };
         let mut pseudo_tiling_selection_box = SelectionBox::new();
         pseudo_tiling_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -677,16 +645,13 @@ impl Appearance {
             selected_option: Some(appearance_provider.borrow().get_pseudo_tiling().to_string()),
         };
         pseudo_tiling_selection_box.update_state(state.clone());
-        pseudo_tiling_selection_box.update_state(state.clone());
-        pseudo_tiling_selection_box.set_selection_change(pseudo_tiling_selection_change);
+        pseudo_tiling_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_pseudo_tiling(selected_option);
+        });
 
         // Split preservation option
         let appearance_provider_clone = appearance_provider.clone();
-        let split_preservation_selection_change = move |entry: &ComboBoxText| {
-            let selected_text = entry.active_text().expect("Cannot read active selection text");
-            let bool_value = selected_text.parse::<bool>().expect("Cannot parse bool value");
-            appearance_provider_clone.borrow_mut().set_split_preservation(bool_value);
-        };
         let mut split_preservation_selection_box = SelectionBox::new();
         split_preservation_selection_box.set_text_width(APPEARANCE_LABEL_WIDTH);
         let state = SelectionBoxState {
@@ -695,8 +660,11 @@ impl Appearance {
             selected_option: Some(appearance_provider.borrow().get_split_preservation().to_string()),
         };
         split_preservation_selection_box.update_state(state.clone());
-        split_preservation_selection_box.update_state(state.clone());
-        split_preservation_selection_box.set_selection_change(split_preservation_selection_change);
+
+        split_preservation_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
+            appearance_provider_clone.borrow_mut().set_split_preservation(selected_option);
+        });
 
         // Master status option
         let appearance_provider_clone = appearance_provider.clone();

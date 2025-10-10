@@ -1,5 +1,6 @@
-use gtk::{Align, ComboBoxText, Label, Orientation};
-use gtk::prelude::{BoxExt, ComboBoxExt, ComboBoxExtManual, WidgetExt};
+use gtk::{Align, DropDown, Expression, Label, Orientation, StringObject};
+use gtk::gio::ListStore;
+use gtk::prelude::{BoxExt, Cast, ListModelExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
@@ -12,7 +13,7 @@ pub struct SelectionBox {
     state: SelectionBoxState,
     selection_box: GTKBox,
     selection_label: Label,
-    selection_combobox: ComboBoxText,
+    selection_dropdown: DropDown,
 }
 
 impl Control for SelectionBox {
@@ -64,12 +65,14 @@ impl SelectionBox {
         let selection_label = Label::new(None);
         selection_label.set_halign(Align::Start);
         selection_label.set_xalign(0.0);
-        
-        let selection_combobox = ComboBoxText::new();
-        selection_combobox.set_width_request(180);
+
+        let dropdown_model = ListStore::new::<StringObject>();
+        let selection_dropdown = DropDown::new(None::<ListStore>, None::<Expression>);
+        selection_dropdown.set_width_request(180);
+        selection_dropdown.set_model(Some(&dropdown_model));
 
         selection_box.append(&selection_label);
-        selection_box.append(&selection_combobox);
+        selection_box.append(&selection_dropdown);
 
         let state = SelectionBoxState {
             label_text: "".to_string(),
@@ -81,47 +84,59 @@ impl SelectionBox {
             state,
             selection_label,
             selection_box,
-            selection_combobox
+            selection_dropdown
         }
     }
 
-    pub fn get_selected_option_as_bool(combobox: &ComboBoxText) -> bool {
-        let selected_text = Self::get_selected_option(combobox);
+    pub fn get_selected_option_as_bool(dropdown: &DropDown) -> bool {
+        let selected_text = Self::get_selected_option(dropdown);
         selected_text
             .parse::<bool>()
             .unwrap_or(false)
     }
 
-    pub fn get_selected_option(combobox: &ComboBoxText) -> String {
-        let active_text = combobox.active_text();
-        if let Some(active_text) = active_text {
-            active_text.to_string()
+    pub fn get_selected_option(dropdown: &DropDown) -> String {
+        let model = dropdown.model().unwrap();
+        if let Some(active_item) = model.item(dropdown.selected()) {
+            let active_text = active_item.downcast_ref::<StringObject>().unwrap();
+            active_text.string().to_string()
         } else {
             "".to_string()
         }
     }
 
-    pub fn set_selection_change(&self, selection_change: impl Fn(&ComboBoxText) + 'static) {
-        self.selection_combobox.connect_changed(selection_change);
+    pub fn set_selection_change(&self, selection_change: impl Fn(&DropDown) + 'static) {
+        self.selection_dropdown.connect_selected_notify(selection_change);
     }
 
     pub fn set_items(&mut self, items: Vec<String>) {
-        self.selection_combobox.remove_all();
-        
-        for item in items {
-            self.selection_combobox.append_text(item.as_str());
+        if let Some(model) = self.selection_dropdown.model() {
+            if let Some(list) = model.downcast_ref::<ListStore>() {
+                list.remove_all();
+
+                for item in items {
+                    list.append(&StringObject::new(item.as_str()));
+                }
+            }
         }
     }
 
-    pub fn set_selected_by_name(&mut self, item: String) {
-        let index = self.state.options
-            .iter()
-            .position(|option| *option == item.clone());
-
-        if let Some(index) = index {
-            self.selection_combobox.set_active(Some(index as u32));
-        } else {
-            self.selection_combobox.set_active(Some(0));
+    pub fn set_selected_by_name(&mut self, selected_item: String) {
+        if let Some(model) = self.selection_dropdown.model() {
+            if let Some(list) = model.downcast_ref::<ListStore>() {
+                for item_index in 0..list.n_items() {
+                    if let Some(item) = list.item(item_index) {
+                        if let Some(item_text) = item.downcast_ref::<StringObject>() {
+                            if item_text.string().to_string() == selected_item {
+                                self.selection_dropdown.set_selected(item_index);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        self.selection_dropdown.set_selected(0);
     }
 }

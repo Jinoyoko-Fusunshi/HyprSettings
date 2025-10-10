@@ -1,4 +1,4 @@
-use gtk::{ComboBoxText, Entry, Orientation, ScrolledWindow};
+use gtk::{DropDown, Entry, Orientation, ScrolledWindow};
 use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
 use crate::providers::application_provider::ApplicationProvider;
@@ -198,8 +198,8 @@ impl ManagedControl<InputManager> for Input {
         });
 
         let input_provider_clone = input_provider.clone();
-        self.numlock_enabled_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combobox);
+        self.numlock_enabled_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             input_provider_clone.borrow_mut().set_numlock_enabled(bool_value);
         });
 
@@ -219,8 +219,8 @@ impl ManagedControl<InputManager> for Input {
         });
 
         let input_provider_clone = input_provider.clone();
-        self.left_handed_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combobox);
+        self.left_handed_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             input_provider_clone.borrow_mut().set_mouse_left_handed(bool_value);
         });
 
@@ -230,21 +230,21 @@ impl ManagedControl<InputManager> for Input {
         });
 
         let input_provider_clone = input_provider.clone();
-        self.natural_scroll_enabled_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combobox);
+        self.natural_scroll_enabled_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             input_provider_clone.borrow_mut().set_mouse_natural_scroll(bool_value);
         });
 
         let input_provider_clone = input_provider.clone();
-        self.tablet_orientation_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let selected_text = SelectionBox::get_selected_option(combobox);
+        self.tablet_orientation_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_text = SelectionBox::get_selected_option(dropdown);
             input_provider_clone.borrow_mut().set_tablet_orientation(MonitorOrientation::from(selected_text));
         });
 
         let input_provider_clone = input_provider.clone();
         let monitor_provider_clone = monitor_provider.clone();
-        self.tablet_monitor_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let selected_monitor = SelectionBox::get_selected_option(combobox);
+        self.tablet_monitor_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_monitor = SelectionBox::get_selected_option(dropdown);
             input_provider_clone.borrow_mut().set_tablet_monitor(selected_monitor.clone());
 
             let selected_configuration = monitor_provider_clone.borrow()
@@ -275,14 +275,14 @@ impl ManagedControl<InputManager> for Input {
         });
 
         let input_provider_clone = input_provider.clone();
-        self.tablet_relative_input_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let selected_option = SelectionBox::get_selected_option_as_bool(combobox);
+        self.tablet_relative_input_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
             input_provider_clone.borrow_mut().set_tablet_relative_input(selected_option);
         });
 
         let input_provider_clone = input_provider.clone();
-        self.tablet_left_handed_selection_box.set_selection_change(move |combobox: &ComboBoxText| {
-            let selected_option = SelectionBox::get_selected_option_as_bool(combobox);
+        self.tablet_left_handed_selection_box.set_selection_change(move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option_as_bool(dropdown);
             input_provider_clone.borrow_mut().set_tablet_left_handed(selected_option);
         });
 

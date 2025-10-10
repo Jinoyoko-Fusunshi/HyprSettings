@@ -1,5 +1,5 @@
-use gtk::{Align, ColorButton, Label, Orientation};
-use gtk::prelude::{BoxExt, ColorChooserExt, WidgetExt};
+use gtk::{Align, ColorDialog, ColorDialogButton, Label, Orientation};
+use gtk::prelude::{BoxExt, WidgetExt};
 use crate::types::GTKBox;
 use crate::ui::box_builder::BoxBuilder;
 use crate::ui::controls::Control;
@@ -11,7 +11,7 @@ pub struct ColorSelector {
     state: ColorSelectorState,
     color_button_box: GTKBox,
     color_button_label: Label,
-    color_button: ColorButton,
+    color_dialog_button: ColorDialogButton,
 }
 
 impl Control for ColorSelector {
@@ -30,7 +30,7 @@ impl UpdatableControl<ColorSelectorState> for ColorSelector {
     fn update_state(&mut self, state: ColorSelectorState) {
         self.color_button_label.set_text(&state.label_text);
         if let Some(color) = state.selected_color.clone() {
-            self.color_button.set_rgba(color.get_rgba());
+            self.color_dialog_button.set_rgba(color.get_rgba());
         }
 
         self.state = state;
@@ -50,11 +50,11 @@ impl ColorSelector {
         let color_button_label = Label::new(None);
         color_button_label.set_halign(Align::Start);
         color_button_label.set_xalign(0.0);
-        
-        let color_button = ColorButton::new();
-        color_button.set_use_alpha(true);
+
+        let color_dialog = ColorDialog::new();
+        let color_dialog_button = ColorDialogButton::new(Some(color_dialog));
         color_button_box.append(&color_button_label);
-        color_button_box.append(&color_button);
+        color_button_box.append(&color_dialog_button);
 
         let state = Default::default();
 
@@ -62,11 +62,11 @@ impl ColorSelector {
             state,
             color_button_box,
             color_button_label,
-            color_button
+            color_dialog_button
         }
     }
 
-    pub fn set_color_change(&self, color_change: impl Fn(&ColorButton) + 'static) {
-        self.color_button.connect_color_set(color_change);
+    pub fn set_color_change(&self, color_change: impl Fn(&ColorDialogButton) + 'static) {
+        self.color_dialog_button.connect_rgba_notify(color_change);
     }
 }

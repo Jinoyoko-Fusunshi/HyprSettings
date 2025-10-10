@@ -1,4 +1,4 @@
-use gtk::{ComboBoxText, Orientation, ScrolledWindow, Separator, Switch};
+use gtk::{DropDown, Orientation, ScrolledWindow, Separator, Switch};
 use gtk::glib::Propagation;
 use gtk::prelude::{BoxExt, WidgetExt};
 use crate::models::monitor::monitor_configuration::MonitorOrientation;
@@ -10,6 +10,7 @@ use crate::ui::manager::control_manager::ControlManager;
 use crate::ui::controls::Control;
 use crate::ui::controls::monitor_configurator::MonitorConfigurator;
 use crate::ui::controls::monitor_field::MonitorField;
+use crate::ui::controls::selection_box::SelectionBox;
 use crate::ui::managed_control::ManagedControl;
 use crate::ui::manager::monitor_configurator_manager::MonitorConfiguratorManager;
 use crate::ui::manager::monitor_field_manager::{MonitorFieldEvent, MonitorFieldManager};
@@ -132,8 +133,9 @@ impl Monitors {
 
             let monitor_provider = self.application_provider.get_monitor_provider();
             let port_clone = port.clone();
-            let monitor_mode_selection_box_change = move |combobox: &ComboBoxText| {
-                let monitor_orientation = MonitorOrientation::from(combobox.active_text().unwrap().to_string());
+            let monitor_mode_selection_box_change = move |dropdown: &DropDown| {
+                let selected_option = SelectionBox::get_selected_option(dropdown);
+                let monitor_orientation = MonitorOrientation::from(selected_option);
                 monitor_provider.borrow_mut().set_monitor_orientation(port_clone.clone(), monitor_orientation);
             };
             monitor_field.borrow_mut().set_orientation_change(monitor_mode_selection_box_change);
@@ -157,7 +159,6 @@ impl Monitors {
             monitor_configurator.borrow_mut().insert_monitor(port);
         }
 
-        monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
         monitor_configurator.borrow_mut().update_state(monitor_configurator_state.clone());
 
         let monitor_configurator_manager = MonitorConfiguratorManager::new(

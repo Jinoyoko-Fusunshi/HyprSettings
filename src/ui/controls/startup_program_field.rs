@@ -1,4 +1,4 @@
-use gtk::{Button, ComboBoxText, Entry, Orientation};
+use gtk::{Button, DropDown, Entry, Orientation};
 use gtk::prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt};
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::GTKBox;
@@ -193,18 +193,16 @@ impl StartupProgramField {
         }
     }
 
-    fn create_selection_box_change(startup_program_field_manager: StartupProgramFieldManager) -> impl Fn(&ComboBoxText) {
-        let selection_box_changed_callback = move |combobox :&ComboBoxText| {
-            if let Some(active_text) = combobox.active_text() {
-                let selected_text = active_text.to_string();
-                let program= if selected_text == CUSTOM_ITEM {
-                    None
-                } else {
-                    Some(selected_text)
-                };
+    fn create_selection_box_change(startup_program_field_manager: StartupProgramFieldManager) -> impl Fn(&DropDown) {
+        let selection_box_changed_callback = move |dropdown :&DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            let program= if selected_option == CUSTOM_ITEM {
+                None
+            } else {
+                Some(selected_option)
+            };
 
-                startup_program_field_manager.send_event(StartupProgramFieldEvent::SelectionChanged(program));
-            }
+            startup_program_field_manager.send_event(StartupProgramFieldEvent::SelectionChanged(program));
         };
         selection_box_changed_callback
     }

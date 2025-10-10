@@ -1,5 +1,5 @@
-use gtk::{ColorButton, ComboBoxText, Entry, Orientation, ScrolledWindow};
-use gtk::prelude::{BoxExt, ColorChooserExt, EditableExt, WidgetExt};
+use gtk::{ColorDialogButton, DropDown, Entry, Orientation, ScrolledWindow};
+use gtk::prelude::{BoxExt, EditableExt, WidgetExt};
 use crate::models::rgba_color::RGBAColor;
 use crate::providers::application_provider::ApplicationProvider;
 use crate::types::{GTKBox, GTKSpinButton};
@@ -102,11 +102,10 @@ impl Lockscreen {
             options: SelectionBoxState::get_false_true_options(),
         };
         hide_cursor_selection_box.update_state(state.clone());
-        hide_cursor_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let hide_cursor_selection_change = move |combobox: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combobox);
+        let hide_cursor_selection_change = move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             lockscreen_provider.borrow_mut().set_hide_cursor(bool_value);
         };
         hide_cursor_selection_box.set_selection_change(hide_cursor_selection_change);
@@ -483,11 +482,10 @@ impl Lockscreen {
             options: SelectionBoxState::get_false_true_options()
         };
         input_dots_center_selection_box.update_state(state.clone());
-        input_dots_center_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let input_dots_center_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combo_box_text);
+        let input_dots_center_selection_box_change = move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             lockscreen_provider.borrow_mut().set_input_dots_center(bool_value);
         };
         input_dots_center_selection_box.set_selection_change(input_dots_center_selection_box_change);
@@ -503,7 +501,7 @@ impl Lockscreen {
         outer_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let outer_color_selector_change = move |color_button: &ColorButton| {
+        let outer_color_selector_change = move |color_button: &ColorDialogButton| {
             lockscreen_provider.borrow_mut().set_input_outer_color(RGBAColor::new(color_button.rgba()))
         };
         outer_color_selector.set_color_change(outer_color_selector_change);
@@ -519,7 +517,7 @@ impl Lockscreen {
         inner_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let inner_color_selector_change = move |color_button: &ColorButton| {
+        let inner_color_selector_change = move |color_button: &ColorDialogButton| {
             lockscreen_provider.borrow_mut().set_input_inner_color(RGBAColor::new(color_button.rgba()))
         };
         inner_color_selector.set_color_change(inner_color_selector_change);
@@ -535,7 +533,7 @@ impl Lockscreen {
         font_color_selector.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let font_color_selector_change = move |color_button: &ColorButton| {
+        let font_color_selector_change = move |color_button: &ColorDialogButton| {
             lockscreen_provider.borrow_mut().set_input_font_color(RGBAColor::new(color_button.rgba()))
         };
         font_color_selector.set_color_change(font_color_selector_change);
@@ -566,11 +564,10 @@ impl Lockscreen {
             options: SelectionBoxState::get_false_true_options(),
         };
         hide_input_selection_box.update_state(state.clone());
-        hide_input_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let hide_input_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            let bool_value = SelectionBox::get_selected_option_as_bool(combo_box_text);
+        let hide_input_selection_box_change = move |dropdown: &DropDown| {
+            let bool_value = SelectionBox::get_selected_option_as_bool(dropdown);
             lockscreen_provider.borrow_mut().set_hide_input(bool_value);
         };
         hide_input_selection_box.set_selection_change(hide_input_selection_box_change);
@@ -633,11 +630,11 @@ impl Lockscreen {
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
         vertical_align_selection_box.update_state(state.clone());
-        vertical_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let vertical_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            lockscreen_provider.borrow_mut().set_input_vertical_alignment(combo_box_text.active_text().unwrap().to_string());
+        let vertical_align_selection_box_change = move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            lockscreen_provider.borrow_mut().set_input_vertical_alignment(selected_option);
         };
         vertical_align_selection_box.set_selection_change(vertical_align_selection_box_change);
 
@@ -651,11 +648,11 @@ impl Lockscreen {
             options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
         };
         horizontal_align_selection_box.update_state(state.clone());
-        horizontal_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let horizontal_align_selection_box_change = move |combo_box_text: &ComboBoxText| {
-            lockscreen_provider.borrow_mut().set_input_horizontal_alignment(combo_box_text.active_text().unwrap().to_string());
+        let horizontal_align_selection_box_change = move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            lockscreen_provider.borrow_mut().set_input_horizontal_alignment(selected_option);
         };
         horizontal_align_selection_box.set_selection_change(horizontal_align_selection_box_change);
 
@@ -710,7 +707,7 @@ impl Lockscreen {
         text_color_picker.update_state(state);
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_color_picker_change = move |color_button: &ColorButton| {
+        let text_color_picker_change = move |color_button: &ColorDialogButton| {
             lockscreen_provider.borrow_mut().set_display_text_color(RGBAColor::new(color_button.rgba()))
         };
         text_color_picker.set_color_change(text_color_picker_change);
@@ -813,11 +810,11 @@ impl Lockscreen {
             options: vec!["top".to_string(), "center".to_string(), "bottom".to_string()],
         };
         text_vertical_align_selection_box.update_state(state.clone());
-        text_vertical_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_vertical_align_selection_box_change = move |combobox: &ComboBoxText| {
-            lockscreen_provider.borrow_mut().set_display_text_vertical_alignment(combobox.active_text().unwrap().to_string())
+        let text_vertical_align_selection_box_change = move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            lockscreen_provider.borrow_mut().set_display_text_vertical_alignment(selected_option);
         };
         text_vertical_align_selection_box.set_selection_change(text_vertical_align_selection_box_change);
 
@@ -831,11 +828,11 @@ impl Lockscreen {
             options: vec!["start".to_string(), "center".to_string(), "end".to_string()],
         };
         text_horizontal_align_selection_box.update_state(state.clone());
-        text_horizontal_align_selection_box.update_state(state.clone());
 
         let lockscreen_provider = self.application_provider.get_lockscreen_provider();
-        let text_horizontal_align_selection_box_change = move |combobox: &ComboBoxText| {
-            lockscreen_provider.borrow_mut().set_display_text_horizontal_alignment(combobox.active_text().unwrap().to_string())
+        let text_horizontal_align_selection_box_change = move |dropdown: &DropDown| {
+            let selected_option = SelectionBox::get_selected_option(dropdown);
+            lockscreen_provider.borrow_mut().set_display_text_horizontal_alignment(selected_option)
         };
         text_horizontal_align_selection_box.set_selection_change(text_horizontal_align_selection_box_change);
 
