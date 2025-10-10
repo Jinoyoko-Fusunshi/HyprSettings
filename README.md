@@ -4,7 +4,7 @@ A generical independent tool to configure the hyprland environment by a GTK GUI.
 This tool gives the ability to easily configure all hyprland variables and writes the settings into their config files 
 after clicking the save button.
 
-<img src="docs/hyprsettings-overview.png" alt="HyprSettings Overview" height="511"/>
+<img src="docs/dark-preview.gif" alt="dark-preview" />
 
 Since the Hyprland ecosystem is divided into separate program packages, each program has its own category panel to be configured. 
 Each program is internally stored as a module and can only be configured when the program at start time actually exists
@@ -57,16 +57,11 @@ Run the program via terminal:
 
 ## Installation
 
-### From package manager
-```shell
-sudo pacman -Sy hyprsettings
-```
-
 ### From release artifacts
 Select the wanted version and download the **hypersettings-(version)-(arch).pkg.tar.zst**.
 Install the downloaded package file.
 ```shell
-sudo pacman -Uy hypersettings-(version)-(architecture).pkg.tar.zst
+sudo pacman -U hypersettings-(version)-(architecture).pkg.tar.zst
 ```
 
 ### From local build

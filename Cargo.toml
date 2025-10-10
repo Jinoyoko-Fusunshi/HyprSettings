@@ -1,9 +1,9 @@
 [package]
 name = "hyprsettings"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 
 [dependencies]
 gtk = { version = "0.10.1", package = "gtk4", features = ["v4_20"] }
 serde = { version = "1.0.225", features = ["derive"] }
-serde_yaml = "0.9.34+deprecated"
+serde_yaml = "0.9.33"
